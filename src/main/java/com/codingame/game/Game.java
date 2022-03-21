@@ -24,25 +24,17 @@ public class Game {
 
 	@Inject private MultiplayerGameManager<Player> gameManager;
 	@Inject private GameSummaryManager gameSummaryManager;
+	@Inject private ChipManager chipManager;
 
-	public static boolean ENABLE_SEED;
-	public static boolean ENABLE_GROW;
-	public static boolean ENABLE_SHADOW;
-	public static boolean ENABLE_HOLES;
 	public static int MAX_ROUNDS;
-	public static int STARTING_TREE_COUNT;
-	public static int STARTING_TREE_SIZE;
-	public static int STARTING_TREE_DISTANCE;
-	public static boolean STARTING_TREES_ON_EDGES;
 
-	Board board;
-	List<Chip> placedChips;
-	Gravity gravity;
-	Map<Integer, Integer> shadows;
-	List<Cell> cells;
-	Random random;
-	int round = 0;
-	int turn = 0;
+	Board		board;
+	List<Chip>	placedChips;
+	Gravity		gravity;
+	List<Cell>	cells;
+	Random		random;
+	int			round = 0;
+	int			turn = 0;
 
 	public void init(long seed) {
 
@@ -167,21 +159,66 @@ public class Game {
 		// currentFrameType = nextFrameType;
 	}
 
-	private void doDrop(Player player, Action action) throws GameException {
-		HexCoord coord = getCoordByIndex(action.getTargetId());
-		Cell cell = board.map.get(coord);
-		// Chip chip = ChipGenerator
+	//TODO: implement this
+	private Chip doDrop(Player player, Action action) throws GameException {
+		//Get coord of the top of the row to drop the chip;
 
+		//create the chip
+
+		//add it to the chips list
+
+		//drop the chip
+
+		//move rest of selection back to remaining
+		return chipManager.createChip(player, 0, new HexCoord(0,0,0));
 	}
 
-	// private boolean aChipIsOn(Cell cell) {
-	// 	return trees.containsKey(cell.getIndex());
-	// }
+	private void doRotate(Player player, Action action) throws GameException {
+		gravity = gravity.rotate(action.cycleAmount);
 
-	public void performGameUpdate() {
+		//Drop all chips
+		for (Chip chip: placedChips) {
+			dropChip(chip);
+		}
+		//Burn the selected chips
+		chipManager.destroySelection();
+	}
+
+	public void dropChip(Chip chip) {
+		Map<HexCoord, Cell> board = getBoard();
+		//Move it downwards
+		while (true) {
+			HexCoord coord = chip.getCoord();
+			Cell cell = board.get(coord);
+			coord = coord.neighbour(gravity);
+			Cell neighbour = board.get(coord);
+			//If we've reached the bottom of the board, we're done
+			if (neighbour == null) {
+				break;
+			}
+			Chip neighbourChip = neighbour.getChip();
+			//Cell is vacant
+			if (neighbourChip == null) {
+				cell.setChip(null);
+				neighbour.setChip(chip);
+				cell = neighbour;
+			}
+			//Cell is already occupied
+			else {
+				dropChip(neighbourChip);
+				neighbourChip = neighbour.getChip();
+				//Chip hasn't moved
+				if (neighbourChip != null) {
+					break;
+				}
+			}
+		}
+	}
+
+	public void performGameUpdate(Player player) {
 		turn++;
 
-		//Perform logic here
+		performActionUpdate(player);
 
 		gameManager.addToGameSummary(gameSummaryManager.toString());
 		gameSummaryManager.clear();
@@ -193,48 +230,22 @@ public class Game {
 		}
 	}
 
-	public void performActionUpdate() {
-		gameManager.getPlayers()
-			.stream()
-			.filter(p -> !p.isWaiting())
-			.forEach(player -> {
-				try {
-					Action action = player.getAction();
-					if (action.isGrow()) {
-						doGrow(player, action);
-					} else if (action.isSeed()) {
-						doSeed(player, action);
-					} else if (action.isComplete()) {
-						doComplete(player, action);
-					} else {
-						player.setWaiting(true);
-						gameSummaryManager.addWait(player);
-					}
-				} catch (GameException e) {
-					gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());
-					player.setWaiting(true);
-				}
-			});
-
+	public void performActionUpdate(Player player) {
+		try {
+			Action action = player.getAction();
+			if (action.isDrop()) {
+				Chip chip = doDrop(player, action);
+			} else if (action.isRotate()) {
+				doRotate(player, action);
+			}
+		} catch (GameException e) {
+			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());
+		}
 		// gameManager.setFrameDuration(Constants.DURATION_ACTION_PHASE);
-
-	}
-
-	private Tree placeTree(Player player, int index, int size) {
-		Tree tree = new Tree();
-		tree.setSize(size);
-		tree.setOwner(player);
-		trees.put(index, tree);
-		return tree;
 	}
 
 	public Map<HexCoord, Cell> getBoard() {
 		return board.map;
-	}
-
-	public Map<Integer, Integer> getShadows() {
-
-		return shadows;
 	}
 
 	private boolean gameOver() {

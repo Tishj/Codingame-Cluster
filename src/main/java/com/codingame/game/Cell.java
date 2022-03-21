@@ -12,10 +12,12 @@ public class Cell {
 			return -1;
 		}
 	};
-	int index;
+	int			index;
+	Chip		chip;
 	
 	Cell(int index) {
 		this.index = index;
+		this.chip = null;
 	}
 	
 	public boolean isValid() {
@@ -23,5 +25,11 @@ public class Cell {
 	}
 	public int getIndex() {
 		return index;
+	}
+	public Chip getChip() {
+		return chip;
+	}
+	public void setChip(Chip chip) {
+		this.chip = chip;
 	}
 }
