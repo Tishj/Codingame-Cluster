@@ -47,7 +47,7 @@ public class HexCoord {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CubeCoord other = (CubeCoord) obj;
+		HexCoord other = (HexCoord) obj;
 		if (q != other.q)
 			return false;
 		if (r != other.r)
@@ -57,10 +57,20 @@ public class HexCoord {
 		return true;
 	}
 
+	int distanceTo(HexCoord dst) {
+		return (Math.abs(q - dst.q) + Math.abs(r - dst.r) + Math.abs(s - dst.s)) / 2;
+	}
+
 	public HexCoord neighbour(Gravity direction) {
-		int nq = q + directions[direction.getIndex()][0];
-		int nr = r + directions[direction.getIndex()][1];
-		int ns = s + directions[direction.getIndex()][2];
+		int index = direction.getIndex();
+		return neighbour(index);
+	}
+
+	public HexCoord neighbour(int direction) {
+
+		int nq = q + directions[direction][0];
+		int nr = r + directions[direction][1];
+		int ns = s + directions[direction][2];
 		return new HexCoord(nq, nr, ns);
 	}
 }

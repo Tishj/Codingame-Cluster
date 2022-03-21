@@ -11,6 +11,7 @@ public class Config {
 	public static int MAX_ROUNDS = 24;
 	public static int MAP_RING_COUNT = 4;
 	public static int CELL_COUNT;
+	public static int CHIP_MAX;
 
 
 	public static void load(Properties params) {
@@ -23,13 +24,13 @@ public class Config {
 		CHIP_MAX = getChipMax();
 	}
 
-	private int getChipMax() {
+	private static int getChipMax() {
 		int max = (int)(CELL_COUNT / 4);
 		max -= max % (COLORS_PER_PLAYER * 2);
 		return max;
 	}
 
-	private int getCellCount() {
+	private static int getCellCount() {
 		int count = 0;
 		for (int i = 0; i < MAP_RING_COUNT; i++) {
 			count += 6 * i;

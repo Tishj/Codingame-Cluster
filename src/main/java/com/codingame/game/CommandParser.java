@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.codingame.game.action.RotateAction;
 import com.codingame.game.action.DropAction;
+import com.codingame.game.action.RotateAction;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class CommandManager {
+public class CommandParser {
 	@Inject private GameSummaryManager gameSummaryManager;
 
 	static final Pattern PLAYER_ROTATE_PATTERN = Pattern.compile(
@@ -23,10 +23,6 @@ public class CommandManager {
 
 	public void parseCommands(Player player, List<String> lines, Game game) {
 		String command = lines.get(0);
-
-		if (player.isWaiting()) {
-			return;
-		}
 
 		try {
 			Matcher match;

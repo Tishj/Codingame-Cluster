@@ -1,5 +1,6 @@
 package com.codingame.game;
 
+import com.codingame.game.action.Action;
 import com.codingame.gameengine.core.AbstractMultiplayerPlayer;
 import com.codingame.gameengine.module.entities.Group;
 
@@ -23,8 +24,8 @@ public class Player extends AbstractMultiplayerPlayer {
 	}
 
 	public void endTurn() {
-		for (chip: selectedChips) {
-			chip = 0;
+		for (int i = 0; i < selectedChips.length; i++) {
+			selectedChips[i] = 0;
 		}
 	}
 
