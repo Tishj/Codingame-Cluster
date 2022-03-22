@@ -8,4 +8,6 @@ public class GlobalViewData {
     public List<Integer> nutrients;
     public int totalRounds;
 
+
+
 }

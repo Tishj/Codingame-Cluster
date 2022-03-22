@@ -5,18 +5,21 @@ import java.util.ArrayList;
 
 import com.codingame.game.exception.GameException;
 import com.codingame.gameengine.core.MultiplayerGameManager;
-import com.google.inject.Inject;
 import com.codingame.game.exception.ChipNotFoundException;
 import com.codingame.game.exception.ChipNotSelectedException;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ChipManager {
-	@Inject private MultiplayerGameManager<Player> gameManager;
 	private static int index = 0;
 	int remainingChips[][];
 	int selectedChips[][];
-	Random random;
+	Random	random;
 
-	ChipManager() {
+	public ChipManager() {
+	}
+
+	public void init(MultiplayerGameManager<Player> gameManager) {
 		this.random = new Random(gameManager.getSeed());
 		this.remainingChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
 		this.selectedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];

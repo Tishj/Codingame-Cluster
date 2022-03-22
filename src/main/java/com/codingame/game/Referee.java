@@ -87,14 +87,15 @@ public class Referee extends AbstractReferee {
 
 		try {
 			commandParser.parseCommands(player, player.getOutputs(), game);
+			if (player.isActive()) {
+				game.performGameUpdate(player);
+			}
 		}
 		catch (TimeoutException e) {
 			commandParser.deactivatePlayer(player, "Timeout!");
 			gameSummaryManager.addPlayerTimeout(player);
 			gameSummaryManager.addPlayerDisqualified(player);
 		}
-		// Handle actions
-		game.performGameUpdate(player);
 	}
 
 	private void endGame() {

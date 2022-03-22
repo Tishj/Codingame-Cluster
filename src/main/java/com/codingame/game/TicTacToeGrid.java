@@ -8,6 +8,7 @@ import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.module.entities.Group;
 import com.codingame.gameengine.module.entities.Line;
 import com.codingame.gameengine.module.entities.Sprite;
+import com.codingame.game.action.Action;
 import com.google.inject.Inject;
 
 public class TicTacToeGrid {
@@ -22,33 +23,6 @@ public class TicTacToeGrid {
     private int cellSize;
     private int[][] grid = new int[3][3];
     protected int winner = 0;
-
-    public List<Action> getValidActions() {
-        List<Action> validActions = new ArrayList<>();
-        if (winner == 0) {
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    if (grid[x][y] == 0) {
-                        validActions.add(new Action(null, x, y));
-                    }
-                }
-            }
-        }
-        return validActions;
-    }
-
-    public int play(Action action) throws InvalidAction {
-        if (action.row < 0 || action.row >= 3 || action.col < 0 || action.col >= 3 || grid[action.row][action.col] != 0) {
-            throw new InvalidAction("Invalid move!");
-        }
-
-        // update grid
-        grid[action.row][action.col] = action.player.getIndex() + 1;
-
-        winner = checkWinner();
-        drawPlay(action);
-        return winner;
-    }
 
     private int checkWinner() {
         for (int i = 0; i < 3; i++) {
@@ -95,25 +69,6 @@ public class TicTacToeGrid {
                 .setLineColor(lineColor);
             entity.add(line);
         }
-    }
-
-    public void drawPlay(Action action) {
-        Sprite avatar = graphicEntityModule.createSprite()
-            .setX(convert(origX, cellSize, action.col))
-            .setY(convert(origY, cellSize, action.row))
-            .setImage(images[action.player.getIndex()])
-            .setBaseWidth((int) (0.8 * cellSize))
-            .setBaseHeight((int) (0.8 * cellSize))
-            .setTint(action.player.getColorToken())
-            .setAnchor(0.5);
-
-        // Animate arrival
-        avatar.setScale(0);
-        graphicEntityModule.commitEntityState(0.2, avatar);
-        avatar.setScale(1, Curve.ELASTIC);
-        graphicEntityModule.commitEntityState(1, avatar);
-
-        this.entity.add(avatar);
     }
 
     private int convert(int orig, int cellSize, double unit) {
