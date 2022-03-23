@@ -1030,11 +1030,13 @@ export class ViewModule {
         for (const shadow of data.shadows) {
             shadows[shadow.index] = shadow;
         }
+		//every tree existing on the board this frame
         const trees = {};
         for (const treeData of data.trees) {
             this.createLightParticleEffect(treeData);
             trees[treeData.index] = treeData;
         }
+		//for every seed made this frame
         for (const seedData of data.seeds) {
             this.createDirtParticleEffect(seedData);
         }

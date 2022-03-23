@@ -160,18 +160,26 @@ public class Game {
 		// currentFrameType = nextFrameType;
 	}
 
-	//TODO: implement this
 	private Chip doDrop(Player player, Action action) throws GameException {
-		//Get coord of the top of the row to drop the chip;
-
+		HexCoord startingLocation = board.getTopOfRow(gravity, action.targetId);
+		if (startingLocation == null) {
+			//really shouldnt happen
+		}
+		Cell cell = getBoard().get(startingLocation);
+		if (cell == null || cell.getChip() != null) {
+			//throw exception
+			//position out of bounds, or already occupied by another chip
+		}
 		//create the chip
-
+		Chip chip = chipManager.createChip(player, action.colorId, startingLocation);
 		//add it to the chips list
+		placedChips.add(chip);
 
-		//drop the chip
+		dropChip(chip);
 
 		//move rest of selection back to remaining
-		return chipManager.createChip(player, 0, new HexCoord(0,0,0));
+		chipManager.emptySelectionForPlayer(player);
+		return chip;
 	}
 
 	private void doRotate(Player player, Action action) throws GameException {
@@ -185,35 +193,41 @@ public class Game {
 		chipManager.destroySelection();
 	}
 
-	public void dropChip(Chip chip) {
+	private void updateChipLocation(Cell oldCell, Cell newCell, Chip chip, HexCoord newCoord) {
+		oldCell.setChip(null);
+		newCell.setChip(chip);
+		chip.setCoord(newCoord);
+	}
+
+	//@return true/false indicating whether the chip moved at least one place or not
+	public boolean dropChip(Chip chip) {
 		Map<HexCoord, Cell> board = getBoard();
 		//Move it downwards
+		boolean moved = false;
 		while (true) {
+			//Current coordinate of the chip
 			HexCoord coord = chip.getCoord();
+			//Get the cell corresponding to that coordinate
 			Cell cell = board.get(coord);
+
+			//Get the neighbour
 			coord = coord.neighbour(gravity);
+			//Get the cell of the neighbour
 			Cell neighbour = board.get(coord);
 			//If we've reached the bottom of the board, we're done
 			if (neighbour == null) {
 				break;
 			}
+			//Check if the neighbour already contains a chip
 			Chip neighbourChip = neighbour.getChip();
-			//Cell is vacant
-			if (neighbourChip == null) {
-				cell.setChip(null);
-				neighbour.setChip(chip);
-				cell = neighbour;
+			//Cell is not vacant
+			if (neighbourChip != null && !dropChip(neighbourChip)) {
+				break;
 			}
-			//Cell is already occupied
-			else {
-				dropChip(neighbourChip);
-				neighbourChip = neighbour.getChip();
-				//Chip hasn't moved
-				if (neighbourChip != null) {
-					break;
-				}
-			}
+			updateChipLocation(cell, neighbour, chip, coord);
+			moved = true;
 		}
+		return moved;
 	}
 
 	public void performGameUpdate(Player player) {
@@ -235,9 +249,13 @@ public class Game {
 		try {
 			Action action = player.getAction();
 			if (action.isDrop()) {
+				//Keep track of the chip so we know which one was added this turn
 				Chip chip = doDrop(player, action);
 			} else if (action.isRotate()) {
 				doRotate(player, action);
+			}
+			else {
+				//throw exception
 			}
 		} catch (GameException e) {
 			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());

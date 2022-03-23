@@ -6,6 +6,7 @@ import com.codingame.gameengine.core.Module;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+//These functions are callbacks registered to certain events, basically
 @Singleton
 public class ViewModule implements Module {
 
@@ -21,8 +22,8 @@ public class ViewModule implements Module {
 
     @Override
     public final void onGameInit() {
-        sendGlobalData();
-        sendFrameData();
+        sendGlobalData(); //send the global data (the cells)
+        sendFrameData(); //send the volatile, frame specific data
     }
 
     private void sendFrameData() {

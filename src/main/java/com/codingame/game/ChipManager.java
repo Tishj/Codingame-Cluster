@@ -9,6 +9,8 @@ import com.codingame.game.exception.ChipNotFoundException;
 import com.codingame.game.exception.ChipNotSelectedException;
 import com.google.inject.Singleton;
 
+import java.util.Arrays;
+
 @Singleton
 public class ChipManager {
 	private static int index = 0;

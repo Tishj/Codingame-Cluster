@@ -21,7 +21,7 @@ public class Board {
 			.collect(Collectors.toList());
 	}
 
-	public Cell getTopOfRow(Gravity gravity, int row) {
+	public HexCoord getTopOfRow(Gravity gravity, int row) {
 		HexCoord coord = new HexCoord(0,0,0);
 		for (int i = 0; i < Config.MAP_RING_COUNT; i++) {
 			coord = coord.neighbour(gravity);
@@ -34,13 +34,10 @@ public class Board {
 			stepDirection = gravity.rotate(1);
 		}
 
+		//travel to the cell
 		for (int i = 0; i < row; i++) {
 			coord = coord.neighbour(stepDirection);
 		}
-		Cell cell = map.get(coord);
-		if (cell == null) {
-			//really should not happen o.o
-		}
-		return cell;
+		return coord;
 	}
 }

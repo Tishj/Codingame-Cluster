@@ -38,7 +38,6 @@ public class Serializer {
                 join(
                     cellData.q,
                     cellData.r,
-                    cellData.richness,
                     cellData.index
                 )
             );

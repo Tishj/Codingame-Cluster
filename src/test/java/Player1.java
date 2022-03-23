@@ -31,7 +31,7 @@ public class Player1 {
             
             Action a = actions.get(random.nextInt(actions.size()));
            
-            System.out.println(String.format("ROTATE %d", a.row, a.col));
+            System.out.printf("DROP %d %d%n", a.row, 0);
         }
     }
 }

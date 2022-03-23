@@ -13,6 +13,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.codingame.game.HexCoord;
 
+//Get and convert the data from Game to the format expected by the ViewModule
+
 @Singleton
 public class GameDataProvider {
     @Inject private Game game;
