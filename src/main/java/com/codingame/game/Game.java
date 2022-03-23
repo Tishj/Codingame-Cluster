@@ -43,6 +43,7 @@ public class Game {
 		random = new Random(seed);
 		board = BoardGenerator.generate(random);
 		cells = new ArrayList<>();
+		chipManager.init(gameManager);
 
 		round = 0;
 	}

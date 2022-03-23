@@ -26,7 +26,7 @@ public class Player2 {
                 col = in.nextInt();
             }
             
-            System.out.println(String.format("%d %d", row, col));
+            System.out.println(String.format("ROTATE %d", row, col));
         }
     }
 }

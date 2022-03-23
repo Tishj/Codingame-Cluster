@@ -12,8 +12,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class ChipManager {
 	private static int index = 0;
-	int remainingChips[][];
-	int selectedChips[][];
+	int[][] remainingChips;
+	int[][] selectedChips;
 	Random	random;
 
 	public ChipManager() {
@@ -39,8 +39,7 @@ public class ChipManager {
 		}
 		selectedChips[index][colorId]--;
 
-		Chip chip = new Chip(ChipManager.index++, colorId, owner, coord);
-		return chip;
+		return new Chip(ChipManager.index++, colorId, owner, coord);
 	}
 
 	private ArrayList<Integer> getIndicesOfRemainingChipsForPlayer(Player player) {
@@ -73,11 +72,8 @@ public class ChipManager {
 	}
 
 	public void destroySelection() {
-		for (int i = 0; i < selectedChips.length; i++) {
-			for (int j = 0; j < selectedChips[i].length; j++) {
-				selectedChips[i][j] = 0;
-			}
+		for (int[] selectedChip : selectedChips) {
+			Arrays.fill(selectedChip, 0);
 		}
 	}
-
 }

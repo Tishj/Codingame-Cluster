@@ -20,4 +20,27 @@ public class Board {
 			.map(Entry::getKey)
 			.collect(Collectors.toList());
 	}
+
+	public Cell getTopOfRow(Gravity gravity, int row) {
+		HexCoord coord = new HexCoord(0,0,0);
+		for (int i = 0; i < Config.MAP_RING_COUNT; i++) {
+			coord = coord.neighbour(gravity);
+		}
+
+		//steps to get to the desired cell
+		Gravity stepDirection = gravity.rotate(-1);
+		if (row > Config.MAP_RING_COUNT) {
+			row -= Config.MAP_RING_COUNT;
+			stepDirection = gravity.rotate(1);
+		}
+
+		for (int i = 0; i < row; i++) {
+			coord = coord.neighbour(stepDirection);
+		}
+		Cell cell = map.get(coord);
+		if (cell == null) {
+			//really should not happen o.o
+		}
+		return cell;
+	}
 }
