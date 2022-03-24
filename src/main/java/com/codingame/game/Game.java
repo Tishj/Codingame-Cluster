@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import com.codingame.game.action.Action;
 import com.codingame.game.exception.CellNotFoundException;
 import com.codingame.game.exception.CellNotValidException;
+import com.codingame.game.exception.UnrecognizedActionException;
 import com.codingame.game.exception.GameException;
 import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.google.inject.Inject;
@@ -44,6 +45,7 @@ public class Game {
 		board = BoardGenerator.generate(random);
 		cells = new ArrayList<>();
 		chipManager.init(gameManager);
+		this.gravity = Gravity.SOUTH;
 
 		round = 0;
 	}
@@ -74,34 +76,6 @@ public class Game {
 		lines.add(String.valueOf(round));
 		//Player information, receiving player first
 		Player other = gameManager.getPlayer(1 - player.getIndex());
-		// lines.add(
-		// 	String.format(
-		// 		"%d %d",
-		// 		player.getSun(),
-		// 		player.getScore()
-		// 	)
-		// );
-		// lines.add(
-		// 	String.format(
-		// 		"%d %d %d",
-		// 		other.getSun(),
-		// 		other.getScore(),
-		// 		other.isWaiting() ? 1 : 0
-		// 	)
-		// );
-		// lines.add(String.valueOf(trees.size()));
-		// trees.forEach((index, tree) -> {
-		// 	lines.add(
-		// 		String.format(
-		// 			"%d %d %d %d",
-		// 			index,
-		// 			tree.getSize(),
-		// 			tree.getOwner() == player ? 1 : 0,
-		// 			tree.isDormant() ? 1 : 0
-		// 		)
-		// 	);
-		// });
-
 		return lines;
 	}
 
@@ -150,14 +124,6 @@ public class Game {
 	}
 
 	public void resetGameTurnData() {
-		// dyingTrees.clear();
-		// availableSun.clear();
-		// sentSeeds.clear();
-		// for (Player p : gameManager.getPlayers()) {
-		// 	availableSun.add(p.getSun());
-		// 	p.reset();
-		// }
-		// currentFrameType = nextFrameType;
 	}
 
 	private Chip doDrop(Player player, Action action) throws GameException {
@@ -256,6 +222,7 @@ public class Game {
 			}
 			else {
 				//throw exception
+				throw new UnrecognizedActionException();
 			}
 		} catch (GameException e) {
 			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());

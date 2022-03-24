@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class Referee extends AbstractReferee {
-	@Inject private Provider<TicTacToeGrid> ticTacToeGridProvider;
 	@Inject private MultiplayerGameManager<Player> gameManager;
 	@Inject private CommandParser commandParser;
 	@Inject private Game game;
@@ -27,7 +26,6 @@ public class Referee extends AbstractReferee {
 	@Inject private ViewModule viewModule;
 	@Inject private GameSummaryManager gameSummaryManager;
 
-	private TicTacToeGrid masterGrid;
 	private Action lastAction = null;
 	private Random random;
 

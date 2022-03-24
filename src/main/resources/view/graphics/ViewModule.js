@@ -29,18 +29,10 @@ const api = {
     },
     setDebug: () => {
         api.options.updateTrees();
-        for (const [, shadow] of api.options.shadows) {
-            updateDebugShadow(shadow);
-        }
     },
     setMessage: () => { }
 };
 export { api };
-export function updateDebugShadow(shadow) {
-    shadow.sprite.texture = api.options.debugMode2
-        ? PIXI.Texture.from('shadowDebug.png')
-        : PIXI.Texture.from('Ombre.png');
-}
 export class ViewModule {
     constructor() {
         this.states = [];
@@ -51,7 +43,7 @@ export class ViewModule {
         this.dormants = new Map();
         this.shadows = new Map();
         this.debugData = new Map();
-        this.debugHUD = new Map();
+        // this.debugHUD = new Map();
         window.debug = this;
         this.tooltipManager = new TooltipManager();
         api.options.updateTrees = () => {
@@ -117,23 +109,22 @@ export class ViewModule {
         this.playerSpeed = playerSpeed || 0;
         this.resetEffects();
         this.updateHud(previousData, currentData, progress);
-        this.updateTotoros(previousData, currentData, progress);
         this.updateSpeechBubbles(currentData);
         // ACTIONS Frame
-        this.updateTrees(previousData, currentData, progress);
-        this.updateDormants(previousData, currentData, progress);
-        this.updateSeeds(previousData, currentData, progress);
-        this.updateSeedSplash(previousData, currentData, progress);
-        this.updateDebugActions(previousData, currentData, progress);
+        // this.updateTrees(previousData, currentData, progress);
+        // this.updateDormants(previousData, currentData, progress);
+        // this.updateSeeds(previousData, currentData, progress);
+        // this.updateSeedSplash(previousData, currentData, progress);
+        // this.updateDebugActions(previousData, currentData, progress);
         // SUNMOVE Frame
-        this.updateShadows(previousData, currentData, progress);
-        this.updateSun(previousData, currentData, progress);
+        // this.updateShadows(previousData, currentData, progress);
+        // this.updateSun(previousData, currentData, progress);
         // GATHERING Frame
         const ratio = 3 / 4; // Generates a pause after the animation
         const sunProgress = unlerp(0, ratio, progress);
-        this.updateSunPoints(currentData, sunProgress);
-        this.updateTooltip(currentData);
-        this.updateDebugHud(previousData, currentData);
+        // this.updateSunPoints(currentData, sunProgress);
+        // this.updateTooltip(currentData);
+        // this.updateDebugHud(previousData, currentData);
     }
     getFrameTypeName(frameType) {
         switch (frameType) {
@@ -209,35 +200,8 @@ export class ViewModule {
     updateHud(previousData, currentData, progress) {
         for (const player of this.globalData.players) {
             const data = progress < 3 / 4 ? previousData : currentData;
-            this.HUD.sun[player.index].text = data.players[player.index].sun.toString();
-            this.HUD.score[player.index].text = data.players[player.index].score.toString();
-        }
-    }
-    updateTotoros(previousData, currentData, progress) {
-        for (let idx = 0; idx < this.globalData.playerCount; ++idx) {
-            const totoro = this.totoros[idx];
-            const sleepBefore = previousData.players[idx].isWaiting;
-            const sleepNow = currentData.players[idx].isWaiting;
-            if (!sleepBefore && !sleepNow) {
-                totoro.sleep.alpha = 0;
-                totoro.idle.alpha = 1;
-            }
-            else if (sleepBefore && sleepNow) {
-                totoro.sleep.alpha = 1;
-                totoro.idle.alpha = 0;
-            }
-            else if (sleepNow) {
-                // Going to sleep
-                const p = unlerp(0.3, 0.7, progress);
-                totoro.idle.alpha = 1 - p;
-                totoro.sleep.alpha = p;
-            }
-            else {
-                // Waking up
-                const p = unlerp(0.4, 0.6, progress);
-                totoro.idle.alpha = p;
-                totoro.sleep.alpha = 1 - p;
-            }
+            // this.HUD.sun[player.index].text = data.players[player.index].sun.toString();
+            // this.HUD.score[player.index].text = data.players[player.index].score.toString();
         }
     }
     updateSpeechBubbles(currentData) {
@@ -267,70 +231,6 @@ export class ViewModule {
             }
         }
     }
-    updateTrees(previousData, currentData, progress) {
-        var _a;
-        for (const [index, tree] of this.trees) {
-            const treeBefore = previousData.trees[index];
-            const treeNow = currentData.trees[index];
-            const ownerIdx = (_a = treeNow === null || treeNow === void 0 ? void 0 : treeNow.owner) !== null && _a !== void 0 ? _a : treeBefore === null || treeBefore === void 0 ? void 0 : treeBefore.owner;
-            const colorName = ownerIdx === 0 ? 'Red' : 'Blue';
-            const shadowBefore = previousData.shadows[index] && previousData.shadows[index].size;
-            const shadowNow = currentData.shadows[index] && currentData.shadows[index].size;
-            const color = lerpColor(0xFFFFFF, 0xAAAAAA, lerp(treeBefore && treeBefore.size <= shadowBefore ? 1 : 0, treeNow && treeNow.size <= shadowNow ? 1 : 0, progress));
-            tree.transitionSprite.tint = color;
-            tree.mainSprite.tint = color;
-            tree.mainSprite.scale.set(1);
-            tree.transitionSprite.scale.set(1);
-            tree.transitionSprite.visible = false;
-            if (treeBefore && !treeNow) {
-                tree.mainSprite.texture = PIXI.Texture.from(`Arbre3_${colorName}.png`);
-                tree.mainSprite.alpha = progress < 0.6 ? 1 : 0;
-                tree.mainSprite.scale.set(lerp(1, 1.2, progress));
-                tree.transitionSprite.texture = PIXI.Texture.from('Arbre3_White.png');
-                tree.transitionSprite.visible = true;
-                tree.transitionSprite.alpha = bell(progress);
-                tree.transitionSprite.scale.set(lerp(1, 1.2, progress));
-                this.updateTreeFlash(index, treeBefore.sfxData, lerp(0, 0.5, progress));
-            }
-            else if (!treeBefore && treeNow) {
-                // Seed animation is playing
-                tree.mainSprite.alpha = 0;
-            }
-            else if (treeBefore && treeNow) {
-                tree.mainSprite.alpha = 1;
-                tree.mainSprite.texture = PIXI.Texture.from(`Arbre${treeBefore.size}_${colorName}.png`);
-                if (treeBefore.size !== treeNow.size) {
-                    tree.transitionSprite.visible = true;
-                    tree.transitionSprite.alpha = 1;
-                    tree.transitionSprite.texture = PIXI.Texture.from(`Arbre${treeNow.size}_${colorName}.png`);
-                    tree.mainSprite.scale.set(lerp(1, 0, easeOut(unlerp(0, 0.4, progress))));
-                    tree.transitionSprite.scale.set(lerp(0, 1, elastic(progress)));
-                }
-                else {
-                    const seedData = currentData.seeds.find(s => s.sourceIndex === index);
-                    if (seedData != null) {
-                        tree.mainSprite.scale.set(this.bounce(progress));
-                    }
-                }
-            }
-            else {
-                tree.mainSprite.alpha = 0;
-                if (previousData.previous.trees[index] && !previousData.trees[index]) {
-                    this.updateTreeFlash(index, previousData.previous.trees[index].sfxData, lerp(0.5, 1, progress));
-                }
-            }
-            for (const sprite of [tree.mainSprite, tree.transitionSprite]) {
-                if (api.options.debugMode2) {
-                    sprite.scale.x *= api.options.ratio;
-                    sprite.scale.y *= api.options.ratio;
-                    sprite.position.y = HEXAGON_RADIUS / 3;
-                }
-                else {
-                    sprite.position.y = 0;
-                }
-            }
-        }
-    }
     updateTreeFlash(index, sfxData, progress) {
         const hex = this.hexes.get(index).data;
         const targetP = this.screenToBoard(hexToScreen(hex.q, hex.r));
@@ -343,28 +243,6 @@ export class ViewModule {
             particle.position.y = targetP.y + position.y + Math.sin(angle) * speed * easeOut(progress);
             particle.scale.set(size * lerp(0.5, 1, easeIn(progress)));
             particle.alpha = bell(unlerp(0.2, duration, progress));
-        }
-    }
-    updateDormants(previousData, currentData, progress) {
-        var _a, _b, _c, _d, _e;
-        for (const [index, dormant] of this.dormants) {
-            const dormantBefore = (_a = previousData.trees[index]) === null || _a === void 0 ? void 0 : _a.isDormant;
-            const dormantNow = (_b = currentData.trees[index]) === null || _b === void 0 ? void 0 : _b.isDormant;
-            const ownerIdx = (_d = (_c = currentData.trees[index]) === null || _c === void 0 ? void 0 : _c.owner) !== null && _d !== void 0 ? _d : (_e = previousData.trees[index]) === null || _e === void 0 ? void 0 : _e.owner;
-            const colorName = ownerIdx === 0 ? 'Rouge' : 'Bleu';
-            dormant.sprite.texture = PIXI.Texture.from(`Dormant_${colorName}.png`);
-            if (dormantBefore && !dormantNow) {
-                dormant.sprite.alpha = unlerp(1 / 6, 0, progress);
-            }
-            else if (!dormantBefore && dormantNow) {
-                dormant.sprite.alpha = unlerp(1 / 2, 1, progress);
-            }
-            else if (dormantBefore && dormantNow) {
-                dormant.sprite.alpha = 1;
-            }
-            else {
-                dormant.sprite.alpha = 0;
-            }
         }
     }
     updateDebugActions(previousData, currentData, progress) {
@@ -389,62 +267,6 @@ export class ViewModule {
                     display.position.copyFrom(pos);
                 }
             }
-        }
-    }
-    updateSeedSplash(previousData, currentData, progress) {
-        const animated = new Set();
-        for (const seedData of previousData.seeds) {
-            const targetCell = this.hexes.get(seedData.targetIndex);
-            if (animated.has(targetCell)) {
-                continue;
-            }
-            animated.add(targetCell);
-            const targetP = this.screenToBoard(hexToScreen(targetCell.data.q, targetCell.data.r));
-            for (let i = 0; i < DIRT_PARTICLE_COUNT; ++i) {
-                const particle = this.getFromPool('particle').display;
-                const { angle, speed, size } = seedData.sfxData[i];
-                particle.visible = true;
-                particle.angle = angle;
-                particle.position.x = targetP.x + Math.cos(angle) * speed * easeOut(progress);
-                particle.position.y = targetP.y + Math.sin(angle) * speed * easeOut(progress);
-                particle.scale.set(size * lerp(1, 0, easeIn(progress)));
-            }
-        }
-    }
-    updateSeeds(previousData, currentData, progress) {
-        for (const seedData of currentData.seeds) {
-            const seed = this.getFromPool('seed').display;
-            const colorName = seedData.owner === 0 ? 'Red' : 'Blue';
-            seed.visible = true;
-            seed.texture = PIXI.Texture.from(`Arbre0_${colorName}.png`);
-            const sourceCell = this.hexes.get(seedData.sourceIndex);
-            const targetCell = this.hexes.get(seedData.targetIndex);
-            const sourceP = this.screenToBoard(hexToScreen(sourceCell.data.q, sourceCell.data.r));
-            const targetP = this.screenToBoard(hexToScreen(targetCell.data.q, targetCell.data.r));
-            const newPosition = lerpPosition(sourceP, targetP, ease(progress));
-            seed.position.set(newPosition.x, newPosition.y);
-            const belled = bell(progress);
-            const scale = (belled + ease(progress));
-            seed.scale.set(scale);
-        }
-    }
-    updateShadows(previousData, currentData, progress) {
-        for (const [index, shadow] of this.shadows) {
-            const shadowBefore = previousData.shadows[index];
-            const shadowNow = currentData.shadows[index];
-            if (shadowBefore && !shadowNow) {
-                shadow.sprite.alpha = 1 - progress;
-            }
-            else if (!shadowBefore && shadowNow) {
-                shadow.sprite.alpha = progress;
-            }
-            else if (shadowBefore && shadowNow) {
-                shadow.sprite.alpha = 1;
-            }
-            else {
-                shadow.sprite.alpha = 0;
-            }
-            updateDebugShadow(shadow);
         }
     }
     updateSun(previousData, currentData, progress) {
@@ -554,9 +376,7 @@ export class ViewModule {
         this.container = container;
         this.pool = {};
         const background = this.asLayer(this.initBackground);
-        const totoLayer = this.asLayer(this.initTotoros);
         this.boardLayer = this.asLayer(this.initBoard);
-        const shadowLayer = this.asLayer(this.initShadows);
         const treeLayer = this.asLayer(this.initTrees);
         const dormantLayer = this.asLayer(this.initDormants);
         const hudLayer = this.asLayer(this.initHud);
@@ -567,15 +387,14 @@ export class ViewModule {
         this.sfxLayer = new PIXI.Container();
         const tooltipLayer = this.tooltipManager.reinit();
         /* debug mode */
-        const debugMask = this.asLayer(this.initDebugMask);
-        const debugBoard = this.asLayer(this.initDebugBoard);
-        const debugHUD = this.asLayer(this.initDebugHUD);
+        // const debugMask = this.asLayer(this.initDebugMask);
+        // const debugBoard = this.asLayer(this.initDebugBoard);
+        // const debugHUD = this.asLayer(this.initDebugHUD);
         /*            */
         this.markerLayer.sortableChildren = true;
-        this.setVisibility(debugMask, 1);
-        this.setVisibility(debugBoard, 1);
-        this.setVisibility(debugHUD, 1);
-        this.setVisibility(totoLayer, 0);
+        // this.setVisibility(debugMask, 1);
+        // this.setVisibility(debugBoard, 1);
+        // this.setVisibility(debugHUD, 1);
         this.setVisibility(this.boardLayer, 0);
         this.setVisibility(bubbleLayer, 0);
         Object.defineProperty(this.sfxLayer, 'visible', { get: () => api.options.showSFX });
@@ -584,18 +403,14 @@ export class ViewModule {
         bubbleLayer.interactiveChildren = false;
         hudLayer.interactiveChildren = false;
         tooltipLayer.interactiveChildren = false;
-        totoLayer.interactiveChildren = false;
-        shadowLayer.interactiveChildren = false;
         treeLayer.interactiveChildren = false;
         this.sfxLayer.interactiveChildren = false;
         sunLayer.interactiveChildren = false;
         dormantLayer.interactiveChildren = false;
         container.addChild(background);
-        container.addChild(debugMask);
-        container.addChild(totoLayer);
+        // container.addChild(debugMask);
         container.addChild(this.boardLayer);
-        container.addChild(debugBoard);
-        container.addChild(shadowLayer);
+        // container.addChild(debugBoard);
         container.addChild(treeLayer);
         container.addChild(dormantLayer);
         container.addChild(this.markerLayer);
@@ -604,7 +419,7 @@ export class ViewModule {
         container.addChild(sunLayer);
         container.addChild(this.sfxLayer);
         container.addChild(devantLayer);
-        container.addChild(debugHUD);
+        // container.addChild(debugHUD);
         container.addChild(tooltipLayer);
     }
     setVisibility(layer, visibility) {
@@ -615,37 +430,11 @@ export class ViewModule {
             Object.defineProperty(layer, 'visible', { get: () => api.options.debugMode2 });
         }
     }
-    initTotoros(layer) {
-        this.totoros = [];
-        for (const player of this.globalData.players) {
-            const totoro = new PIXI.Container();
-            const idle = PIXI.AnimatedSprite.fromFrames(IDLE_FRAMES[player.index]);
-            const sleep = PIXI.AnimatedSprite.fromFrames(SLEEP_FRAMES[player.index]);
-            idle.animationSpeed = 1 / 3;
-            sleep.animationSpeed = 1 / 4;
-            for (const anim of [idle, sleep]) {
-                anim.anchor.set(1, 1);
-                anim.scale.set(1.6);
-                anim.scale.x *= player.index === 0 ? -1 : 1;
-                anim.gotoAndPlay(0);
-                anim.loop = true;
-                anim.y = -80;
-                totoro.addChild(anim);
-            }
-            // const desiredFPS = 30
-            // const actualFPS = 60
-            totoro.x = player.index * WIDTH;
-            totoro.y = HEIGHT;
-            this.totoros.push({
-                idle,
-                sleep,
-                container: totoro
-            });
-            layer.addChild(totoro);
-        }
-    }
     initBackground(layer) {
-        const backdrop = PIXI.Sprite.from('background.jpg');
+        // let backdrop = PIXI.Sprite.from('Background.png');
+		// if (backdrop == null) {
+			let backdrop = PIXI.Sprite.from('Background.png');
+		// }
         layer.addChild(backdrop);
     }
     initBoard(layer) {
@@ -749,13 +538,13 @@ export class ViewModule {
             const score = this.drawText('0', 0xFFFFFF, player.index === 0 ? 300 : WIDTH - 300, 145);
             this.HUD.score.push(score);
             const sun = this.drawText('0', 0xFFFFFF, player.index === 0 ? 180 : WIDTH - 180, 307);
-            this.HUD.sun.push(sun);
+            // this.HUD.sun.push(sun);
             playerHUDs.addChild(frame);
             playerHUDs.addChild(avatar);
             playerHUDs.addChild(mask);
             playerHUDs.addChild(name);
             playerHUDs.addChild(score);
-            playerHUDs.addChild(sun);
+            // playerHUDs.addChild(sun);
         }
         layer.addChild(playerHUDs);
     }
@@ -876,7 +665,7 @@ export class ViewModule {
         container.addChild(hud);
         container.addChild(text);
         layer.addChild(container);
-        this.debugHUD.set(-1, text);
+        // this.debugHUD.set(-1, text);
         for (const player of this.globalData.players) {
             const container = new PIXI.Container();
             const hud = new PIXI.Graphics();
@@ -896,7 +685,7 @@ export class ViewModule {
             container.addChild(hud);
             container.addChild(text);
             layer.addChild(container);
-            this.debugHUD.set(player.index, text);
+            // this.debugHUD.set(player.index, text);
         }
     }
     // Init functions
@@ -943,12 +732,7 @@ export class ViewModule {
         };
     }
     drawTile(cell) {
-        const path = [
-            'Sol_0.png',
-            'Sol_1.png',
-            'Sol_2.png',
-            'Sol_3.png'
-        ][cell.richness];
+        const path = 'GridTile.png'
         const sprite = PIXI.Sprite.from(path);
         sprite.anchor.set(0.5);
         return sprite;
@@ -1025,26 +809,8 @@ export class ViewModule {
     }
     handleFrameData(frameInfo, raw) {
         const data = parseData(raw, this.globalData);
-        // const data = JSON.parse(raw)
-        const shadows = {};
-        for (const shadow of data.shadows) {
-            shadows[shadow.index] = shadow;
-        }
-		//every tree existing on the board this frame
-        const trees = {};
-        for (const treeData of data.trees) {
-            this.createLightParticleEffect(treeData);
-            trees[treeData.index] = treeData;
-        }
-		//for every seed made this frame
-        for (const seedData of data.seeds) {
-            this.createDirtParticleEffect(seedData);
-        }
         const previous = this.states[this.states.length - 1];
         const state = {
-            shadows,
-            trees,
-            seeds: data.seeds,
             players: data.players,
             round: data.round,
             sunOrientation: data.sunOrientation,

@@ -1,6 +1,6 @@
 package com.codingame.game;
 
-import java.lang.Math.*;
+import java.lang.Math;
 
 public enum Gravity {
 	SOUTH(0),
