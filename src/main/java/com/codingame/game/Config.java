@@ -12,7 +12,7 @@ public class Config {
 	public static int MAP_RING_COUNT = 4;
 	public static int CELL_COUNT;
 	public static int CHIP_MAX;
-
+	public static int COLUMN_COUNT;
 
 	public static void load(Properties params) {
 		WIN_LENGTH = getFromParams(params, "WIN_LENGTH", WIN_LENGTH);
@@ -22,6 +22,11 @@ public class Config {
 		MAP_RING_COUNT = getFromParams(params, "MAP_RING_COUNT", MAP_RING_COUNT);
 		CELL_COUNT = getCellCount();
 		CHIP_MAX = getChipMax();
+		COLUMN_COUNT = getColumnCount();
+	}
+
+	private static int getColumnCount() {
+		return (Config.MAP_RING_COUNT * 2) -1;
 	}
 
 	private static int getChipMax() {
@@ -31,11 +36,7 @@ public class Config {
 	}
 
 	private static int getCellCount() {
-		int count = 0;
-		for (int i = 0; i < MAP_RING_COUNT; i++) {
-			count += 6 * i;
-		}
-		return count;
+		return (MAP_RING_COUNT * MAP_RING_COUNT - MAP_RING_COUNT) * 3 + 1;
 	}
 
 	public static void export(Properties params) {

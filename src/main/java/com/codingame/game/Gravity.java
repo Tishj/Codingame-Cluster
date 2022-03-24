@@ -29,6 +29,6 @@ public enum Gravity {
 		if (cycles < 0) {
 			cycles = 6 - (Math.abs(cycles) % 6);
 		}
-		return Gravity.values()[index + cycles % 6];
+		return Gravity.values()[(index + cycles) % 6];
 	}
 };

@@ -1,14 +1,16 @@
 const MAIN_SEPARATOR = '\n';
+const PLAYER_AMOUNT = 2;
+
 export function parseData(raw, globalData) {
     const input = raw.split(MAIN_SEPARATOR)
         .map(hardSplit);
-    const globalInfos = input.shift().map(x => +x);
+    const globalInfos = input.shift().map(elem => +elem);
     const data = {
         round: globalInfos[0],
         players: []
     };
 	let index;
-    index = 2;
+    index = PLAYER_AMOUNT;
     for (let i = 1; i <= index; i++) {
         const player = input.shift().map(x => +x);
         data.players.push({
@@ -18,11 +20,18 @@ export function parseData(raw, globalData) {
     return data;
 }
 
+//lines
+// [
+// 	[ "5", "4", "5" ], //every line
+// 	[ "5", "4", "5" ],
+// 	[ "5", "4", "5" ],
+// 	[ "5", "4", "5" ],
+// ]
+
 export function parseGlobalData(raw) {
-    const input = raw.split(MAIN_SEPARATOR).map(x => hardSplit(x).map(y => +y));
+    const input = raw.split(MAIN_SEPARATOR).map(line => hardSplit(line).map(element => +element));
     const data = {
         totalRounds: input.shift()[0],
-        nutrients: input.shift(),
         cells: []
     };
     while (input.length) {
@@ -30,8 +39,7 @@ export function parseGlobalData(raw) {
         data.cells.push({
             q: cell[0],
             r: cell[1],
-            richness: cell[2],
-            index: cell[3]
+            index: cell[2]
         });
     }
     return data;

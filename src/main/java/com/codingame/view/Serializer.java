@@ -20,9 +20,6 @@ public class Serializer {
                     playerData.score
                 )
             );
-            lines.add(
-                playerData.message == null ? "" : playerData.message
-            );
         });
         return lines.stream().collect(Collectors.joining("\n"));
     }

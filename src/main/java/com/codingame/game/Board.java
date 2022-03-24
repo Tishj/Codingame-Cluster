@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.codingame.game.exception.ColumnOutOfRangeException;
+import com.codingame.game.exception.GameException;
+
 public class Board {
 
 	public final Map<HexCoord, Cell> map;
@@ -21,21 +24,30 @@ public class Board {
 			.collect(Collectors.toList());
 	}
 
-	public HexCoord getTopOfRow(Gravity gravity, int row) {
+	public HexCoord getTopOfColumn(Gravity gravity, int column) {
+		gravity = gravity.rotate(3);
 		HexCoord coord = new HexCoord(0,0,0);
-		for (int i = 0; i < Config.MAP_RING_COUNT; i++) {
+		for (int i = 1; i < Config.MAP_RING_COUNT; i++) {
 			coord = coord.neighbour(gravity);
 		}
+	
+		int middleColumn = Config.MAP_RING_COUNT - 1;
 
 		//steps to get to the desired cell
-		Gravity stepDirection = gravity.rotate(-1);
-		if (row > Config.MAP_RING_COUNT) {
-			row -= Config.MAP_RING_COUNT;
-			stepDirection = gravity.rotate(1);
+		Gravity stepDirection = gravity.rotate(-2);
+		if (column > middleColumn) {
+			column -= middleColumn;
+			stepDirection = gravity.rotate(2);
+		}
+		else if (column < middleColumn) {
+			column = middleColumn - column;
+		}
+		else {
+			return coord;
 		}
 
 		//travel to the cell
-		for (int i = 0; i < row; i++) {
+		for (int i = 0; i < column; i++) {
 			coord = coord.neighbour(stepDirection);
 		}
 		return coord;

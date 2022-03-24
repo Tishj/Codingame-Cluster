@@ -37,12 +37,13 @@ public class Referee extends AbstractReferee {
 		try {
 			Config.load(gameManager.getGameParameters());
 			Config.export(gameManager.getGameParameters());
+			System.out.println(Config.MAX_ROUNDS);
 			gameManager.setFirstTurnMaxTime(1000);
 			gameManager.setTurnMaxTime(100);
 
 			gameManager.setFrameDuration(500);
-
 			game.init(seed);
+
 			sendGlobalInfo();
 
 		} catch (Exception e) {
@@ -68,6 +69,9 @@ public class Referee extends AbstractReferee {
 
 	private void sendInputs(Player player) {
 		//Send the updated gamestate
+		for (String line : game.getCurrentFrameInfoFor(player)) {
+			player.sendInputLine(line);
+		}
 	}
 
 	private void setWinner(Player player) {
@@ -78,8 +82,10 @@ public class Referee extends AbstractReferee {
 
 	@Override
 	public void gameTurn(int turn) {
+		// System.out.println(turn);
 		Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
 		
+		game.preparePlayerDataForRound(player);
 		sendInputs(player);
 		player.execute();
 
@@ -93,6 +99,29 @@ public class Referee extends AbstractReferee {
 			commandParser.deactivatePlayer(player, "Timeout!");
 			gameSummaryManager.addPlayerTimeout(player);
 			gameSummaryManager.addPlayerDisqualified(player);
+		}
+		GameResult result = game.getWinner();
+		switch (result) {
+			case IN_PROGRESS: {
+				break;
+			}
+			case WIN_PLAYER_ONE: {
+				gameManager.getPlayer(0).setScore(100);
+				endGame();
+				break;
+			}
+			case WIN_PLAYER_TWO: {
+				gameManager.getPlayer(1).setScore(100);
+				endGame();
+				break;
+			}
+			case TIE: {
+				for (Player p : gameManager.getPlayers()) {
+					p.setScore(50);
+				}
+				endGame();
+				break;
+			}
 		}
 	}
 

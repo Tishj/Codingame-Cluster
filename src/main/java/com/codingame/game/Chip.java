@@ -10,6 +10,38 @@ public class Chip {
 
 	// };
 
+	@Override
+	public int hashCode() {
+		return coord.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)  {
+			return false;
+		}
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof Chip == false) {
+			return false;
+		}
+		Chip other = (Chip)o;
+		if (other.colorId != this.colorId) {
+			return false;
+		}
+		if (other.owner != this.owner) {
+			return false;
+		}
+		if (other.index != this.index) {
+			return false;
+		}
+		if (other.coord != this.coord) {
+			return false;
+		}
+		return true;
+	}
+
 	Chip(int index, int colorId, Player owner, HexCoord coord) {
 		this.index = index;
 		this.colorId = colorId;

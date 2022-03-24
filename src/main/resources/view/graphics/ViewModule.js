@@ -231,44 +231,30 @@ export class ViewModule {
             }
         }
     }
-    updateTreeFlash(index, sfxData, progress) {
-        const hex = this.hexes.get(index).data;
-        const targetP = this.screenToBoard(hexToScreen(hex.q, hex.r));
-        for (let i = 0; i < LIGHT_PARTICLE_COUNT; ++i) {
-            const particle = this.getFromPool('light').display;
-            const { angle, speed, size, position, duration } = sfxData[i];
-            particle.visible = true;
-            particle.angle = angle;
-            particle.position.x = targetP.x + position.x + Math.cos(angle) * speed * easeOut(progress);
-            particle.position.y = targetP.y + position.y + Math.sin(angle) * speed * easeOut(progress);
-            particle.scale.set(size * lerp(0.5, 1, easeIn(progress)));
-            particle.alpha = bell(unlerp(0.2, duration, progress));
-        }
-    }
-    updateDebugActions(previousData, currentData, progress) {
-        for (let playerIdx = 0; playerIdx < this.globalData.playerCount; ++playerIdx) {
-            const player = currentData.players[playerIdx];
-            for (const cellIdx of player.affected) {
-                const a = this.getFromPool('outerMarkerA');
-                const b = this.getFromPool('outerMarkerB');
-                if (playerIdx === 0) {
-                    a.display.zIndex = 4;
-                    b.display.zIndex = 1;
-                }
-                else {
-                    a.display.zIndex = 2;
-                    b.display.zIndex = 3;
-                }
-                for (const { display } of [a, b]) {
-                    display.tint = this.globalData.players[playerIdx].color;
-                    display.visible = true;
-                    const cell = this.hexes.get(cellIdx);
-                    const pos = this.screenToBoard(hexToScreen(cell.data.q, cell.data.r));
-                    display.position.copyFrom(pos);
-                }
-            }
-        }
-    }
+    // updateDebugActions(previousData, currentData, progress) {
+    //     for (let playerIdx = 0; playerIdx < this.globalData.playerCount; ++playerIdx) {
+    //         const player = currentData.players[playerIdx];
+    //         for (const cellIdx of player.affected) {
+    //             const a = this.getFromPool('outerMarkerA');
+    //             const b = this.getFromPool('outerMarkerB');
+    //             if (playerIdx === 0) {
+    //                 a.display.zIndex = 4;
+    //                 b.display.zIndex = 1;
+    //             }
+    //             else {
+    //                 a.display.zIndex = 2;
+    //                 b.display.zIndex = 3;
+    //             }
+    //             for (const { display } of [a, b]) {
+    //                 display.tint = this.globalData.players[playerIdx].color;
+    //                 display.visible = true;
+    //                 const cell = this.hexes.get(cellIdx);
+    //                 const pos = this.screenToBoard(hexToScreen(cell.data.q, cell.data.r));
+    //                 display.position.copyFrom(pos);
+    //             }
+    //         }
+    //     }
+    // }
     updateSun(previousData, currentData, progress) {
         for (const sun of this.sun.values()) {
             const sunBefore = sun.data.activeOrientations.includes(previousData.sunOrientation);
@@ -288,67 +274,36 @@ export class ViewModule {
             }
         }
     }
-    updateSunPoints(currentData, progress) {
-        for (const [index] of this.trees) {
-            if (currentData.trees[index] && currentData.trees[index].sunPoints) {
-                const sun = this.getFromPool('sunPoint');
-                sun.display.visible = true;
-                const initP = this.screenToBoard(hexToScreen(this.hexes.get(index).data.q, this.hexes.get(index).data.r));
-                const targP = {
-                    x: [280, WIDTH - 280][currentData.trees[index].owner],
-                    y: 300
-                };
-                const initS = currentData.trees[index].sfxData[0].speed * 20;
-                const initA = currentData.trees[index].sfxData[0].angle;
-                const targS = currentData.trees[index].sfxData[1].speed * 20;
-                const targA = currentData.trees[index].sfxData[1].angle;
-                const x = ease(unlerp(0.5, 1, progress));
-                const newPositionX = (initS * Math.cos(initA) + targS * Math.cos(targA) - 2 * targP.x + 2 * initP.x) * (Math.pow(x, 3)) +
-                    (-2 * initS * Math.cos(initA) - targS * Math.cos(targA) + 3 * targP.x - 3 * initP.x) * (Math.pow(x, 2)) +
-                    (initS * Math.cos(initA)) * x +
-                    initP.x;
-                const newPositionY = (initS * Math.sin(initA) + targS * Math.sin(targA) - 2 * targP.y + 2 * initP.y) * (Math.pow(x, 3)) +
-                    (-2 * initS * Math.sin(initA) - targS * Math.sin(targA) + 3 * targP.y - 3 * initP.y) * (Math.pow(x, 2)) +
-                    (initS * Math.sin(initA)) * x +
-                    initP.y;
-                sun.display.position.set(newPositionX, newPositionY);
-                const belled = bell(ease(progress));
-                const scale = (belled * 2 + ease(progress));
-                sun.display.scale.x = scale * (currentData.trees[index].owner ? 1 : -1);
-                sun.display.scale.y = scale;
-            }
-        }
-    }
-    updateTooltip(currentData) {
-        var _a, _b;
-        for (const [index, hex] of this.hexes) {
-            const nutrients = hex.data.richness
-                ? currentData.nutrients + this.globalData.nutrients[hex.data.richness - 1]
-                : 0;
-            const dormant = (_a = currentData.trees[index]) === null || _a === void 0 ? void 0 : _a.isDormant;
-            const shadowSize = (_b = currentData.shadows[index]) === null || _b === void 0 ? void 0 : _b.size;
-            const tree = currentData.trees[index];
-            const spooky = tree != null && tree.size <= shadowSize;
-            this.registerTooltip(hex.container, {
-                richness: hex.data.richness,
-                index: index,
-                nutrients,
-                dormant,
-                shadowSize,
-                spooky,
-                tree
-            });
-            this.registerTooltip(this.debugData.get(index).container, {
-                richness: hex.data.richness,
-                index: index,
-                nutrients,
-                dormant,
-                shadowSize,
-                spooky,
-                tree
-            });
-        }
-    }
+    // updateTooltip(currentData) {
+    //     var _a, _b;
+    //     for (const [index, hex] of this.hexes) {
+    //         const nutrients = hex.data.richness
+    //             ? currentData.nutrients + this.globalData.nutrients[hex.data.richness - 1]
+    //             : 0;
+    //         const dormant = (_a = currentData.trees[index]) === null || _a === void 0 ? void 0 : _a.isDormant;
+    //         const shadowSize = (_b = currentData.shadows[index]) === null || _b === void 0 ? void 0 : _b.size;
+    //         const tree = currentData.trees[index];
+    //         const spooky = tree != null && tree.size <= shadowSize;
+    //         this.registerTooltip(hex.container, {
+    //             richness: hex.data.richness,
+    //             index: index,
+    //             nutrients,
+    //             dormant,
+    //             shadowSize,
+    //             spooky,
+    //             tree
+    //         });
+    //         this.registerTooltip(this.debugData.get(index).container, {
+    //             richness: hex.data.richness,
+    //             index: index,
+    //             nutrients,
+    //             dormant,
+    //             shadowSize,
+    //             spooky,
+    //             tree
+    //         });
+    //     }
+    // }
     // Update Functions
     resetEffects() {
         for (const type in this.pool) {

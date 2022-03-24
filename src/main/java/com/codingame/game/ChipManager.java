@@ -17,14 +17,14 @@ public class ChipManager {
 	int[][] remainingChips;
 	int[][] selectedChips;
 	Random	random;
-
-	public ChipManager() {
-	}
-
+	
 	public void init(MultiplayerGameManager<Player> gameManager) {
 		this.random = new Random(gameManager.getSeed());
 		this.remainingChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
 		this.selectedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
+		for (int[] chips : this.remainingChips) {
+			Arrays.fill(chips, Config.CHIP_MAX);
+		}
 	}
 
 	public boolean colorIsValid(int colorId) {
