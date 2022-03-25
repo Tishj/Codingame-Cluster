@@ -15,11 +15,14 @@ import java.util.List;
 @Singleton
 public class ChipManager {
 	private static int index = 0;
+	public int selectedAmount;
 	int[][] remainingChips;
 	int[][] selectedChips;
 	Random	random;
+	private MultiplayerGameManager<Player> gameManager;
 	
 	public void init(MultiplayerGameManager<Player> gameManager) {
+		this.gameManager = gameManager;
 		this.random = new Random(gameManager.getSeed());
 		this.remainingChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
 		this.selectedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
@@ -71,6 +74,9 @@ public class ChipManager {
 			selectedChips[index][choice]++;
 			selected++;
 		}
+		gameManager.addToGameSummary("Chips selected for " + player.getNicknameToken() + ":\n0: " + selectedChips[index][0] + "\n1: " + selectedChips[index][1]);
+		gameManager.addToGameSummary("Chips remaining for " + player.getNicknameToken() + ":\n0: " + remainingChips[index][0] + "\n1: " + remainingChips[index][1]);
+		this.selectedAmount = selected;
 		return selected != 0;
 	}
 

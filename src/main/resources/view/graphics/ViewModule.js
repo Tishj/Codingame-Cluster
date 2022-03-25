@@ -312,7 +312,7 @@ export class ViewModule {
 			}
 			else if (!chipBefore && chipNow) {
 				console.log("NEW CHIP ADDED!");
-				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}.png`);
+				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
 				const hexaP = this.screenToBoard(hexToScreen(chipNow.q, chipNow.r));

@@ -6,6 +6,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.google.common.primitives.Ints;
+
 public class Player2 {
 
 	private static class Chip {
@@ -73,7 +75,7 @@ public class Player2 {
 
 		int numberOfColumns = in.nextInt();
 		ArrayList<InsertPosition>	columns = new ArrayList<>(numberOfColumns);
-		ArrayList<Chip>				chips = new ArrayList<>(numberOfColumns);
+		ArrayList<Chip>				chips = new ArrayList<>(numberOfCells);
 		for (int i = 0; i < numberOfColumns; i++) {
 			int[] directions = new int[6];
 			for (int n = 0; n < 6; n++) {
@@ -97,9 +99,9 @@ public class Player2 {
 			int gravity = in.nextInt();
 
 			int numberOfInvalidColumns = in.nextInt();
-			int[] invalid = new int[numberOfInvalidColumns];
+			List<Integer>	validColumns = IntStream.range(0,numberOfColumns).boxed().collect(Collectors.toList());
 			for (int i = 0; i < numberOfInvalidColumns; i++) {
-				invalid[i] = in.nextInt();
+				validColumns.remove(in.nextInt());
 			}
 
 			int numberOfNewChips = in.nextInt();
@@ -126,13 +128,7 @@ public class Player2 {
 				possibleColors[i] = in.nextInt();
 			}
 
-			//Check which places are valid to place a Chip at
-			List<Integer> validColumnIndices = IntStream.range(0,numberOfColumns).boxed().collect(Collectors.toList());
-			for (int i = 0; i < invalid.length; i++) {
-				validColumnIndices.remove(invalid[i]);
-			}
-
-			int column = random.nextInt(validColumnIndices.size());
+			int column = validColumns.get(random.nextInt(validColumns.size()));
 			int color = possibleColors[random.nextInt(possibleColors.length)];
 			System.out.printf("DROP %d %d%n", column, color);
 		}

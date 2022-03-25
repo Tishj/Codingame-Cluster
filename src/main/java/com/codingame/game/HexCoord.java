@@ -3,8 +3,8 @@ package com.codingame.game;
 public class HexCoord {
 	static int directions[][] = new int[][] {
 		{ 0, 1,-1},
-		{-1,+1, 0},
-		{-1, 0,+1},
+		{-1, 1, 0},
+		{-1, 0, 1},
 		{ 0,-1, 1},
 		{ 1,-1, 0},
 		{ 1, 0,-1}

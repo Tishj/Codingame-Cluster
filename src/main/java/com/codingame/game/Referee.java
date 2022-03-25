@@ -101,6 +101,10 @@ public class Referee extends AbstractReferee {
 			if (player.isActive()) {
 				game.performGameUpdate(player);
 			}
+			else {
+				setWinner(gameManager.getPlayer(1 - player.getIndex()));
+				return ;
+			}
 		}
 		catch (TimeoutException e) {
 			commandParser.deactivatePlayer(player, "Timeout!");
@@ -113,14 +117,14 @@ public class Referee extends AbstractReferee {
 				break;
 			}
 			case WIN_PLAYER_ONE: {
-				gameManager.getPlayer(0).setScore(100);
-				gameManager.getPlayer(1).setScore(0);
+				gameManager.getPlayer(1).setScore(100);
+				gameManager.getPlayer(0).setScore(0);
 				endGame();
 				break;
 			}
 			case WIN_PLAYER_TWO: {
-				gameManager.getPlayer(1).setScore(100);
-				gameManager.getPlayer(0).setScore(0);
+				gameManager.getPlayer(0).setScore(100);
+				gameManager.getPlayer(1).setScore(0);
 				endGame();
 				break;
 			}

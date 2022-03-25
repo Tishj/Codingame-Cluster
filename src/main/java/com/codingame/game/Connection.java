@@ -1,7 +1,6 @@
 package com.codingame.game;
 
 public class Connection {
-	public int playerIndex;
 	public int colorIndex;
 	public int length;
 
@@ -11,7 +10,7 @@ public class Connection {
 	}
 
 	public void updateIfBigger(int color, int length) {
-		if (this.length >= length)
+		if (length <= this.length)
 			return;
 		this.length = length;
 		this.colorIndex = color;

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.codingame.game.action.Action;
+import com.codingame.game.exception.CellAlreadyOccupiedException;
 import com.codingame.game.exception.CellNotFoundException;
 import com.codingame.game.exception.CellNotValidException;
 import com.codingame.game.exception.UnrecognizedActionException;
@@ -45,7 +46,7 @@ public class Game {
 		random = new Random(seed);
 		board = BoardGenerator.generate(random);
 		chipManager.init(gameManager);
-		this.gravity = Gravity.SOUTH_EAST;
+		this.gravity = Gravity.SOUTH;
 		this.placedChips = new ArrayList<>(Config.CELL_COUNT);
 
 		round = 0;
@@ -89,8 +90,8 @@ public class Game {
 		}
 		//invalidColumns
 		lines.add(String.valueOf(columns.size()));
-		for (int invalidIndex : columns) {
-			lines.add(String.valueOf(invalidIndex));
+		for (int i = columns.size() - 1; i >= 0; i--) {
+			lines.add(String.valueOf(columns.get(i)));
 		}
 
 		//newChips
@@ -116,7 +117,7 @@ public class Game {
 		}
 
 		//selectedColors
-		int amountOfSelectedColors = Config.COLORS_PER_ROUND;
+		int amountOfSelectedColors = chipManager.selectedAmount;
 		lines.add(String.valueOf(amountOfSelectedColors));
 		int[] selectedColors = new int[amountOfSelectedColors];
 		int index = 0;
@@ -178,34 +179,36 @@ public class Game {
 				biggestConnection[chip.getOwner().getIndex()].updateIfBigger(chip.colorId, length);
 			}
 		}
+		gameManager.addToGameSummary("Red: length: " + biggestConnection[0].length);
+		gameManager.addToGameSummary("Blue:  length: " + biggestConnection[1].length);
 		//No winner
 		if (biggestConnection[0].length < Config.WIN_LENGTH && biggestConnection[1].length < Config.WIN_LENGTH) {
 			return GameResult.IN_PROGRESS;
 		}
 		//Blue wins
 		if (biggestConnection[0].length > biggestConnection[1].length) {
-			return GameResult.WIN_PLAYER_ONE;
+			return GameResult.WIN_PLAYER_TWO;
 		}
 		//Red wins
 		if (biggestConnection[1].length > biggestConnection[0].length) {
-			return GameResult.WIN_PLAYER_TWO;
+			return GameResult.WIN_PLAYER_ONE;
 		}
 		//Possible tie
 		long amountOfBlueChips = placedChips.stream()
 			.filter(c -> 
-				(c.colorId == biggestConnection[0].colorIndex &&
+				(c.colorId == biggestConnection[1].colorIndex &&
 				c.getOwner().getIndex() == 1))
 			.count();
 		long amountOfRedChips = placedChips.stream()
 			.filter(c -> 
-				(c.colorId == biggestConnection[1].colorIndex &&
-				c.getOwner().getIndex() == 1))
+				(c.colorId == biggestConnection[0].colorIndex &&
+				c.getOwner().getIndex() == 0))
 			.count();
 		if (amountOfBlueChips > amountOfRedChips) {
-			return GameResult.WIN_PLAYER_ONE;
+			return GameResult.WIN_PLAYER_TWO;
 		}
 		if (amountOfRedChips > amountOfBlueChips) {
-			return GameResult.WIN_PLAYER_TWO;
+			return GameResult.WIN_PLAYER_ONE;
 		}
 		return GameResult.TIE;
 	}
@@ -273,13 +276,10 @@ public class Game {
 
 	private Chip doDrop(Player player, Action action) throws GameException {
 		HexCoord startingLocation = board.getTopOfColumn(gravity, action.targetId);
-		if (startingLocation == null) {
-			//really shouldnt happen
-		}
+		assert(startingLocation != null);
 		Cell cell = getBoard().get(startingLocation);
 		if (cell == null || cell.getChip() != null) {
-			//throw exception
-			//position out of bounds, or already occupied by another chip
+			throw new CellAlreadyOccupiedException(cell.getIndex());
 		}
 		//create the chip
 		Chip chip = chipManager.createChip(player, action.colorId, startingLocation);
@@ -288,7 +288,9 @@ public class Game {
 		other.addToUnknown(chip);
 		//add it to the chips list
 		placedChips.add(chip);
-
+		cell = getBoard().get(chip.getCoord());
+		cell.setChip(chip);
+		
 		dropChip(chip, null);
 
 		//move rest of selection back to remaining
@@ -367,6 +369,7 @@ public class Game {
 	}
 
 	public void performGameUpdate(Player player) {
+		gameManager.addToGameSummary("Round:" + round );
 		turn++;
 		round++;
 
@@ -397,6 +400,10 @@ public class Game {
 			}
 		} catch (GameException e) {
 			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());
+			gameManager.getPlayer(1 - player.getIndex()).setScore(100);
+			player.setScore(-1);
+			gameManager.endGame();
+			return;
 		}
 		gameManager.setFrameDuration(1000);
 	}
