@@ -8,7 +8,7 @@ public class Config {
 	public static int WIN_LENGTH = 4;
 	public static int COLORS_PER_PLAYER = 2;
 	public static int COLORS_PER_ROUND = 2;
-	public static int MAP_RING_COUNT = 4;
+	public static int MAP_RING_COUNT = 6;
 	public static int CELL_COUNT;
 	public static int CHIP_MAX;
 	public static int COLUMN_COUNT;
@@ -31,7 +31,7 @@ public class Config {
 	}
 
 	private static int getChipMax() {
-		int max = (int)(CELL_COUNT / 4);
+		int max = (int)(CELL_COUNT / (2 * COLORS_PER_PLAYER));
 		max -= max % (COLORS_PER_PLAYER * 2);
 		return max;
 	}

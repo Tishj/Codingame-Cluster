@@ -36,7 +36,7 @@ public class Player extends AbstractMultiplayerPlayer {
 	}
 
 	public Chip[] getUnknown() {
-		Chip[] chips = unknown.toArray(Chip[]::new);
+		Chip[] chips = unknown.toArray(new Chip[unknown.size()]);
 		unknown.clear();
 		return chips;
 	}
@@ -50,7 +50,7 @@ public class Player extends AbstractMultiplayerPlayer {
 	}
 
 	public Chip[] getChanged() {
-		Chip[] chips = changed.toArray(Chip[]::new);
+		Chip[] chips = changed.toArray(new Chip[changed.size()]);
 		changed.clear();
 		return chips;
 	}

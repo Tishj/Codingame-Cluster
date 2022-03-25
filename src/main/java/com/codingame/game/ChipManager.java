@@ -74,8 +74,14 @@ public class ChipManager {
 			selectedChips[index][choice]++;
 			selected++;
 		}
-		gameManager.addToGameSummary("Chips selected for " + player.getNicknameToken() + ":\n0: " + selectedChips[index][0] + "\n1: " + selectedChips[index][1]);
-		gameManager.addToGameSummary("Chips remaining for " + player.getNicknameToken() + ":\n0: " + remainingChips[index][0] + "\n1: " + remainingChips[index][1]);
+		gameManager.addToGameSummary("Chips selected for " + player.getNicknameToken() + ":");
+		for (int i = 0; i < Config.COLORS_PER_PLAYER; i++) {
+			gameManager.addToGameSummary(i + ": " + selectedChips[index][i]);
+		}
+		gameManager.addToGameSummary("Chips remaining for " + player.getNicknameToken() + ":");
+		for (int i = 0; i < Config.COLORS_PER_PLAYER; i++) {
+			gameManager.addToGameSummary(i + ": " + remainingChips[index][i]);
+		}
 		this.selectedAmount = selected;
 		return selected != 0;
 	}

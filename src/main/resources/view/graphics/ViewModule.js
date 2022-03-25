@@ -5,6 +5,7 @@ import { HEXAGON_RADIUS, HEXAGON_WIDTH, hexToScreen } from './hex.js';
 import { TooltipManager } from './TooltipManager.js';
 import { IDLE_FRAMES, SLEEP_FRAMES, SUN_DATA_LIST } from './assetConstants.js';
 import { parseData, parseGlobalData } from './Deserializer.js';
+import { degreesToRadians } from './utils.js';
 const DIRT_PARTICLE_COUNT = 20;
 const LIGHT_PARTICLE_COUNT = 15;
 export var FrameType;
@@ -112,6 +113,7 @@ export class ViewModule {
 		// this.updateSpeechBubbles(currentData);
 		// ACTIONS Frame
 		this.updateChips(previousData, currentData, progress);
+		this.updateBoardRotation(previousData, currentData, progress);
 		// this.updateDormants(previousData, currentData, progress);
 		// this.updateSeeds(previousData, currentData, progress);
 		// this.updateSeedSplash(previousData, currentData, progress);
@@ -274,6 +276,23 @@ export class ViewModule {
 	//         }
 	//     }
 	// }
+
+	updateBoardRotation(previousData, currentData, progress) {
+		// if (previousData.gravity == currentData.gravity) {
+		// 	return;
+		// }
+		const oldDegrees = 60 * previousData.gravity;
+		const newDegrees = 60 * currentData.gravity;
+		const gravityDifference = Math.abs(oldDegrees - newDegrees);
+		const difference = Math.abs(oldDegrees - newDegrees);
+		const oldRadian = degreesToRadians(oldDegrees);
+		const newRadian = degreesToRadians(newDegrees);
+		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, progress);
+		for (const [index, chip] of this.chips) {
+			chip.mainSprite.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), progress);
+		}
+	}
+
 	updateTooltip(currentData) {
 	    var _a, _b;
 	    for (const [index, hex] of this.hexes) {
@@ -315,14 +334,14 @@ export class ViewModule {
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
-				const hexaP = this.screenToBoard(hexToScreen(chipNow.q, chipNow.r));
+				const hexaP = hexToScreen(chipNow.q, chipNow.r);
 				chip.container.position.set(hexaP.x, hexaP.y);
 			}
 			else if (chipBefore && chipNow) {
 				console.log("CHIP PASSIVE!");
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
-				const hexaP = this.screenToBoard(hexToScreen(chipNow.q, chipNow.r));
+				const hexaP = hexToScreen(chipNow.q, chipNow.r);
 				chip.container.position.set(hexaP.x, hexaP.y);
 			}
 			else {
@@ -377,6 +396,7 @@ export class ViewModule {
 		const hudLayer = this.asLayer(this.initHud);
 		const bubbleLayer = this.asLayer(this.initSpeechBubbles);
 		const chipLayer = this.asLayer(this.initChips);
+		this.boardLayer.addChild(chipLayer);
 		// const sunLayer = this.asLayer(this.initSuns);
 		const devantLayer = this.asLayer(this.initDevant);
 		this.markerLayer = new PIXI.Container();
@@ -409,7 +429,7 @@ export class ViewModule {
 		// container.addChild(debugMask);
 		container.addChild(this.boardLayer);
 		// container.addChild(debugBoard);
-		container.addChild(chipLayer);
+		// container.addChild(chipLayer);
 		container.addChild(dormantLayer);
 		container.addChild(this.markerLayer);
 		container.addChild(bubbleLayer);
@@ -524,6 +544,8 @@ export class ViewModule {
 			frame.anchor.x = 1;
 			frame.scale.x = player.index === 0 ? -1 : 1;
 			frame.x = WIDTH * player.index;
+			const playerAvatar = player.avatar;
+			console.log(playerAvatar);
 			const avatar = new PIXI.Sprite(player.avatar);
 			avatar.anchor.set(0.5);
 			avatar.width = avatar.height = 128;
@@ -803,7 +825,8 @@ export class ViewModule {
 		const state = {
 			players: data.players,
 			round: data.round,
-			chips: data.chips
+			chips: data.chips,
+			gravity: data.gravity
 		};
 		state.previous = previous || state;
 		this.states.push(state);

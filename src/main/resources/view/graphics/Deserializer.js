@@ -7,6 +7,7 @@ export function parseData(raw, globalData) {
 	const globalInfos = input.shift().map(elem => +elem);
 	const data = {
 		round: globalInfos[0],
+		gravity: globalInfos[1],
 		players: [],
 		chips: []
 	};

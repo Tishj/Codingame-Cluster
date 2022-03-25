@@ -128,9 +128,15 @@ public class Player2 {
 				possibleColors[i] = in.nextInt();
 			}
 
-			int column = validColumns.get(random.nextInt(validColumns.size()));
-			int color = possibleColors[random.nextInt(possibleColors.length)];
-			System.out.printf("DROP %d %d%n", column, color);
+			boolean rotate = random.nextInt(10) == 0;
+			if (rotate) {
+				System.out.printf("ROTATE %d%n", 1 + random.nextInt(5));
+			}
+			else {
+				int column = validColumns.get(random.nextInt(validColumns.size()));
+				int color = possibleColors[random.nextInt(possibleColors.length)];
+				System.out.printf("DROP %d %d%n", column, color);
+			}
 		}
 	}
 }

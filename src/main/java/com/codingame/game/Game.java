@@ -391,13 +391,16 @@ public class Game {
 			if (action.isDrop()) {
 				//Keep track of the chip so we know which one was added this turn
 				Chip chip = doDrop(player, action);
+				gameManager.setFrameDuration(300);
 			} else if (action.isRotate()) {
 				doRotate(player, action);
+				gameManager.setFrameDuration(500 * (3 - (Math.abs(action.cycleAmount - 3))));
 			}
 			else {
 				//throw exception
 				throw new UnrecognizedActionException();
 			}
+			gameManager.addToGameSummary(String.valueOf(gameManager.getFrameDuration()));
 		} catch (GameException e) {
 			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());
 			gameManager.getPlayer(1 - player.getIndex()).setScore(100);
@@ -405,7 +408,6 @@ public class Game {
 			gameManager.endGame();
 			return;
 		}
-		gameManager.setFrameDuration(1000);
 	}
 
 	public Map<HexCoord, Cell> getBoard() {

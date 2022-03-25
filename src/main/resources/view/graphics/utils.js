@@ -7,3 +7,7 @@ export function setAnimationProgress(fx, progress) {
 export function fit(entity, maxWidth, maxHeight) {
 	entity.scale.set(utils.fitAspectRatio(entity.texture.width, entity.texture.height, maxWidth, maxHeight));
 }
+
+export function degreesToRadians(degrees) {
+	return -(degrees * (Math.PI / 180));
+}

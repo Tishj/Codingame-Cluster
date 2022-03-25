@@ -17,11 +17,11 @@ import com.codingame.game.HexCoord;
 
 @Singleton
 public class GameDataProvider {
-    @Inject private Game game;
-    @Inject private MultiplayerGameManager<Player> gameManager;
+	@Inject private Game game;
+	@Inject private MultiplayerGameManager<Player> gameManager;
 
-    public FrameViewData getCurrentFrameData() {
-        FrameViewData data = new FrameViewData();
+	public FrameViewData getCurrentFrameData() {
+		FrameViewData data = new FrameViewData();
 
 		data.chips = game.getChips()
 			.stream()
@@ -36,40 +36,41 @@ public class GameDataProvider {
 			})
 			.collect(Collectors.toList());
 
-        data.players = gameManager.getPlayers()
-            .stream()
-            .map(player -> {
+		data.gravity = game.getGravity().getIndex();
+		data.players = gameManager.getPlayers()
+			.stream()
+			.map(player -> {
 
-                PlayerData playerData = new PlayerData();
-                playerData.score = player.getScore();
-                return playerData;
-            })
-            .collect(Collectors.toList());
+				PlayerData playerData = new PlayerData();
+				playerData.score = player.getScore();
+				return playerData;
+			})
+			.collect(Collectors.toList());
 
-        data.round = game.getRound();
+		data.round = game.getRound();
 
-        return data;
-    }
+		return data;
+	}
 
-    public GlobalViewData getGlobalData() {
-        GlobalViewData data = new GlobalViewData();
-        data.cells = game.getBoard()
-            .entrySet()
-            .stream()
-            .map(entry -> {
+	public GlobalViewData getGlobalData() {
+		GlobalViewData data = new GlobalViewData();
+		data.cells = game.getBoard()
+			.entrySet()
+			.stream()
+			.map(entry -> {
 
-                HexCoord coord = entry.getKey();
-                Cell cell = entry.getValue();
+				HexCoord coord = entry.getKey();
+				Cell cell = entry.getValue();
 
-                CellData cellData = new CellData();
-                cellData.q = coord.getQ();
-                cellData.r = coord.getR();
-                cellData.index = cell.getIndex();
-                return cellData;
-            })
-            .collect(Collectors.toList());
+				CellData cellData = new CellData();
+				cellData.q = coord.getQ();
+				cellData.r = coord.getR();
+				cellData.index = cell.getIndex();
+				return cellData;
+			})
+			.collect(Collectors.toList());
 
-        data.totalRounds = Game.MAX_ROUNDS;
-        return data;
-    }
+		data.totalRounds = Game.MAX_ROUNDS;
+		return data;
+	}
 }
