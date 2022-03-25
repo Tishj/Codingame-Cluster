@@ -1,15 +1,16 @@
 package com.codingame.game;
 
 import java.util.Random;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.ArrayList;
 
-import com.codingame.game.exception.GameException;
 import com.codingame.gameengine.core.MultiplayerGameManager;
-import com.codingame.game.exception.ChipNotFoundException;
-import com.codingame.game.exception.ChipNotSelectedException;
 import com.google.inject.Singleton;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Singleton
 public class ChipManager {
@@ -31,38 +32,46 @@ public class ChipManager {
 		return (colorId >= 0 && colorId < Config.COLORS_PER_PLAYER);
 	}
 
-	public Chip createChip(Player owner, int colorId, HexCoord coord) throws GameException {
-		if (!colorIsValid(colorId)) {
-			throw new ChipNotFoundException(colorId);
-		}
+	public Chip createChip(Player owner, int colorId, HexCoord coord) {
 		int index = owner.getIndex();
-		if (selectedChips[index][colorId] == 0) {
-			throw new ChipNotSelectedException(colorId);
-		}
 		selectedChips[index][colorId]--;
 
 		return new Chip(ChipManager.index++, colorId, owner, coord);
 	}
 
-	private ArrayList<Integer> getIndicesOfRemainingChipsForPlayer(Player player) {
+	public boolean colorIsSelected(Player player, int colorId) {
 		int index = player.getIndex();
-		ArrayList<Integer> indices = new ArrayList<>(Config.COLORS_PER_PLAYER);
+		return (selectedChips[index][colorId] != 0);
+	}
+
+	private List<Integer> getIndicesOfRemainingChipsForPlayer(Player player) {
+		int index = player.getIndex();
+		List<Integer> indices = IntStream.range(0,remainingChips[index].length).boxed().collect(Collectors.toList());
 		for (int i = 0; i < remainingChips[index].length; i++) {
-			if (remainingChips[index][i] != 0) {
-				indices.add(i);
+			if (remainingChips[index][i] == 0) {
+				indices.remove(i);
 			}
 		}
 		return indices;
 	}
 
-	public void populateSelectionForPlayer(Player player) {
+	public boolean populateSelectionForPlayer(Player player) {
 		int index = player.getIndex();
+		int selected = 0;
 		for (int i = 0; i < Config.COLORS_PER_ROUND; i++) {
-			ArrayList<Integer> indices = getIndicesOfRemainingChipsForPlayer(player);
-			int choice = random.nextInt(indices.size());
+			List<Integer> indices = getIndicesOfRemainingChipsForPlayer(player);
+			int remainingChipTypes = indices.size();
+			if (remainingChipTypes == 0) {
+				break;
+			}
+			int choice = random.nextInt(remainingChipTypes);
+			choice = indices.get(choice); //retrieve the corresponding index
+
 			remainingChips[index][choice]--;
 			selectedChips[index][choice]++;
+			selected++;
 		}
+		return selected != 0;
 	}
 
 	public void emptySelectionForPlayer(Player player) {

@@ -6,10 +6,6 @@ public class Chip {
 	int			index;
 	HexCoord	coord;
 
-	// public static final Chip NO_CHIP = new Chip(-1, -1) {
-
-	// };
-
 	@Override
 	public int hashCode() {
 		return coord.hashCode();

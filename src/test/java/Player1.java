@@ -55,8 +55,9 @@ public class Player1 {
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		Random random = new Random(0);
-
+		Random random = new Random();
+		long seed = random.nextLong();
+		System.err.println("Player1 random seed is " + seed);
 		//Start of Initial input
 		int numberOfCells = in.nextInt();
 		ArrayList<Cell>	board = new ArrayList<>(numberOfCells);

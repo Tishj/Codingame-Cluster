@@ -8,6 +8,7 @@ import com.codingame.view.ViewModule;
 
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.game.action.Action;
+import com.codingame.game.exception.GameException;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.GameManager;
 import com.codingame.gameengine.core.MultiplayerGameManager;
@@ -76,7 +77,7 @@ public class Referee extends AbstractReferee {
 
 	private void setWinner(Player player) {
 		gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
-		player.setScore(10);
+		player.setScore(100);
 		endGame();
 	}
 
@@ -85,7 +86,13 @@ public class Referee extends AbstractReferee {
 		// System.out.println(turn);
 		Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
 		
-		game.preparePlayerDataForRound(player);
+		try {
+			game.preparePlayerDataForRound(player);
+		}
+		catch (GameException e) {
+			setWinner(gameManager.getPlayer(1 - player.getIndex()));
+			return ;
+		}
 		sendInputs(player);
 		player.execute();
 
@@ -107,11 +114,13 @@ public class Referee extends AbstractReferee {
 			}
 			case WIN_PLAYER_ONE: {
 				gameManager.getPlayer(0).setScore(100);
+				gameManager.getPlayer(1).setScore(0);
 				endGame();
 				break;
 			}
 			case WIN_PLAYER_TWO: {
 				gameManager.getPlayer(1).setScore(100);
+				gameManager.getPlayer(0).setScore(0);
 				endGame();
 				break;
 			}
@@ -127,14 +136,20 @@ public class Referee extends AbstractReferee {
 
 	private void endGame() {
 		gameManager.endGame();
+	}
 
-		Player p0 = gameManager.getPlayers().get(0);
-		Player p1 = gameManager.getPlayers().get(1);
-		if (p0.getScore() > p1.getScore()) {
-			p1.hud.setAlpha(0.3);
-		}
-		if (p0.getScore() < p1.getScore()) {
-			p0.hud.setAlpha(0.3);
-		}
+	@Override
+	public void onEnd() {
+		endScreenModule.setTitleRankingsSprite("logo.png");
+
+		int scores[] = gameManager.getPlayers().stream()
+			.mapToInt(Player::getScore)
+			.toArray();
+		
+		String displayedText[] = gameManager.getPlayers().stream()
+			.map(Player::scoreToString)
+			.toArray(String[]::new);
+	 
+		endScreenModule.setScores(scores, displayedText);
 	}
 }

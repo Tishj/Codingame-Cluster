@@ -45,6 +45,10 @@ public class Player extends AbstractMultiplayerPlayer {
 		changed.add(chip);
 	}
 
+	public String scoreToString() {
+		return String.valueOf(this.getScore());
+	}
+
 	public Chip[] getChanged() {
 		Chip[] chips = changed.toArray(Chip[]::new);
 		changed.clear();

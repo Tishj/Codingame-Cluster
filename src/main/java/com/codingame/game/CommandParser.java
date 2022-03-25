@@ -6,16 +6,17 @@ import java.util.regex.Pattern;
 
 import com.codingame.game.action.DropAction;
 import com.codingame.game.action.RotateAction;
+import com.codingame.game.exception.ChipNotSelectedException;
 import com.codingame.game.exception.ColorOutOfRangeException;
 import com.codingame.game.exception.ColumnOutOfRangeException;
 import com.codingame.game.exception.CycleOutOfRangeException;
-import com.codingame.game.exception.GameException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class CommandParser {
 	@Inject private GameSummaryManager gameSummaryManager;
+	@Inject private ChipManager chipManager;
 
 	static final Pattern PLAYER_ROTATE_PATTERN = Pattern.compile(
 		"^ROTATE (?<cycleAmount>\\d+)"
@@ -50,6 +51,9 @@ public class CommandParser {
 				int colorId = Integer.parseInt(match.group("colorId"));
 				if (colorId < 0 || colorId >= Config.COLORS_PER_PLAYER) {
 					throw new ColorOutOfRangeException(colorId);
+				}
+				if (!chipManager.colorIsSelected(player, colorId)) {
+					throw new ChipNotSelectedException(colorId);
 				}
 				player.setAction(new DropAction(targetId, colorId));
 				return;

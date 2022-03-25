@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.codingame.game.exception.ColumnOutOfRangeException;
-import com.codingame.game.exception.GameException;
-
 public class Board {
 
 	public final Map<HexCoord, Cell> map;

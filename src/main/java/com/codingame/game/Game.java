@@ -17,6 +17,7 @@ import com.codingame.game.exception.CellNotFoundException;
 import com.codingame.game.exception.CellNotValidException;
 import com.codingame.game.exception.UnrecognizedActionException;
 import com.codingame.game.exception.GameException;
+import com.codingame.game.exception.NoChipsRemainingException;
 import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -359,8 +360,10 @@ public class Game {
 		return moved;
 	}
 
-	public void preparePlayerDataForRound(Player player) {
-		chipManager.populateSelectionForPlayer(player);
+	public void preparePlayerDataForRound(Player player) throws GameException {
+		if (!chipManager.populateSelectionForPlayer(player)) {
+			throw new NoChipsRemainingException();
+		}
 	}
 
 	public void performGameUpdate(Player player) {
