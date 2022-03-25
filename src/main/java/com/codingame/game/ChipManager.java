@@ -47,7 +47,7 @@ public class ChipManager {
 	private List<Integer> getIndicesOfRemainingChipsForPlayer(Player player) {
 		int index = player.getIndex();
 		List<Integer> indices = IntStream.range(0,remainingChips[index].length).boxed().collect(Collectors.toList());
-		for (int i = 0; i < remainingChips[index].length; i++) {
+		for (int i = remainingChips[index].length - 1; i >= 0; i--) {
 			if (remainingChips[index][i] == 0) {
 				indices.remove(i);
 			}

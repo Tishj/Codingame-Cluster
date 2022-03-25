@@ -14,6 +14,19 @@ public class Serializer {
                 frameViewData.round
             )
         );
+		//ChipData
+		lines.add(String.valueOf(frameViewData.chips.size()));
+		frameViewData.chips.stream().forEach(chipData -> {
+			lines.add(
+				join(
+					chipData.index,
+					chipData.color,
+					chipData.owner,
+					chipData.q,
+					chipData.r
+				)
+			);
+		});
         frameViewData.players.stream().forEach(playerData -> {
             lines.add(
                 join(

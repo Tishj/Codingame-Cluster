@@ -5,6 +5,6 @@ import java.util.Map;
 
 public class FrameViewData {
     public List<PlayerData> players;
-    public int frameType;
-    public int round, sunOrientation, nutrients;
+    public int round;
+	public List<ChipData> chips;
 }

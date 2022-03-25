@@ -45,7 +45,7 @@ public class Game {
 		random = new Random(seed);
 		board = BoardGenerator.generate(random);
 		chipManager.init(gameManager);
-		this.gravity = Gravity.SOUTH;
+		this.gravity = Gravity.SOUTH_EAST;
 		this.placedChips = new ArrayList<>(Config.CELL_COUNT);
 
 		round = 0;
@@ -420,4 +420,9 @@ public class Game {
 	public Gravity getGravity() {
 		return gravity;
 	}
+
+	public List<Chip> getChips() {
+		return this.placedChips;
+	}
+
 }

@@ -23,6 +23,19 @@ public class GameDataProvider {
     public FrameViewData getCurrentFrameData() {
         FrameViewData data = new FrameViewData();
 
+		data.chips = game.getChips()
+			.stream()
+			.map(chip -> {
+				ChipData chipData = new ChipData();
+				chipData.color = chip.getColorId();
+				chipData.owner = chip.getOwner().getIndex();
+				chipData.index = chip.getIndex();
+				chipData.q = chip.getCoord().getQ();
+				chipData.r = chip.getCoord().getR();
+				return chipData;
+			})
+			.collect(Collectors.toList());
+
         data.players = gameManager.getPlayers()
             .stream()
             .map(player -> {
