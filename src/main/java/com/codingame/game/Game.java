@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -84,37 +85,43 @@ public class Game {
 			Cell cell = board.map.get(board.getTopOfColumn(gravity, i));
 			assert(cell != null);
 			Chip chip = cell.getChip();
-			if (chip != null) {
+			if (chip == null) {
 				columns.add(i);
 			}
 		}
-		//invalidColumns
+		//validColumns
 		lines.add(String.valueOf(columns.size()));
-		for (int i = columns.size() - 1; i >= 0; i--) {
-			lines.add(String.valueOf(columns.get(i)));
+		for (int idx : columns) {
+			lines.add(String.valueOf(idx));
 		}
 
 		//newChips
 		Chip[] newChips = player.getUnknown();
 		lines.add(String.valueOf(newChips.length));
 		for (Chip chip : (Chip[])newChips) {
-			lines.add(String.format("%d %d %d %d",
+			lines.add(String.format("%d %d %d",
 				chip.getIndex(),
 				chip.getColorId(),
-				board.map.get(chip.getCoord()).getIndex(),
 				chip.getOwner().getIndex() == player.getIndex() ? 1 : 0
 				));
 		}
 
 		//changedChips
-		Chip[] changedChips = player.getChanged();
-		lines.add(String.valueOf(changedChips.length));
-		for (Chip chip : (Chip[])changedChips) {
-			lines.add(String.format("%d %d",
-				chip.getIndex(),
-				board.map.get(chip.getCoord()).getIndex()
-			));
-		}
+		HashSet<HexCoord> changedCells = player.getChanged();
+		lines.add(String.valueOf(changedCells.size()));
+		changedCells.stream()
+			.map(coord -> {
+				return board.map.get(coord);
+			})
+			.forEach(cell -> {
+				Chip chip = cell.getChip();
+				int chipIndex = (chip == null) ? -1 : chip.getIndex();
+				lines.add(String.format("%d %d",
+					cell.getIndex(),
+					chipIndex
+				));
+			});
+		player.clearChanged();
 
 		//selectedColors
 		int amountOfSelectedColors = chipManager.selectedAmount;
@@ -292,6 +299,8 @@ public class Game {
 		cell.setChip(chip);
 		
 		dropChip(chip, null);
+		player.addToChanged(chip.getCoord()); //add the position the chip has landed
+		other.addToChanged(chip.getCoord());
 
 		//move rest of selection back to remaining
 		chipManager.emptySelectionForPlayer(player);
@@ -302,17 +311,19 @@ public class Game {
 		gravity = gravity.rotate(action.cycleAmount);
 
 		//Drop all chips
-		ArrayList<Chip> changedChips = new ArrayList<>(placedChips.size());
+		ArrayList<HexCoord> changedCells = new ArrayList<>(placedChips.size());
 		for (Chip chip: placedChips) {
-			if (dropChip(chip, changedChips)) {
-				changedChips.add(chip);
+			HexCoord oldPosition = chip.getCoord();
+			if (dropChip(chip, changedCells)) {
+				changedCells.add(chip.getCoord());
+				changedCells.add(oldPosition);
 			}
 		}
 		//Add the changed chips to the players(and other) changed chips
 		Player other = gameManager.getPlayer(1 - player.getIndex());
-		for (Chip chip : changedChips) {
-			other.addToChanged(chip);
-			player.addToChanged(chip);
+		for (HexCoord coord : changedCells) {
+			other.addToChanged(coord);
+			player.addToChanged(coord);
 		}
 		//Burn the selected chips
 		chipManager.destroySelection();
@@ -325,7 +336,7 @@ public class Game {
 	}
 
 	//@return true/false indicating whether the chip moved at least one place or not
-	public boolean dropChip(Chip chip, ArrayList<Chip> changedChips) {
+	public boolean dropChip(Chip chip, ArrayList<HexCoord> changedCells) {
 		Map<HexCoord, Cell> board = getBoard();
 		//Move it downwards
 		boolean moved = false;
@@ -347,13 +358,14 @@ public class Game {
 			Chip neighbourChip = neighbour.getChip();
 			//Cell is not vacant
 			if (neighbourChip != null) {
-				if (!dropChip(neighbourChip, changedChips)) {
+				if (!dropChip(neighbourChip, changedCells)) {
 					break;
 				}
 				//Chip moved, cell is now vacant
 				//Optional
-				if (changedChips != null) {
-					changedChips.add(neighbourChip);
+				if (changedCells != null) {
+					changedCells.add(coord); //might be redundant??
+					changedCells.add(neighbourChip.getCoord());
 				}
 			}
 			updateChipLocation(cell, neighbour, chip, coord);

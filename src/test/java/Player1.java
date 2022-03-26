@@ -16,11 +16,10 @@ public class Player1 {
 
 		public Chip(int index,
 					int color,
-					int cellIndex,
 					boolean isMine) {
 			this.index = index;
 			this.color = color;
-			this.cellIndex = cellIndex;
+			this.cellIndex = -1;
 			this.isMine = isMine;
 		}
 
@@ -35,11 +34,19 @@ public class Player1 {
 	private static class Cell {
 		private int index;
 		private int[] neighbours;
+		private int chipIndex;
 
 		public Cell(int index,
 					int[] neighbours) {
 			this.index = index;
+			this.chipIndex = -1;
 			this.neighbours = neighbours;
+		}
+		public void setChipIndex(int chipIndex) {
+			this.chipIndex = chipIndex;
+		}
+		public int getChipIndex() {
+			return this.chipIndex;
 		}
 	}
 
@@ -96,28 +103,29 @@ public class Player1 {
 		while (true) {
 			int gravity = in.nextInt();
 
-			int numberOfInvalidColumns = in.nextInt();
-			List<Integer>	validColumns = IntStream.range(0,numberOfColumns).boxed().collect(Collectors.toList());
-			for (int i = 0; i < numberOfInvalidColumns; i++) {
-				validColumns.remove(in.nextInt());
+			int numberOfValidColumns = in.nextInt();
+			List<Integer>	validColumns = new ArrayList<>(numberOfColumns);
+			for (int i = 0; i < numberOfValidColumns; i++) {
+				validColumns.add(in.nextInt());
 			}
 
 			int numberOfNewChips = in.nextInt();
 			for (int i = 0; i < numberOfNewChips; i++) {
 				int index = in.nextInt();
 				int colorIndex = in.nextInt();
-				int cellIndex = in.nextInt();
 				int isMine = in.nextInt();
-				chips.add(new Chip(index, colorIndex, cellIndex, isMine == 1));
+				chips.add(new Chip(index, colorIndex, isMine == 1));
 			}
 
-			//This is slightly fucked.. dont know whether a cell was already updated by another chip, so I cant just set the old cell to NULL
-			//Maybe the player never needs to register in the Cell which Chip is on it ??
-			int numberOfChangedChips = in.nextInt();
-			for (int i = 0; i < numberOfChangedChips; i++) {
+			int numberOfChangedCells = in.nextInt();
+			for (int i = 0; i < numberOfChangedCells; i++) {
+				int cellIndex = in.nextInt();
 				int chipIndex = in.nextInt();
-				int newCellIndex = in.nextInt();
-				chips.get(chipIndex).updatePosition(newCellIndex);
+				Chip chip = (chipIndex == -1) ? null : chips.get(chipIndex);
+				board.get(cellIndex).setChipIndex(chipIndex);
+				if (chip != null) {
+					chip.updatePosition(cellIndex);
+				}
 			}
 
 			int numberOfPelletsInHand = in.nextInt();
@@ -126,9 +134,15 @@ public class Player1 {
 				possibleColors[i] = in.nextInt();
 			}
 
-			int column = validColumns.get(random.nextInt(validColumns.size()));
-			int color = possibleColors[random.nextInt(possibleColors.length)];
-			System.out.printf("DROP %d %d%n", column, color);
+			boolean rotate = random.nextInt(10) == 0;
+			if (rotate) {
+				System.out.printf("ROTATE %d%n", 1 + random.nextInt(5));
+			}
+			else {
+				int column = validColumns.get(random.nextInt(validColumns.size()));
+				int color = possibleColors[random.nextInt(possibleColors.length)];
+				System.out.printf("DROP %d %d%n", column, color);
+			}
 		}
 	}
 }

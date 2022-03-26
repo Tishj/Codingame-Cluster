@@ -1,16 +1,53 @@
-gameloop
-read opponentRow:int opponentCol:int
-read validActionCount:int
-loop validActionCount read row:int col:int
-write 0 0
+read numberOfCells:int
+loop numberOfCells read index:int richness:int neigh0:int neigh1:int neigh2:int neigh3:int neigh4:int neigh5:int
 
-STATEMENT
-Get 3 cells in a row!
+read numberOfColumns:int
+loop numberOfColumns read cell0:int cell1:int cell2:int cell3:int cell5:int cell6:int
+
+read yourColors:int
+loop yourColors read maxAmount:int
+
+read opponentColors:int
+loop opponentColors read maxAmount:int
+
+gameloop
+
+read gravity:int
+
+read numberOfValidColumns:int
+loop numberOfValidColumns read columnIndex:int
+
+read numberOfNewChips:int
+loop numberOfNewChips read index:int colorIndex:int isMine:int
+
+read numberOfChangedCells:int
+loop numberOfChangedCells read cellIndex:int chipIndex:int
+
+read numberOfPelletsInHand:int
+loop numberOfPelletsInHand read colorIndex:int
+
+write ROTATE 1
 
 INPUT
-opponentRow: The coordinates of your opponent's last move
-validActionCount: the number of possible actions for your next move
-row: The coordinates of a possible next move
+numberOfCells: amount of cells the board consists of
+index: unique indentifier between 0 and numberOfCells
+neigh0: the index of the neighbouring cell for each gravity direction
+
+numberOfColumns: amount of cell positions that chips can be inserted at
+cell0: the cell index at this position for each gravity direction
+
+gravity: the current direction of gravity, starts at 0(south): 0-5
+
+numberOfValidColumns: the amount of columns that aren't currently filled
+
+numberOfNewChips: new chips added since last update
+isMine: 1 if you own it
+
+numberOfChangedCells: changed cells since last update
+chipIndex: -1 if now empty else index of the chip currently on this cell
+
+numberOfPelletsInHand: amount of chips drawn for you this round
+colorIndex: the color of this chip
 
 OUTPUT
-<row> <column>
+DROP columnIdx colorIdx | ROTATE cycleAmount
