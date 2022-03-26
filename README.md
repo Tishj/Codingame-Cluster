@@ -1,5 +1,5 @@
 VALID MOVES:  
-`PLACE column color`  
+`DROP column color`  
 `ROTATE cycles` (1-5 are valid amounts for `cycles`)
 
 If an invalid move is made, or a bot times out, the opposing player wins and the game is over.
@@ -22,8 +22,7 @@ Next `numberOfCells` lines: 7 space-separated integers:
 - 6 `neigh` variables, one for each direction, containing the index of a neighboring cell or -1 if is there is no neighbor.  
 
 Next line: An integer `numberOfColumns`
-for `numberOfColumns` lines: 7 space-separated integers
-- column number
+for `numberOfColumns` lines: 6 space-separated integers
 - 6 cellIndex variables, one for each direction, containing the index of the cell that is at the top of that column, for that direction.
 
 Next line: An integer `yourColors`  
@@ -37,24 +36,22 @@ Next `opponentColors` lines: 2 space-separated integers:
 - `maxAmount` for the max amount of pellets of that color.  
 
 ### Input for One Game Turn
-First line: An integer `direction` (between 0 and 5): the direction of gravity.  
+First line: An integer `gravity` (between 0 and 5): the direction of gravity.  
 
 Next line: `numberOfValidColumns`  
-next `numberOfValidColumns` lines: 2 space-separated integers  
-- `column`: the column to use for a PLACE command  
-- `cellIndex`: the cell that correspond to the top of the column, according to the current gravity  
+next `numberOfValidColumns` lines: 1 integer 
+- `column`: the column to use for a DROP command
 
 Next line: `numberOfNewPellets`  
-next `numberOfNewPellets` lines: 4 space-separated integers:  
+next `numberOfNewPellets` lines: 3 space-separated integers:  
 - `index`: index of the new pellet.  
-- `cellIndex`: index of the cell the pellet is currently on.  
 - `colorIndex`: index of the pellet's color.  
 - `isMine`: 1 if you are the owner of this pellet, 0 otherwise.
 
-Next line: `numberOfChangedPellets`  
-next `numberOfChangedPellets` lines: 2 space-separated integers:  
-- `index`: index of the pellet.   
-- `cellIndex`: index of the cell the pellet is currently on.  
+Next line: `numberOfChangedCells`  
+next `numberOfChangedCells` lines: 2 space-separated integers:  
+- `cellIndex`: index of the cell 
+- `chipIndex`: index of the chip. (-1 if empty)
 
 Next line: `numberOfPelletsInHand`
 next `numberOfPelletsInHand` lines: 1 integer:
@@ -76,5 +73,6 @@ Both players have a match of equal size, with equal number of tiles of their win
 
 Invalid moves:  
 Move is not among the valid moves, or does not follow the correct format for the move  
-PLACE command was done for a column that is already full  
+DROP command was done for a column that is already full
+ROTATE command specified an invalid amount of cycles.
 Sending a command before reading all the input  
