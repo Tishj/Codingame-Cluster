@@ -32,20 +32,14 @@ INPUT
 numberOfCells: amount of cells the board consists of
 index: unique indentifier between 0 and numberOfCells
 neigh0: the index of the neighbouring cell for each gravity direction
-
 numberOfColumns: amount of cell positions that chips can be inserted at
 cell0: the cell index at this position for each gravity direction
-
 gravity: the current direction of gravity, starts at 0(south): 0-5
-
 numberOfValidColumns: the amount of columns that aren't currently filled
-
 numberOfNewChips: new chips added since last update
 isMine: 1 if you own it
-
 numberOfChangedCells: changed cells since last update
 chipIndex: -1 if now empty else index of the chip currently on this cell
-
 numberOfPelletsInHand: amount of chips drawn for you this round
 colorIndex: the color of this chip
 

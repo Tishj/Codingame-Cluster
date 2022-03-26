@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Player {
+class Player {
 
 	private static class Chip {
 		private int		index;
@@ -64,7 +64,6 @@ public class Player {
 		Scanner in = new Scanner(System.in);
 		Random random = new Random();
 		long seed = random.nextLong();
-		System.err.println("Player2 random seed is " + seed);
 
 		//Start of Initial input
 		int numberOfCells = in.nextInt();
