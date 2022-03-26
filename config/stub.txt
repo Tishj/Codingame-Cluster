@@ -23,8 +23,8 @@ loop numberOfNewChips read index:int colorIndex:int isMine:int
 read numberOfChangedCells:int
 loop numberOfChangedCells read cellIndex:int chipIndex:int
 
-read numberOfPelletsInHand:int
-loop numberOfPelletsInHand read colorIndex:int
+read numberOfColorsInHand:int
+loop numberOfColorsInHand read colorIndex:int
 
 write ROTATE 1
 
@@ -40,7 +40,7 @@ numberOfNewChips: new chips added since last update
 isMine: 1 if you own it
 numberOfChangedCells: changed cells since last update
 chipIndex: -1 if now empty else index of the chip currently on this cell
-numberOfPelletsInHand: amount of chips drawn for you this round
+numberOfColorsInHand: amount of chips drawn for you this round
 colorIndex: the color of this chip
 
 OUTPUT
