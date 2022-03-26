@@ -1,6 +1,7 @@
 package com.codingame.game;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import com.codingame.game.action.Action;
@@ -11,11 +12,11 @@ public class Player extends AbstractMultiplayerPlayer {
 	public Group hud;
 	private Action action;
 	ArrayDeque<Chip>	unknown;
-	HashSet<Chip>	changed;
+	HashSet<HexCoord>	changed;
 
 	Player() {
 		unknown = new ArrayDeque<Chip>();
-		changed = new HashSet<Chip>();
+		changed = new HashSet<HexCoord>();
 	}
 
 	@Override
@@ -41,17 +42,18 @@ public class Player extends AbstractMultiplayerPlayer {
 		return chips;
 	}
 
-	public void addToChanged(Chip chip) {
-		changed.add(chip);
+	public void addToChanged(HexCoord coord) {
+		changed.add(coord);
 	}
 
 	public String scoreToString() {
 		return String.valueOf(this.getScore());
 	}
 
-	public Chip[] getChanged() {
-		Chip[] chips = changed.toArray(new Chip[changed.size()]);
+	public HashSet<HexCoord> getChanged() {
+		return changed;
+	}
+	public void clearChanged() {
 		changed.clear();
-		return chips;
 	}
 }

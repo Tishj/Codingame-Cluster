@@ -1,60 +1,429 @@
-<div id="statement_back" class="statement_back" style="display:none"></div>  <div class="statement-body">
-      <!-- LEAGUE ALERT -->
-      <div style="color: #7cc576; 
-        background-color: rgba(124, 197, 118,.1);
-        padding: 20px;
-        margin-right: 15px;
-        margin-left: 15px;
-        margin-bottom: 10px;
-        text-align: left;">
-          <div style="text-align: center; margin-bottom: 6px">
-            <img src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" />
-          </div>
-          <p style="text-align: center; font-weight: 700; margin-bottom: 6px;">
-            This is a <b>league based</b> challenge.
-          </p>
-          <span class="statement-league-alert-content">
-            For this challenge, multiple versions of the same game are available. Once you have proven your skills on this first version, you will access a higher league and extra rules will be unlocked.
-          </span>
-      </div> 
-      <!-- GOAL --> 
-      <div class="statement-section statement-goal"> 
-        <h2> 
-          <span class="icon icon-goal">&nbsp;</span> 
-          <span>The Goal</span> 
-        </h2> 
-        <div class="statement-goal-content"> 
-          Tic-tac-toe is a turn-based game, where the objective is to get three in a row.
-        </div> 
-      </div> 
-      <!-- RULES --> 
-      <div class="statement-section statement-rules"> 
-        <h2> 
-          <span class="icon icon-rules">&nbsp;</span> 
-          <span>Rules</span> 
-        </h2> 
-        <div><div class="statement-rules-content"><p>The game is played on a 3x3 grid. You must output the coordinate of the cell you want to mark. The first player to get 3 of their mark in a row (vertically, horizontally or diagonally) wins.</p>
-<p>You can download the source code of this game on <a href="https://github.com/CodinGame/game-ultimate-tictactoe" target="_blank">GitHub</a>. You can create your own game using the <a href="https://github.com/CodinGame/codingame-sdk-doc" target="_blank">CodinGame SDK</a>!</p></div> 
-        </div> 
-      </div> 
-      <!-- PROTOCOL --> 
-      <div class="statement-section statement-protocol"> 
-        <h2> 
-          <span class="icon icon-protocol">&nbsp;</span> 
-          <span>Game Input</span> 
-        </h2> 
-        <!-- Protocol block --> 
-        <div class="blk"> 
-  <div class="title">Input for one game turn</div> 
-          <div class="text"><span class="statement-lineno">Line 1:</span> 2 space separated integers <var>opponentRow</var> and <var>opponentCol</var>, the opponent's last action (<const>-1</const> <const>-1</const> for the first turn). <br>
-<span class="statement-lineno">Line 2:</span> the number of valid actions for this turn, <var>validActionCount</var>. <br>
-<span class="statement-lineno">Next <var>validActionCount</var> lines:</span> 2 space separated integers <var>row</var> and <var>col</var>, the coordinates you're allowed to play at.</div> 
-        </div> 
- 
-        <!-- Protocol block --> 
-        <div class="blk"> 
-  <div class="title">Output for one game turn</div> 
-          <div class="text"><span class="statement-lineno">Line 1:</span> 2 space separated integers <var>row</var> and <var>col</var>.</div> 
-        </div> 
-      </div>
-  </div>
+<!-- LEAGUES level1 -->
+<div id="statement_back" class="statement_back" style="display: none"></div>
+<div class="statement-body">
+	<!-- LEAGUE ALERT -->
+	<div style="color: #7cc576; 
+	background-color: rgba(124, 197, 118,.1);
+	padding: 20px;
+	margin-right: 15px;
+	margin-left: 15px;
+	margin-bottom: 10px;
+	text-align: left;">
+	<div style="text-align: center; margin-bottom: 6px">
+		<img src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" />
+	</div>
+	
+	<p style="text-align: center; font-weight: 700; margin-bottom: 6px;">
+		This is a <b>league based</b> challenge.
+	</p>
+	<div class="statement-league-alert-content">
+		For this challenge, multiple leagues for the same game are available. Once you have proven yourself against the
+		first Boss, you will access a higher league and extra rules will be available.<br>
+		<br>
+	</div>
+	
+</div>
+
+<div style="padding: 20px;
+margin-right: 15px;
+margin-bottom: 10px;
+text-align: left;">
+<em>Tutorial video by Gaurav Sen: <a href="https://youtu.be/gZMdOiqchDk" rel="noopener" target="_blank" >https://youtu.be/gZMdOiqchDk</a></em>
+</div>
+
+
+<!-- GOAL -->
+<div class="statement-section statement-goal">
+	<h2>
+		<span class="icon icon-goal">&nbsp;</span>
+		<span>Goal</span>
+	</h2>
+	<div style="margin-bottom: 10px" class="statement-goal-content">
+		<div>
+			Connect enough chips to <b>win</b> before your opponent.
+		</div>
+		<center style="margin: 20px">
+			<img src="https://static.codingame.com/servlet/fileservlet?id=61574189838986" style="margin-bottom: 5px">
+		</center>
+	</div>
+	Decide between placing chips at strategic positions, or to rotate the board to a different side.
+	
+</div>
+<!-- RULES -->
+<div class="statement-section statement-rules">
+	<h2>
+		<span class="icon icon-rules">&nbsp;</span>
+		<span>Rules</span>
+	</h2>
+	
+	<div class="statement-rules-content">
+		<div style="margin-bottom: 10px">
+			The game takes place on a hexagonal grid representing the <b>galaxy</b>.
+		</div>
+		<div style="margin-bottom: 10px">
+			The players take turns to take actions.
+		</div>
+		
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		Galaxy</h3>
+		
+		<div style="margin-bottom: 10px">
+			The galaxy is made up of <const>37</const> hexagonal cells, arranged to form a larger hexagon.
+			<br>
+			<div class="statement-new-league-rule">
+				Each cell has an <b>index</b> and up to six neighbors. Each direction is labelled <const>0</const> to <const>5</const> and have a one-to-one relation with <b>gravity</b>.
+				
+				<center style="margin: 20px">
+					<img src="https://static.codingame.com/servlet/fileservlet?id=61694161023285"
+					style="height: 226px; margin-bottom: 5px">
+					<div>
+						<em>Hex directions</em>
+					</div>
+				</center>
+				<br>
+				
+				The distance between two cells equals the minimum number of cells to go through to get from one to the other.
+				
+			</div>
+		</div>
+		
+		
+		<div style="margin-bottom: 10px">
+			<div style="margin-bottom: 10px">
+				Each cell may contain a <b>chip</b>. Each chip is owned by one of the players.
+			</div>
+		</div>
+		
+		
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		Chips</h3>
+		
+
+		<div style="margin-bottom: 10px">
+			Every player has a bag of their chip color, at the start of each round <const>2</const> chips are selected from this bag.
+		</div>
+
+		<div style="margin-bottom: 10px">
+			At the start of a turn, the player receives <b>chips</b> of a certain color from their bag.<br>
+			Then the player can place one of these chips on the board.<br>
+			When making a <b>DROP</b> action, the other selected chips go back into the bag. <br>
+			When a <b>ROTATE</b> action is made, the selected chips are destroyed.<br><br>
+			Chips are affected by <b>gravity</b> and will fall until they hit another chip or the board boundary.
+		</div>
+
+		
+		<div class="statement-new-league-rule">
+			
+			
+			<h3 style="font-size: 14px;
+			font-weight: 700;
+			padding-top: 15px;
+			color: #838891;
+			padding-bottom: 15px;">
+			Gravity</h3>
+			
+			<div style="margin-bottom: 10px">
+				The board is rotated to a side, corresponding to the <b>gravity</b>:
+				<ul>
+					<li>Side <const>0</const> the board is leaning on its <b>SOUTH</b> side.</li>
+					<li>Side <const>1</const> the board is leaning on its <b>SOUTH WEST</b> side.</li>
+					<li>Side <const>2</const> the board is leaning on its <b>NORTH WEST</b> side.</li>
+					<li>Side <const>3</const> the board is leaning on its <b>NORTH</b> side.</li>
+					<li>Side <const>4</const> the board is leaning on its <b>NORTH EAST</b> side.</li>
+					<li>Side <const>5</const> the board is leaning on its <b>SOUTH EAST</b> side.</li>
+				</ul>
+			</div>
+			
+			<div style="margin-bottom: 10px">
+				<b>ROTATE</b> commands can be used to change the gravity by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
+			</div>
+			
+		</div>
+		
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		Actions</h3>
+		<div style="margin-bottom: 10px">
+			The players take turns performing actions, the player can perform one of two possible actions.
+			<br>
+		</div>
+		<div style="margin-bottom: 10px">
+			The possible actions are:
+			<ul>
+				<li>
+					<action>DROP column color</action>: Insert a chip of a specific color at the top of the board, at a specific column.
+				</li>
+				<li>
+					<action>ROTATE amount</action>: Rotate the board <b>clock-wise</b> by a certain amount of cycles (1-5), changing the <b>gravity</b>.
+				</li>
+			</ul>
+		</div>
+		
+		
+		<div class="statement-new-league-rule">
+			<h3 style="font-size: 14px;
+			font-weight: 700;
+			padding-top: 15px;
+			color: #838891;
+			padding-bottom: 15px;">
+			Drop action</h3>
+			
+			<div style="margin-bottom: 10px">
+				When performing a drop action, you reduce your amount of remaining chips for that color by <const>1</const>.<br>
+				The other selected chips go back into the <b>bag</b>.
+			</div>
+			<div style="margin-bottom: 10px">
+				You may not drop onto a column that is currently filled.<br>
+				You can only drop a color that has been selected for you for that round.
+			</div>
+			
+		</div>
+		
+		<div class="statement-new-league-rule">
+			<h3 style="font-size: 14px;
+			font-weight: 700;
+			padding-top: 15px;
+			color: #838891;
+			padding-bottom: 15px;">
+			Rotate action</h3>
+			
+			<div style="margin-bottom: 10px">
+				When performing a rotate action, you <b>destroy</b> all of the chips that were selected for you at the start of the round. (reducing the amount remaining)
+			</div>
+			<div style="margin-bottom: 10px">
+				You may only rotate by 1-5(inclusive) cycles.
+			</div>
+			<div style="margin-bottom: 10px">
+				Chips will fall according to this new <b>gravity</b>
+			</div>
+		</div>
+		
+		
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		⛔ Game end</h3>
+		
+		<div style="margin-bottom: 10px">
+			The game lasts at most <b>34 rounds</b> or until one player has made a connection of <const>4</const> or more, and bigger than their opponent.
+		</div>
+		
+		<div style="margin-bottom: 10px">If players have a connection of the same length, the winner is decided by the color of the connection.<br>
+		The color with the least amount of chips of that color placed on the board wins.
+		</div>
+		
+		<div class="statement-victory-conditions">
+			<div class="icon victory"></div>
+			<div class="blk">
+				<div class="title">Victory Conditions</div>
+				<div class="text">
+					<ul style="padding-top:0; padding-bottom: 0;">
+						The winner is the player with the biggest <b>connection</b>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- Lose conditions -->
+		<div class="statement-lose-conditions">
+			<div class="icon lose"></div>
+			<div class="blk">
+				<div class="title">Defeat Conditions</div>
+				<div class="text">
+					<ul style="padding-top:0; padding-bottom: 0;">
+						Your program does not provide a command in the allotted time or it provides an unrecognized/invalid command.
+					</ul>
+				</div>
+			</div>
+		</div>
+		<br>
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		🐞 Debugging tips</h3>
+		<ul>
+			<li>Hover over a cell to see extra information about it</li>
+			<li>Press the gear icon on the viewer to access extra display options</li>
+			<li>Use the keyboard to control the action: space to play/pause, arrows to step 1 frame at a time</li>
+		</ul>
+		
+	</div>
+</div>
+
+<!-- EXPERT RULES -->
+<div class="statement-section statement-expertrules">
+	<h2>
+		<span class="icon icon-expertrules">&nbsp;</span>
+		<span>Technical Details</span>
+	</h2>
+	<div class="statement-expert-rules-content">
+		<ul style="padding-left: 20px;padding-bottom: 0">
+			<li>
+				Chips are initialized to <b>cellAmount</b> / <const>playerAmount(2)</const> * <const>colorsPerPlayer(2)</const> rounded down to the first multiple of (2 * 2)
+			</li>
+			<li>
+				You can check out the source code of this game <a rel="nofollow" target="_blank"
+				href="https://github.com/Tishj/codingame-cluster">on this GitHub repo</a>.
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<!-- PROTOCOL -->
+<div class="statement-section statement-protocol">
+	<h2>
+		<span class="icon icon-protocol">&nbsp;</span>
+		<span>Game Protocol</span>
+	</h2>
+	
+	<!-- Protocol block -->
+	<div class="blk">
+		<div class="title">Initialization Input</div>
+		<span class="statement-lineno">First line:</span> <var>numberOfCells</var>.<br>
+		<span class="statement-lineno">Next <var>numberOfCells</var> lines:</span>
+		<const>7</const> space-separated integers:
+		<ul>
+			<li><var>index</var> for the cell's index.</li>
+			<li>
+				<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of a
+				neighboring cell or <const>-1</const> if there is no neighbor.
+			</li>
+		</ul>
+		<span class="statement-lineno">Next line:</span> <var>numberOfColumns</var>.<br>
+		<span class="statement-lineno">Next <var>numberOfColumns</var> lines:</span>
+		<const>6</const> space-separated integers:
+		<ul>
+			<li>
+				<const>6</const> <var>cell</var> variables, one for each <b>direction</b>, containing the index of the cell at this position for every <b>direction</b>.
+			</li>
+		</ul>
+		<div class="text">
+		<span class="statement-lineno">Next line:</span> <var>yourColors</var>.<br>
+		<span class="statement-lineno">Next <var>yourColors</var> lines:</span>
+		<const>2</const> space-separated integers:
+		<ul>
+			<li>
+				<var>index</var> for the color's index.
+			</li>
+			<li>
+				<var>maxAmount</var> for the total amount of chips of this color in the bag.
+			</li>
+		</ul>
+		<span class="statement-lineno">Next line:</span> <var>opponentColors</var>.<br>
+		<span class="statement-lineno">Next <var>opponentColors</var> lines:</span>
+		<const>2</const> space-separated integers:
+		<ul>
+			<li>
+				<var>index</var> for the color's index.
+			</li>
+			<li>
+				<var>maxAmount</var> for the total amount of chips of this color in their bag.
+			</li>
+		</ul>
+		<div class="text">
+			
+		</div>
+	</div>
+	<div class="blk">
+		<div class="title">Input for One Game Turn</div>
+		<div class="text">
+			
+			<span class="statement-lineno">First line:</span> An integer <var>gravity</var>:
+			the current direction of gravity. (between 0 and 5)<br>
+			
+			<span class="statement-lineno">Next line:</span> <var>numberOfValidColumns</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfValidColumns</var> lines:</span>
+			<const>1</const> integer:
+			<ul>
+				<li><var>column</var>: a column that isn't currently filled with chips.</li>
+			</ul>
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfNewChips</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfNewChips</var> lines:</span>
+			<const>3</const> space-separated integers:
+			<ul>
+				<li><var>index</var>: the index of the new chip.</li>
+				<li><var>colorIndex</var>: the color of the new chip.</li>
+				<li><var>isMine</var>: <const>1</const> if you are the owner of this chip.</li>
+			</ul>
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfChangedCells</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfChangedCells</var> lines:</span>
+			<const>2</const> space-separated integers:
+			<ul>
+				<li><var>cellIndex</var>: the index of the changed cell.</li>
+				<li><var>chipIndex</var>: the index of the chip at this cell (-1 if empty).</li>
+			</ul>
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfColorsInHand</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfColorsInHand</var> lines:</span>
+			<const>1</const> integer:
+			<ul>
+				<li><var>colorIndex</var>: a color selected from the bag this round.</li>
+			</ul>
+		</div>
+	</div>
+	
+	
+	<!-- Protocol block -->
+	<div class="blk">
+		<div class="title">Output</div>
+		<div class="text">
+			A single line with your command:
+			
+			<div class="statement-new-league-rule">
+				
+				<ul style="padding-left: 20px;padding-top: 0">
+					<li>
+						<action>DROP column color</action>: drop a chip of type <action>color</action> onto the board at <action>column</action>.
+					</li>
+					<li>
+						<action>ROTATE amount</action>: rotate the board by <action>amount</action> cycles (clock-wise).
+					</li>
+				</ul>
+				
+			</div>
+		</div>
+	</div>
+	
+	<div class="blk">
+		<div class="title">Constraints</div>
+		<div class="text">
+			Response time per turn ≤ <const>100</const>ms
+			<br>Response time for the first turn ≤ <const>1000</const>ms
+		</div>
+	</div>
+</div>
+
+<!-- LEAGUE ALERT -->
+<div style="color: #7cc576; 
+background-color: rgba(124, 197, 118,.1);
+padding: 20px;
+margin-top: 10px;
+text-align: left;">
+<div style="text-align: center; margin-bottom: 6px"><img
+	src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" /></div>
+	
+	<div style="text-align: center; font-weight: 700; margin-bottom: 6px;">
+		What is in store for me in the higher leagues?
+	</div>
+	Extra rules available in higher leagues are:
+	<ul>
+	</ul>
+</div>
+</div>
