@@ -1,4 +1,4 @@
-<!-- LEAGUES level1 level2 level3 level4 -->
+<!-- LEAGUES level1 -->
 <div id="statement_back" class="statement_back" style="display: none"></div>
 <div class="statement-body">
 	<!-- LEAGUE ALERT -->
@@ -13,20 +13,13 @@
 		<img src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" />
 	</div>
 	
-	<!-- BEGIN level1 -->
 	<p style="text-align: center; font-weight: 700; margin-bottom: 6px;">
 		This is a <b>league based</b> challenge.
 	</p>
-	<!-- END -->
 	<div class="statement-league-alert-content">
-		<!-- BEGIN level1 -->
 		For this challenge, multiple leagues for the same game are available. Once you have proven yourself against the
 		first Boss, you will access a higher league and extra rules will be available.<br>
 		<br>
-		<!-- END -->
-		<!-- Starter AIs are available in the
-		<a target="_blank" href="https://github.com/CodinGame/SpringChallenge2021/tree/main/starterAIs">Starter Kit</a>.
-		They can help you get started with your own bot. -->
 	</div>
 	
 </div>
@@ -70,13 +63,6 @@ text-align: left;">
 		<div style="margin-bottom: 10px">
 			The players take turns to take actions.
 		</div>
-		<!-- BEGIN level1 -->
-		<!-- <div class="statement-new-league-rule">
-			<div style="margin-bottom: 10px">
-				In this league, there is only <const>1 day</const>.
-			</div>
-		</div> -->
-		<!-- END -->
 		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
@@ -87,11 +73,8 @@ text-align: left;">
 		
 		<div style="margin-bottom: 10px">
 			The galaxy is made up of <const>37</const> hexagonal cells, arranged to form a larger hexagon.
-			<!-- BEGIN level3 level4 -->
 			<br>
-			<!-- BEGIN level3 -->
 			<div class="statement-new-league-rule">
-				<!-- END -->
 				Each cell has an <b>index</b> and up to six neighbors. Each direction is labelled <const>0</const> to <const>5</const> and have a one-to-one relation with <b>gravity</b>.
 				
 				<center style="margin: 20px">
@@ -105,19 +88,14 @@ text-align: left;">
 				
 				The distance between two cells equals the minimum number of cells to go through to get from one to the other.
 				
-				<!-- BEGIN level3 -->
 			</div>
-			<!-- END -->
-			<!-- END -->
 		</div>
 		
 		
 		<div style="margin-bottom: 10px">
-			<!-- BEGIN level1 -->
 			<div style="margin-bottom: 10px">
 				Each cell may contain a <b>chip</b>. Each chip is owned by one of the players.
 			</div>
-			<!-- END -->
 		</div>
 		
 		
@@ -142,10 +120,7 @@ text-align: left;">
 		</div>
 
 		
-		<!-- BEGIN level3 level4 -->
-		<!-- BEGIN level3 -->
 		<div class="statement-new-league-rule">
-			<!-- END -->
 			
 			
 			<h3 style="font-size: 14px;
@@ -176,10 +151,7 @@ text-align: left;">
 				<b>ROTATE</b> commands can be used to change the gravity by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
 			</div>
 			
-			<!-- BEGIN level3 -->
 		</div>
-		<!-- END -->
-		<!-- END -->
 		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
@@ -187,7 +159,6 @@ text-align: left;">
 		color: #838891;
 		padding-bottom: 15px;">
 		Actions</h3>
-		<!-- BEGIN level1 -->
 		<div style="margin-bottom: 10px">
 			The players take turns performing actions, the player can perform one of two possible actions.
 			<br>
@@ -203,14 +174,9 @@ text-align: left;">
 				</li>
 			</ul>
 		</div>
-		<!-- END -->
 		
-		<!-- END -->
 		
-		<!-- BEGIN level3 level4 -->
-		<!-- BEGIN level3 -->
 		<div class="statement-new-league-rule">
-			<!-- END -->
 			<h3 style="font-size: 14px;
 			font-weight: 700;
 			padding-top: 15px;
@@ -227,15 +193,9 @@ text-align: left;">
 				You can only drop a color that has been selected for you for that round.
 			</div>
 			
-			<!-- BEGIN level3 -->
 		</div>
-		<!-- END -->
-		<!-- END -->
 		
-		<!-- BEGIN level2 level3 level4 -->
-		<!-- BEGIN level2 level3 -->
 		<div class="statement-new-league-rule">
-			<!-- END -->
 			<h3 style="font-size: 14px;
 			font-weight: 700;
 			padding-top: 15px;
@@ -252,11 +212,8 @@ text-align: left;">
 			<div style="margin-bottom: 10px">
 				Chips will fall according to this new <b>gravity</b>
 			</div>
-			<!-- BEGIN level2 level3 -->
 		</div>
-		<!-- END -->
 		
-		<!-- END -->
 		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
@@ -266,17 +223,13 @@ text-align: left;">
 		⛔ Game end</h3>
 		
 		<div style="margin-bottom: 10px">
-			<!-- BEGIN level1 -->
 			The game lasts at most <b>34 rounds</b> or until one player has made a connection of <const>4</const> or more, and bigger than their opponent.
-			<!-- END -->
-			
 		</div>
 		
 		<div style="margin-bottom: 10px">If players have a connection of the same length, the winner is decided by the color of the connection.<br>
 		The color with the least amount of chips of that color placed on the board wins.
 		</div>
 		
-		<!-- Victory conditions -->
 		<div class="statement-victory-conditions">
 			<div class="icon victory"></div>
 			<div class="blk">
@@ -346,34 +299,46 @@ text-align: left;">
 	<!-- Protocol block -->
 	<div class="blk">
 		<div class="title">Initialization Input</div>
-		<span class="statement-lineno">First line:</span> <var>numberOfCells</var> equals <const>37</const>.<br>
+		<span class="statement-lineno">First line:</span> <var>numberOfCells</var>.<br>
 		<span class="statement-lineno">Next <var>numberOfCells</var> lines:</span>
 		<const>8</const> space-separated integers:
 		<ul>
 			<li><var>index</var> for the cell's index.</li>
-			<li><var>richness</var> for its richness.</li>
-			<!-- BEGIN level1 level2 -->
 			<li>
-				<const>6</const> <var>neigh</var> variables: <em>Ignore for this league.</em>
+				<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of a
+				neighboring cell or <const>-1</const> if there is no neighbor.
 			</li>
-			<!-- END -->
-			<!-- BEGIN level3 level4 -->
-			<!-- BEGIN level3 -->
-			<li style="background: rgba(124, 197, 118, 0.1)">
-				<!-- END -->
-				<!-- BEGIN level4 -->
-				<li>
-					<!-- END -->
-					<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of a
-					neighboring cell or <const>-1</const> is there is no neighbor.
-					<!-- BEGIN level3 -->
-				</li>
-				<!-- END -->
-				<!-- BEGIN level4 -->
+		</ul>
+		<span class="statement-lineno">Next line:</span> <var>numberOfColumns</var>.<br>
+		<span class="statement-lineno">Next <var>numberOfColumns</var> lines:</span>
+		<const>6</const> space-separated integers:
+		<ul>
+			<li>
+				<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of the cell at this position for every <b>direction</b>.
 			</li>
-			<!-- END -->
-			
-			<!-- END -->
+		</ul>
+		<div class="text">
+		<span class="statement-lineno">Next line:</span> <var>yourColors</var>.<br>
+		<span class="statement-lineno">Next <var>yourColors</var> lines:</span>
+		<const>2</const> space-separated integers:
+		<ul>
+			<li>
+				<var>index</var> for the color's index.
+			</li>
+			<li>
+				<var>maxAmount</var> for the total amount of chips of this color in the bag.
+			</li>
+		</ul>
+		<span class="statement-lineno">Next line:</span> <var>opponentColors</var>.<br>
+		<span class="statement-lineno">Next <var>opponentColors</var> lines:</span>
+		<const>2</const> space-separated integers:
+		<ul>
+			<li>
+				<var>index</var> for the color's index.
+			</li>
+			<li>
+				<var>maxAmount</var> for the total amount of chips of this color in their bag.
+			</li>
 		</ul>
 		<div class="text">
 			
@@ -383,57 +348,39 @@ text-align: left;">
 		<div class="title">Input for One Game Turn</div>
 		<div class="text">
 			
-			<!-- BEGIN level2 level3 -->
-			<div class="statement-new-league-rule">
-				<!-- END -->
-				<span class="statement-lineno">First line:</span> An integer <var>day</var>:
-				<!-- BEGIN level1 -->
-				the current day. Equals <const>0</const> for this league.<br>
-				<!-- END -->
-				<!-- BEGIN level2 -->
-				the current day, from <const>0</const> to <const>5</const>.<br>
-				<!-- END -->
-				<!-- BEGIN level3 level4 -->
-				the current day, from <const>0</const> to <const>23</const>.<br>
-				<!-- END -->
-				<!-- BEGIN level2 level3 -->
-			</div>
-			<!-- END -->
+			<span class="statement-lineno">First line:</span> An integer <var>gravity</var>:
+			the current direction of gravity. (between 0 and 5)<br>
 			
-			<span class="statement-lineno">Next line:</span> An integer <var>nutrients</var>: the current nutrient value of the forest.<br>
-			<span class="statement-lineno">Next line:</span> 2 space-separated integers: <ul>
-				<li><var>mySun</var>: your current sun points.</li>
-				<li><var>myScore</var>: your current score.</li>
-			</ul>
-			
-			<span class="statement-lineno">Next line:</span> 3 space-separated integers:
+			<span class="statement-lineno">Next line:</span> <var>numberOfValidColumns</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfValidColumns</var> lines:</span>
+			<const>1</const> integer:
 			<ul>
-				<li><var>oppSun</var>: your opponent's sun points.</li>
-				<li><var>oppScore</var>: your opponent's score.</li>
-				<li><var>oppIsWaiting</var>: equals <const>1</const> if your opponent is asleep, <const>0</const> otherwise.
-				</li>
+				<li><var>column</var>: a column that isn't currently filled with chips.</li>
 			</ul>
-			
-			<span class="statement-lineno">Next line:</span> An integer <var>numberOfTrees</var> for the current number of trees in the forest.<br>
-			<span class="statement-lineno">Next <var>numberOfTrees</var> lines:</span> 4 space-separated integers to describe each tree:
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfNewChips</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfNewChips</var> lines:</span>
+			<const>3</const> space-separated integers:
 			<ul>
-				<li><var>cellIndex</var>: the index of the cell this tree is on.</li>
-				<li><var>size</var>: the size of the tree. From <const>0</const> (seed) to <const>3</const> (large tree).
-				</li>
-				<li><var>isMine</var>: <const>1</const> if you are the owner of this tree, <const>0</const> otherwise.</li>
-				<li><var>isDormant</var>:
-					<!-- BEGIN level1 -->
-					<em>Ignore in this league.</em>
-					<!-- END -->
-					<!-- BEGIN level2 level3 level4 -->
-					<const>1</const> if this tree is dormant, <const>0</const> otherwise.
-					<!-- END -->
-					
-				</li>
+				<li><var>index</var>: the index of the new chip.</li>
+				<li><var>colorIndex</var>: the color of the new chip.</li>
+				<li><var>isMine</var>: <const>1</const> if you are the owner of this chip.</li>
 			</ul>
-			
-			<span class="statement-lineno">Next line:</span> An integer <var>numberOfPossibleActions</var> for the number of legal moves you can make this turn.<br>
-			<span class="statement-lineno">Next <var>numberOfPossibleActions</var> lines:</span> A string <var>possibleAction</var> containing one of the actions you can output this turn.<br>This list is provided to help you get started.<br>
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfChangedCells</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfChangedCells</var> lines:</span>
+			<const>2</const> space-separated integers:
+			<ul>
+				<li><var>cellIndex</var>: the index of the changed cell.</li>
+				<li><var>chipIndex</var>: the index of the chip at this cell (-1 if empty).</li>
+			</ul>
+
+			<span class="statement-lineno">Next line:</span> <var>numberOfColorsInHand</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfColorsInHand</var> lines:</span>
+			<const>1</const> integer:
+			<ul>
+				<li><var>colorIndex</var>: a color selected from the bag this round.</li>
+			</ul>
 		</div>
 	</div>
 	
@@ -444,37 +391,18 @@ text-align: left;">
 		<div class="text">
 			A single line with your command:
 			
-			<!-- BEGIN level2 level3 -->
 			<div class="statement-new-league-rule">
-				<!-- END -->
 				
 				<ul style="padding-left: 20px;padding-top: 0">
-					<!-- BEGIN level2 level3 level4 -->
 					<li>
-						<action>GROW index</action>: make your tree on cell <action>index</action> grow by <const>1</const> size.
-					</li>
-					<!-- END -->
-					<!-- BEGIN level3 level4 -->
-					<li>
-						<action>SEED index0 index1</action>: make your tree on cell <action>index0</action> launch a seed onto cell <action>index1</action>.
-					</li>
-					<!-- END -->
-					<li>
-						<action>COMPLETE index</action>: make your large tree on the specified cell complete its lifecycle. This removes the tree.
+						<action>DROP column color</action>: drop a chip of type <action>color</action> onto the board at <action>column</action>.
 					</li>
 					<li>
-						<!-- BEGIN level1 -->
-						<action>WAIT</action>: go to sleep.
-						<!-- END -->
-						<!-- BEGIN level2 level3 level4 -->
-						<action>WAIT</action>: go to sleep until the start of the next day.
-						<!-- END -->
+						<action>ROTATE amount</action>: rotate the board by <action>amount</action> cycles (clock-wise).
 					</li>
 				</ul>
 				
-				<!-- BEGIN level2 level3 -->
 			</div>
-			<!-- END -->
 		</div>
 	</div>
 	
@@ -487,7 +415,6 @@ text-align: left;">
 	</div>
 </div>
 
-<!-- BEGIN level1 level2 -->
 <!-- LEAGUE ALERT -->
 <div style="color: #7cc576; 
 background-color: rgba(124, 197, 118,.1);
@@ -500,14 +427,8 @@ text-align: left;">
 	<div style="text-align: center; font-weight: 700; margin-bottom: 6px;">
 		What is in store for me in the higher leagues?
 	</div>
-	extra rules available in higher leagues are:
+	Extra rules available in higher leagues are:
 	<ul>
-		<!-- BEGIN level1 -->
-		<li>Help young trees grow.</li>
-		<!-- END -->
-		<li>Choose where to plant trees, trees will also cast shadows on neighbouring trees.</li>
 	</ul>
 </div>
-<!-- END -->
-
 </div>
