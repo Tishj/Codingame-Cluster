@@ -143,11 +143,6 @@ text-align: left;">
 			</div>
 			
 			<div style="margin-bottom: 10px">
-				The direction of a shadow depends on which direction the <b>sun</b> is currently pointing towards.<br>
-				On day <const>0</const>, the sun is pointing towards direction <const>0</const>, meaning all shadows are being cast to the <b>right</b>.
-			</div>
-			
-			<div style="margin-bottom: 10px">
 				<b>ROTATE</b> commands can be used to change the gravity by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
 			</div>
 			
@@ -301,7 +296,7 @@ text-align: left;">
 		<div class="title">Initialization Input</div>
 		<span class="statement-lineno">First line:</span> <var>numberOfCells</var>.<br>
 		<span class="statement-lineno">Next <var>numberOfCells</var> lines:</span>
-		<const>8</const> space-separated integers:
+		<const>7</const> space-separated integers:
 		<ul>
 			<li><var>index</var> for the cell's index.</li>
 			<li>
@@ -314,7 +309,7 @@ text-align: left;">
 		<const>6</const> space-separated integers:
 		<ul>
 			<li>
-				<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of the cell at this position for every <b>direction</b>.
+				<const>6</const> <var>cell</var> variables, one for each <b>direction</b>, containing the index of the cell at this position for every <b>direction</b>.
 			</li>
 		</ul>
 		<div class="text">
