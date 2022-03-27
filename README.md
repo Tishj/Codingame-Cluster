@@ -5,7 +5,7 @@ VALID MOVES:
 If an invalid move is made, or a bot times out, the opposing player wins and the game is over.
 
 ## Mappings
-`direction`  
+`gravity`  
 0 - South  
 1 - SouthWest  
 2 - NorthWest  
