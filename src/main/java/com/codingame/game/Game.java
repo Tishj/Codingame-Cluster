@@ -40,6 +40,18 @@ public class Game {
 	int			turn = 0;
 	FrameType	currentFrameType = FrameType.ACTIONS;
 	FrameType	nextFrameType;
+	Cell[][] insertionPositions;
+
+	public void setInsertionPositions() {
+		this.insertionPositions = new Cell[Config.CELL_COUNT][6];
+		int index = 0;
+		for (Cell[] position : this.insertionPositions) {
+			for (Gravity direction : Gravity.values()) {
+				position[direction.getIndex()] = board.map.get(board.getTopOfColumn(direction, index));
+			}
+			index++;
+		}
+	}
 
 	public void init(long seed) {
 
@@ -49,8 +61,13 @@ public class Game {
 		board = BoardGenerator.generate(random);
 		chipManager.init(gameManager);
 		this.gravity = Gravity.SOUTH;
+		this.setInsertionPositions();
 
 		round = 0;
+	}
+
+	public FrameType getCurrentFrameType() {
+		return this.currentFrameType;
 	}
 
 	public static String getExpected() {
@@ -65,8 +82,7 @@ public class Game {
 
 		List<Integer> columns = new ArrayList<>(amountOfColumns);
 		for (int i = 0; i < amountOfColumns; i++) {
-			Cell cell = board.map.get(board.getTopOfColumn(gravity, i));
-			assert(cell != null);
+			Cell cell = insertionPositions[i][gravity.getIndex()];
 			Chip chip = cell.getChip();
 			if (chip == null) {
 				columns.add(i);
@@ -107,6 +123,13 @@ public class Game {
 		}
 
 		return lines;
+	}
+
+	public void setGameTurnData() {
+		if (this.currentFrameType != FrameType.ACTIONS) {
+			return;
+		}
+
 	}
 
 	private List<Chip> getMatchLength(Chip chip, Gravity direction, List<Chip> connection) {
@@ -209,7 +232,12 @@ public class Game {
 		int amountOfColumns = Config.COLUMN_COUNT;
 		lines.add(String.valueOf(amountOfColumns));
 		for (int i = 0; i < amountOfColumns; i++) {
-			lines.add(getInsertColumnCellIndices(i));
+			lines.add(Stream.of(insertionPositions[i])
+				.map(cell -> {
+					return String.valueOf(cell.getIndex());
+				})
+				.collect(Collectors.joining(" "))
+			);
 		}
 
 		//yourColors
@@ -227,17 +255,17 @@ public class Game {
 		return lines;
 	}
 
-	private String getInsertColumnCellIndices(int column) {
-		List<Integer>	indices = new ArrayList<>(6);
-		for (Gravity direction : Gravity.values()) {
-			indices.add(
-				board.map.getOrDefault(board.getTopOfColumn(direction, column), Cell.NO_CELL).getIndex()
-			);
-		}
-		return indices.stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(" "));
-	}
+	// private String getInsertColumnCellIndices(int column) {
+	// 	List<Integer>	indices = new ArrayList<>(6);
+	// 	for (Gravity direction : Gravity.values()) {
+	// 		indices.add(
+	// 			board.map.getOrDefault(board.getTopOfColumn(direction, column), Cell.NO_CELL).getIndex()
+	// 		);
+	// 	}
+	// 	return indices.stream()
+	// 		.map(String::valueOf)
+	// 		.collect(Collectors.joining(" "));
+	// }
 
 	private String getNeighbourIds(HexCoord coord) {
 		List<Integer> orderedneighbourIds = new ArrayList<>(HexCoord.directions.length);
@@ -254,18 +282,13 @@ public class Game {
 	public void resetGameTurnData() {
 	}
 
-	private Chip doDrop(Player player, Action action) throws GameException {
-		HexCoord startingLocation = board.getTopOfColumn(gravity, action.targetId);
-		assert(startingLocation != null);
-		Cell cell = getBoard().get(startingLocation);
-		if (cell == null || cell.getChip() != null) {
-			throw new CellAlreadyOccupiedException(cell.getIndex());
-		}
+	private Chip doDrop(Player player, Action action) {
+		Cell cell = insertionPositions[action.targetId][gravity.getIndex()];
 		//create the chip
-		Chip chip = chipManager.createChip(player, action.colorId, startingLocation);
+		Chip chip = chipManager.createChip(player, action.colorId, cell.getCoord());
 		cell = getBoard().get(chip.getCoord());
 		cell.setChip(chip);
-		
+
 		dropChip(chip);
 
 		//move rest of selection back to remaining
@@ -273,7 +296,7 @@ public class Game {
 		return chip;
 	}
 
-	private void doRotate(Player player, Action action) throws GameException {
+	private void doRotate(Player player, Action action) {
 		gravity = gravity.rotate(action.cycleAmount);
 		Map<Integer, Chip> chips = chipManager.getChips();
 		//Drop all chips
@@ -348,27 +371,14 @@ public class Game {
 	}
 
 	public void performActionUpdate(Player player) {
-		try {
-			Action action = player.getAction();
-			if (action.isDrop()) {
-				//Keep track of the chip so we know which one was added this turn
-				Chip chip = doDrop(player, action);
-				gameManager.setFrameDuration(300);
-			} else if (action.isRotate()) {
-				doRotate(player, action);
-				gameManager.setFrameDuration(500 * (3 - (Math.abs(action.cycleAmount - 3))));
-			}
-			else {
-				//throw exception
-				throw new UnrecognizedActionException();
-			}
-			gameManager.addToGameSummary(String.valueOf(gameManager.getFrameDuration()));
-		} catch (GameException e) {
-			gameSummaryManager.addError(player.getNicknameToken() + ": " + e.getMessage());
-			gameManager.getPlayer(1 - player.getIndex()).setScore(100);
-			player.setScore(-1);
-			gameManager.endGame();
-			return;
+		Action action = player.getAction();
+		if (action.isDrop()) {
+			doDrop(player, action);
+			gameManager.setFrameDuration(300);
+		} else if (action.isRotate()) {
+			doRotate(player, action);
+			int actualMovedCycles = (3 - (Math.abs(action.cycleAmount - 3)));
+			gameManager.setFrameDuration(Constants.ROTATION_CYCLE_TIME * actualMovedCycles);
 		}
 	}
 
