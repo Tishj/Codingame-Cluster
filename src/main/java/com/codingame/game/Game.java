@@ -285,10 +285,19 @@ public class Game {
 
 	public void removeCompleteConnection(Player player) {
 		ArrayList<Chip> chips = player.getConnection().chips;
+		int points = 0;
 		for (Chip chip : chips) {
-			player.addScore(Constants.CHIP_VALUE);
+			points += Constants.CHIP_VALUE;
 			chipManager.removeChip(chip);
 		}
+		player.addScore(points);
+		gameManager.addTooltip(
+			player, String.format(
+				"%s scores %d points",
+				player.getNicknameToken(),
+				points
+			)
+		);
 		player.resetConnection();
 	}
 

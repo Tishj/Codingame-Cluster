@@ -203,7 +203,7 @@ export class ViewModule {
 		for (const player of this.globalData.players) {
 			const data = progress < 3 / 4 ? previousData : currentData;
 			// this.HUD.sun[player.index].text = data.players[player.index].sun.toString();
-			// this.HUD.score[player.index].text = data.players[player.index].score.toString();
+			this.HUD.score[player.index].text = data.players[player.index].score.toString();
 		}
 	}
 	updateSpeechBubbles(currentData) {
