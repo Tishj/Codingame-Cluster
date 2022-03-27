@@ -4,5 +4,6 @@ public enum FrameType {
 	ACTIONS,
 	NEW_CHIP,
 	DROP_CHIPS,
-	ROTATE_BOARD
+	ROTATE_BOARD,
+	DELETE_CHIPS
 };

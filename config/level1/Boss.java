@@ -64,6 +64,7 @@ class Player {
 		Scanner in = new Scanner(System.in);
 		Random random = new Random();
 		long seed = random.nextLong();
+		System.err.println("Player2 random seed is " + seed);
 
 		//Start of Initial input
 		int numberOfCells = in.nextInt();
@@ -108,28 +109,21 @@ class Player {
 				validColumns.add(in.nextInt());
 			}
 
-			int numberOfNewChips = in.nextInt();
-			for (int i = 0; i < numberOfNewChips; i++) {
+			int numberOfChips = in.nextInt();
+			chips.clear();
+			for (int i = 0; i < numberOfChips; i++) {
 				int index = in.nextInt();
 				int colorIndex = in.nextInt();
 				int isMine = in.nextInt();
-				chips.add(new Chip(index, colorIndex, isMine == 1));
-			}
-
-			int numberOfChangedCells = in.nextInt();
-			for (int i = 0; i < numberOfChangedCells; i++) {
 				int cellIndex = in.nextInt();
-				int chipIndex = in.nextInt();
-				Chip chip = (chipIndex == -1) ? null : chips.get(chipIndex);
-				board.get(cellIndex).setChipIndex(chipIndex);
-				if (chip != null) {
-					chip.updatePosition(cellIndex);
-				}
+				Chip chip = new Chip(index, colorIndex, isMine == 1);
+				chips.add(chip);
+				chip.updatePosition(cellIndex);
 			}
 
-			int numberOfPelletsInHand = in.nextInt();
-			int[] possibleColors = new int[numberOfPelletsInHand];
-			for (int i = 0; i < numberOfPelletsInHand; i++) {
+			int numberOfChipsInHand = in.nextInt();
+			int[] possibleColors = new int[numberOfChipsInHand];
+			for (int i = 0; i < numberOfChipsInHand; i++) {
 				possibleColors[i] = in.nextInt();
 			}
 

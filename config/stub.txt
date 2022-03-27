@@ -17,11 +17,8 @@ read gravity:int
 read numberOfValidColumns:int
 loop numberOfValidColumns read columnIndex:int
 
-read numberOfNewChips:int
-loop numberOfNewChips read index:int colorIndex:int isMine:int
-
-read numberOfChangedCells:int
-loop numberOfChangedCells read cellIndex:int chipIndex:int
+read numberOfChips:int
+loop numberOfChips read index:int colorIndex:int isMine:int cellIndex:int
 
 read numberOfColorsInHand:int
 loop numberOfColorsInHand read colorIndex:int
@@ -36,10 +33,8 @@ numberOfColumns: amount of cell positions that chips can be inserted at
 cell0: the cell index at this position for each gravity direction
 gravity: the current direction of gravity, starts at 0(south): 0-5
 numberOfValidColumns: the amount of columns that aren't currently filled
-numberOfNewChips: new chips added since last update
+numberOfChips: the amount of chips currently on the board
 isMine: 1 if you own it
-numberOfChangedCells: changed cells since last update
-chipIndex: -1 if now empty else index of the chip currently on this cell
 numberOfColorsInHand: amount of chips drawn for you this round
 colorIndex: the color of this chip
 
