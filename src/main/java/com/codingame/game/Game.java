@@ -160,15 +160,36 @@ public class Game {
 	// 	return info;
 	// info.size += 1;
 	// return match_size(neighbour->pellet, info, direction);
-	private int getMatchLength(Chip chip, Gravity direction, int size) {
+	private List<Chip> getMatchLength(Chip chip, Gravity direction, List<Chip> connection) {
 		HexCoord coord = chip.coord.neighbour(direction);
 		Cell cell = getBoard().get(coord);
 		if (cell == null)
-			return size;
+			return connection;
 		Chip other = cell.getChip();
 		if (other == null || (other.colorId != chip.colorId || other.owner.getIndex() != chip.owner.getIndex()))
-			return size;
-		return getMatchLength(other, direction, size + 1);
+			return connection;
+		connection.add(other);
+		return getMatchLength(other, direction, connection);
+	}
+
+	public GameResult setWinnerAndDeleteChips(GameResult result, Connection[] biggestConnections) {
+		switch (result) {
+			case WIN_PLAYER_ONE: {
+				// this.placedChips.removeAll(biggestConnections[0].chips);
+				break;
+			}
+			case WIN_PLAYER_TWO: {
+				// this.placedChips.removeAll(biggestConnections[1].chips);
+				break;
+			}
+			case TIE: {
+				// this.placedChips.removeAll(biggestConnections[1].chips);
+				// this.placedChips.removeAll(biggestConnections[0].chips);
+				break;
+			}
+			case IN_PROGRESS: break;
+		}
+		return result;
 	}
 
 	public GameResult getWinner() {
@@ -177,28 +198,30 @@ public class Game {
 		}
 		Connection[] biggestConnection = new Connection[gameManager.getPlayerCount()];
 		for (int i = 0; i < gameManager.getPlayerCount(); i++) {
-			biggestConnection[i] = new Connection(-1, 0);
+			biggestConnection[i] = new Connection(-1);
 		}
 		//check match lengths
 		for (Chip chip : placedChips) {
 			for (Gravity direction : Gravity.values()) {
-				int length = getMatchLength(chip, direction, 1);
-				biggestConnection[chip.getOwner().getIndex()].updateIfBigger(chip.colorId, length);
+				ArrayList<Chip> connection = new ArrayList<Chip>(Config.WIN_LENGTH);
+				connection.add(chip);
+				getMatchLength(chip, direction, connection);
+				biggestConnection[chip.getOwner().getIndex()].updateIfBigger(chip.colorId, connection);
 			}
 		}
 		gameManager.addToGameSummary("Red: length: " + biggestConnection[0].length);
 		gameManager.addToGameSummary("Blue:  length: " + biggestConnection[1].length);
 		//No winner
 		if (biggestConnection[0].length < Config.WIN_LENGTH && biggestConnection[1].length < Config.WIN_LENGTH) {
-			return GameResult.IN_PROGRESS;
+			return this.setWinnerAndDeleteChips(GameResult.IN_PROGRESS, biggestConnection);
 		}
 		//Blue wins
 		if (biggestConnection[0].length > biggestConnection[1].length) {
-			return GameResult.WIN_PLAYER_TWO;
+			return this.setWinnerAndDeleteChips(GameResult.WIN_PLAYER_TWO, biggestConnection);
 		}
 		//Red wins
 		if (biggestConnection[1].length > biggestConnection[0].length) {
-			return GameResult.WIN_PLAYER_ONE;
+			return this.setWinnerAndDeleteChips(GameResult.WIN_PLAYER_ONE, biggestConnection);
 		}
 		//Possible tie
 		long amountOfBlueChips = placedChips.stream()
@@ -212,12 +235,12 @@ public class Game {
 				c.getOwner().getIndex() == 0))
 			.count();
 		if (amountOfBlueChips > amountOfRedChips) {
-			return GameResult.WIN_PLAYER_TWO;
+			return this.setWinnerAndDeleteChips(GameResult.WIN_PLAYER_TWO, biggestConnection);
 		}
 		if (amountOfRedChips > amountOfBlueChips) {
-			return GameResult.WIN_PLAYER_ONE;
+			return this.setWinnerAndDeleteChips(GameResult.WIN_PLAYER_ONE, biggestConnection);
 		}
-		return GameResult.TIE;
+		return this.setWinnerAndDeleteChips(GameResult.TIE, biggestConnection);
 	}
 
 	public List<String> getGlobalInfoFor(Player player) {

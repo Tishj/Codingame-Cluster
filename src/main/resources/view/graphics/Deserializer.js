@@ -44,8 +44,10 @@ export function parseData(raw, globalData) {
 
 export function parseGlobalData(raw) {
 	const input = raw.split(MAIN_SEPARATOR).map(line => hardSplit(line).map(element => +element));
+	const globalInfos = input.shift();
 	const data = {
-		totalRounds: input.shift()[0],
+		totalRounds: globalInfos[0],
+		mapRingSize: globalInfos[1],
 		cells: []
 	};
 	while (input.length) {

@@ -41,7 +41,10 @@ public class Serializer {
 	static public String serialize(GlobalViewData globalViewData) {
 		List<String> lines = new ArrayList<>();
 		lines.add(
-			String.valueOf(globalViewData.totalRounds)
+			join(
+				globalViewData.totalRounds,
+				globalViewData.mapRingSize
+			)
 		);
 
 		globalViewData.cells.stream().forEach(cellData -> {

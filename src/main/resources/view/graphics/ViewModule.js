@@ -287,9 +287,10 @@ export class ViewModule {
 		const difference = Math.abs(oldDegrees - newDegrees);
 		const oldRadian = degreesToRadians(oldDegrees);
 		const newRadian = degreesToRadians(newDegrees);
-		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, progress);
+		const haltedProgress = unlerp(0, (3/4), progress);
+		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, haltedProgress);
 		for (const [index, chip] of this.chips) {
-			chip.mainSprite.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), progress);
+			chip.mainSprite.parent.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), haltedProgress);
 		}
 	}
 
@@ -322,15 +323,27 @@ export class ViewModule {
 				// chip.mainSprite.texture = PIXI.Texture.from(`Arbre3_${colorName}.png`);
 				// chip.mainSprite.alpha = progress < 0.6 ? 1 : 0;
 				// chip.mainSprite.scale.set(lerp(1, 1.2, progress));
-				// chip.transitionSprite.texture = PIXI.Texture.from('Arbre3_White.png');
+				// chip.transitionSprite.texture = PIXI.Texture.from('StarWhite.png');
 				// chip.transitionSprite.visible = true;
 				// chip.transitionSprite.alpha = bell(progress);
 				// chip.transitionSprite.scale.set(lerp(1, 1.2, progress));
 				// this.updatechipFlash(index, chipBefore.sfxData, lerp(0, 0.5, progress));
-				console.log("CHIP DELETED!");
+				////BUG: chipNow doesnt exist in this context
+				// if (chipBefore.q == chipNow.q && chipBefore.r == chipNow.r) {
+				// 	const hexaP = hexToScreen(chipNow.q, chipNow.r);
+				// 	chip.container.position.set(hexaP.x, hexaP.y);
+				// }
+				// else {
+				// 	const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
+				// 	const newHexaP = hexToScreen(chipNow.q, chipNow.r);
+				// 	const ratio = 3 / 4;
+				// 	const haltedProgress = unlerp(ratio, 1, progress);
+				// 	chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
+				// }
+				console.log("CHIP " + index + " DELETED!");
 			}
 			else if (!chipBefore && chipNow) {
-				console.log("NEW CHIP ADDED!");
+				console.log("CHIP " + index + " ADDED!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
@@ -338,30 +351,40 @@ export class ViewModule {
 				chip.container.position.set(hexaP.x, hexaP.y);
 			}
 			else if (chipBefore && chipNow) {
-				console.log("CHIP PASSIVE!");
+				console.log("CHIP " + index + " PASSIVE!");
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
-				const hexaP = hexToScreen(chipNow.q, chipNow.r);
-				chip.container.position.set(hexaP.x, hexaP.y);
+				//chip hasnt moved
+				if (chipBefore.q == chipNow.q && chipBefore.r == chipNow.r) {
+					const hexaP = hexToScreen(chipNow.q, chipNow.r);
+					chip.container.position.set(hexaP.x, hexaP.y);
+				}
+				else {
+					const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
+					const newHexaP = hexToScreen(chipNow.q, chipNow.r);
+					const ratio = 3 / 4;
+					const haltedProgress = unlerp(ratio, 1, progress);
+					chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
+				}
 			}
 			else {
-				console.log("CHIP NOT ACTIVE!");
+				// console.log("CHIP INACTIVE!");
 				chip.mainSprite.alpha = 0;
 				chip.mainSprite.visible = false;
 				// if (previousData.previous.chips[index] && !previousData.chips[index]) {
 					// 	this.updatechipFlash(index, previousData.previous.chips[index].sfxData, lerp(0.5, 1, progress));
 					// }
 				}
-				for (const sprite of [chip.mainSprite, chip.transitionSprite]) {
-				if (api.options.debugMode2) {
-					sprite.scale.x *= api.options.ratio;
-					sprite.scale.y *= api.options.ratio;
-					sprite.position.y = HEXAGON_RADIUS / 3;
-				}
-				else {
-					sprite.position.y = 0;
-				}
-			}
+			// 	for (const sprite of [chip.mainSprite, chip.transitionSprite]) {
+			// 	if (api.options.debugMode2) {
+			// 		sprite.scale.x *= api.options.ratio;
+			// 		sprite.scale.y *= api.options.ratio;
+			// 		sprite.position.y = HEXAGON_RADIUS / 3;
+			// 	}
+			// 	else {
+			// 		sprite.position.y = 0;
+			// 	}
+			// }
 		}
 	}
 
@@ -397,6 +420,7 @@ export class ViewModule {
 		const bubbleLayer = this.asLayer(this.initSpeechBubbles);
 		const chipLayer = this.asLayer(this.initChips);
 		this.boardLayer.addChild(chipLayer);
+		this.setBoardScale(this.boardLayer);
 		// const sunLayer = this.asLayer(this.initSuns);
 		const devantLayer = this.asLayer(this.initDevant);
 		this.markerLayer = new PIXI.Container();
@@ -440,6 +464,13 @@ export class ViewModule {
 		// container.addChild(debugHUD);
 		container.addChild(tooltipLayer);
 	}
+	setBoardScale(boardLayer) {
+		const cellsOverHeight = (this.globalData.mapRingSize * 2) - 1;
+		const idealHeight = 7.0;
+		const scale = idealHeight / cellsOverHeight;
+		boardLayer.scale.set(scale);
+	}
+
 	setVisibility(layer, visibility) {
 		if (visibility === 0) {
 			Object.defineProperty(layer, 'visible', { get: () => !api.options.debugMode2 });

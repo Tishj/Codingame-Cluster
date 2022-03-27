@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.codingame.game.Cell;
+import com.codingame.game.Config;
 import com.codingame.game.Game;
 import com.codingame.game.Player;
 import com.codingame.gameengine.core.MultiplayerGameManager;
@@ -71,6 +72,7 @@ public class GameDataProvider {
 			.collect(Collectors.toList());
 
 		data.totalRounds = Game.MAX_ROUNDS;
+		data.mapRingSize = Config.MAP_RING_COUNT;
 		return data;
 	}
 }
