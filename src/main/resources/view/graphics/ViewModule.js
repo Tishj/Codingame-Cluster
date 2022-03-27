@@ -131,13 +131,13 @@ export class ViewModule {
 	getFrameTypeName(frameType) {
 		switch (frameType) {
 			case FrameType.ACTIONS:
-				return 'Taking actions';
+			return 'Taking actions';
 			case FrameType.GATHERING:
-				return 'Gathering sun';
+			return 'Gathering sun';
 			case FrameType.INIT:
-				return 'Gathering sun';
+			return 'Gathering sun';
 			case FrameType.SUN_MOVE:
-				return 'Sun is moving';
+			return 'Sun is moving';
 		}
 	}
 	getSunReport(currentData, index) {
@@ -147,8 +147,8 @@ export class ViewModule {
 			3: []
 		};
 		Object.values(currentData.chips)
-			.filter(t => t.owner === index && t.sunPoints > 0 && t.size > 0)
-			.forEach(t => sunPointsMap[t.size].push(t.index));
+		.filter(t => t.owner === index && t.sunPoints > 0 && t.size > 0)
+		.forEach(t => sunPointsMap[t.size].push(t.index));
 		let report = '';
 		for (let i = 1; i <= 3; ++i) {
 			if (sunPointsMap[i].length > 0) {
@@ -162,26 +162,26 @@ export class ViewModule {
 			if (index === -1) {
 				const curRound = currentData.frameType === FrameType.SUN_MOVE ? previousData.round : currentData.round;
 				text.text =
-					`Nutrients: ${currentData.nutrients}` +
-						`\nRound: ${curRound}/${this.globalData.totalRounds - 1}` +
-						`\n${this.getFrameTypeName(currentData.frameType)}`;
+				`Nutrients: ${currentData.nutrients}` +
+				`\nRound: ${curRound}/${this.globalData.totalRounds - 1}` +
+				`\n${this.getFrameTypeName(currentData.frameType)}`;
 			}
 			else {
 				const player = currentData.players[index];
 				text.text =
-					`Waiting: ${player.isWaiting}`;
+				`Waiting: ${player.isWaiting}`;
 				if (currentData.frameType === FrameType.GATHERING) {
 					const report = this.getSunReport(currentData, index);
 					text.text +=
-						'\nSun gathered' +
-							`${report}`;
+					'\nSun gathered' +
+					`${report}`;
 				}
 				else {
 					text.text +=
-						'\nDormant:\n' +
-							this.splitText(player.activated.join(', ')) +
-							'Message:\n' +
-							this.splitText(player.message);
+					'\nDormant:\n' +
+					this.splitText(player.activated.join(', ')) +
+					'Message:\n' +
+					this.splitText(player.message);
 				}
 			}
 		}
@@ -276,7 +276,7 @@ export class ViewModule {
 	//         }
 	//     }
 	// }
-
+	
 	updateBoardRotation(previousData, currentData, progress) {
 		// if (previousData.gravity == currentData.gravity) {
 		// 	return;
@@ -287,25 +287,26 @@ export class ViewModule {
 		const difference = Math.abs(oldDegrees - newDegrees);
 		const oldRadian = degreesToRadians(oldDegrees);
 		const newRadian = degreesToRadians(newDegrees);
-		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, progress);
+		const haltedProgress = unlerp(0, (3/4), progress);
+		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, haltedProgress);
 		for (const [index, chip] of this.chips) {
-			chip.mainSprite.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), progress);
+			chip.mainSprite.parent.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), haltedProgress);
 		}
 	}
-
+	
 	updateTooltip(currentData) {
-	    var _a, _b;
-	    for (const [index, hex] of this.hexes) {
-	        // const chip = currentData.chips[index];
-	        this.registerTooltip(hex.container, {
-	            index: index,
+		var _a, _b;
+		for (const [index, hex] of this.hexes) {
+			// const chip = currentData.chips[index];
+			this.registerTooltip(hex.container, {
+				index: index,
 				q: hex.data.q,
 				r: hex.data.r
-	        });
-	        // this.registerTooltip(this.debugData.get(index).container, {
-	        //     index: index,
-	        // });
-	    }
+			});
+			// this.registerTooltip(this.debugData.get(index).container, {
+			//     index: index,
+			// });
+		}
 	}
 	// Update Functions
 	updateChips(previousData, currentData, progress) {
@@ -320,17 +321,29 @@ export class ViewModule {
 			//chip was deleted
 			if (chipBefore && !chipNow) {
 				// chip.mainSprite.texture = PIXI.Texture.from(`Arbre3_${colorName}.png`);
-				// chip.mainSprite.alpha = progress < 0.6 ? 1 : 0;
-				// chip.mainSprite.scale.set(lerp(1, 1.2, progress));
-				// chip.transitionSprite.texture = PIXI.Texture.from('Arbre3_White.png');
-				// chip.transitionSprite.visible = true;
-				// chip.transitionSprite.alpha = bell(progress);
-				// chip.transitionSprite.scale.set(lerp(1, 1.2, progress));
+				chip.mainSprite.alpha = progress < 0.6 ? 1 : 0;
+				chip.mainSprite.scale.set(lerp(1, 1.2, progress));
+				chip.transitionSprite.texture = PIXI.Texture.from('StarWhite.png');
+				chip.transitionSprite.visible = true;
+				chip.transitionSprite.alpha = bell(progress);
+				chip.transitionSprite.scale.set(lerp(1, 1.2, progress));
 				// this.updatechipFlash(index, chipBefore.sfxData, lerp(0, 0.5, progress));
-				console.log("CHIP DELETED!");
+				////BUG: chipNow doesnt exist in this context
+				// if (chipBefore.q == chipNow.q && chipBefore.r == chipNow.r) {
+				// 	const hexaP = hexToScreen(chipNow.q, chipNow.r);
+				// 	chip.container.position.set(hexaP.x, hexaP.y);
+				// }
+				// else {
+				// 	const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
+				// 	const newHexaP = hexToScreen(chipNow.q, chipNow.r);
+				// 	const ratio = 3 / 4;
+				// 	const haltedProgress = unlerp(ratio, 1, progress);
+				// 	chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
+				// }
+				console.log("CHIP " + index + " DELETED!");
 			}
 			else if (!chipBefore && chipNow) {
-				console.log("NEW CHIP ADDED!");
+				console.log("CHIP " + index + " ADDED!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
@@ -338,33 +351,43 @@ export class ViewModule {
 				chip.container.position.set(hexaP.x, hexaP.y);
 			}
 			else if (chipBefore && chipNow) {
-				console.log("CHIP PASSIVE!");
+				console.log("CHIP " + index + " PASSIVE!");
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
-				const hexaP = hexToScreen(chipNow.q, chipNow.r);
-				chip.container.position.set(hexaP.x, hexaP.y);
+				//chip hasnt moved
+				if (chipBefore.q == chipNow.q && chipBefore.r == chipNow.r) {
+					const hexaP = hexToScreen(chipNow.q, chipNow.r);
+					chip.container.position.set(hexaP.x, hexaP.y);
+				}
+				else {
+					const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
+					const newHexaP = hexToScreen(chipNow.q, chipNow.r);
+					const ratio = 3 / 4;
+					const haltedProgress = unlerp(ratio, 1, progress);
+					chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
+				}
 			}
 			else {
-				console.log("CHIP NOT ACTIVE!");
+				// console.log("CHIP INACTIVE!");
 				chip.mainSprite.alpha = 0;
 				chip.mainSprite.visible = false;
 				// if (previousData.previous.chips[index] && !previousData.chips[index]) {
-					// 	this.updatechipFlash(index, previousData.previous.chips[index].sfxData, lerp(0.5, 1, progress));
-					// }
-				}
-				for (const sprite of [chip.mainSprite, chip.transitionSprite]) {
-				if (api.options.debugMode2) {
-					sprite.scale.x *= api.options.ratio;
-					sprite.scale.y *= api.options.ratio;
-					sprite.position.y = HEXAGON_RADIUS / 3;
-				}
-				else {
-					sprite.position.y = 0;
-				}
+				// 	this.updatechipFlash(index, previousData.previous.chips[index].sfxData, lerp(0.5, 1, progress));
+				// }
 			}
+			// 	for (const sprite of [chip.mainSprite, chip.transitionSprite]) {
+			// 	if (api.options.debugMode2) {
+			// 		sprite.scale.x *= api.options.ratio;
+			// 		sprite.scale.y *= api.options.ratio;
+			// 		sprite.position.y = HEXAGON_RADIUS / 3;
+			// 	}
+			// 	else {
+			// 		sprite.position.y = 0;
+			// 	}
+			// }
 		}
 	}
-
+	
 	resetEffects() {
 		for (const type in this.pool) {
 			for (const effect of this.pool[type]) {
@@ -397,6 +420,7 @@ export class ViewModule {
 		const bubbleLayer = this.asLayer(this.initSpeechBubbles);
 		const chipLayer = this.asLayer(this.initChips);
 		this.boardLayer.addChild(chipLayer);
+		this.setBoardScale(this.boardLayer);
 		// const sunLayer = this.asLayer(this.initSuns);
 		const devantLayer = this.asLayer(this.initDevant);
 		this.markerLayer = new PIXI.Container();
@@ -418,7 +442,7 @@ export class ViewModule {
 		background.interactiveChildren = false;
 		bubbleLayer.interactiveChildren = false;
 		chipLayer.interactiveChildren = false;
-
+		
 		hudLayer.interactiveChildren = false;
 		tooltipLayer.interactiveChildren = false;
 		// chipLayer.interactiveChildren = false;
@@ -440,6 +464,13 @@ export class ViewModule {
 		// container.addChild(debugHUD);
 		container.addChild(tooltipLayer);
 	}
+	setBoardScale(boardLayer) {
+		const cellsOverHeight = (this.globalData.mapRingSize * 2) - 1;
+		const idealHeight = 7.0;
+		const scale = idealHeight / cellsOverHeight;
+		boardLayer.scale.set(scale);
+	}
+	
 	setVisibility(layer, visibility) {
 		if (visibility === 0) {
 			Object.defineProperty(layer, 'visible', { get: () => !api.options.debugMode2 });
@@ -451,7 +482,7 @@ export class ViewModule {
 	initBackground(layer) {
 		// let backdrop = PIXI.Sprite.from('Background.png');
 		// if (backdrop == null) {
-			let backdrop = PIXI.Sprite.from('Background.png');
+		let backdrop = PIXI.Sprite.from('Background.png');
 		// }
 		layer.addChild(backdrop);
 	}
@@ -725,7 +756,7 @@ export class ViewModule {
 	registerTooltip(container, data) {
 		container.interactive = true;
 		const text = `index: ${data.index}` +
-			`\nposition: Q:${data.q}, R:${data.r}, S:${-data.q - data.r}`;
+		`\nposition: Q:${data.q}, R:${data.r}, S:${-data.q - data.r}`;
 		container.mouseover = () => {
 			this.tooltipManager.showTooltip(text);
 			container.mousemove = (event) => {
@@ -769,7 +800,7 @@ export class ViewModule {
 			const { show, container } = this.bubbles[idx];
 			const stepFactor = Math.pow(0.993 + (0.007 * (this.playerSpeed || 1) / 10), delta);
 			const toggled = api.options.messages === ALL ||
-				(this.globalData.players[idx].isMe && api.options.messages === ME);
+			(this.globalData.players[idx].isMe && api.options.messages === ME);
 			const targetAlpha = show && toggled ? 1 : 0;
 			if (targetAlpha === 1) {
 				container.alpha = 1;
@@ -822,10 +853,15 @@ export class ViewModule {
 	handleFrameData(frameInfo, raw) {
 		const data = parseData(raw, this.globalData);
 		const previous = this.states[this.states.length - 1];
+		const chips = {};
+		for (const chipData of data.chips) {
+			this.createLightParticleEffect(chipData);
+			chips[chipData.index] = chipData;
+		}
 		const state = {
 			players: data.players,
 			round: data.round,
-			chips: data.chips,
+			chips: chips,
 			gravity: data.gravity
 		};
 		state.previous = previous || state;

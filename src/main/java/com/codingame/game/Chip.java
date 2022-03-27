@@ -8,7 +8,7 @@ public class Chip {
 
 	@Override
 	public int hashCode() {
-		return coord.hashCode();
+		return index;
 	}
 
 	@Override

@@ -14,7 +14,6 @@ export function parseData(raw, globalData) {
 	let index;
 	index = +input.shift()[0];
 	for (let i = 0; i < index; i++) {
-		//elem = "5" "10"
 		const chip = input.shift().map(elem => +elem);
 		data.chips.push({
 			index: chip[0],
@@ -44,16 +43,18 @@ export function parseData(raw, globalData) {
 
 export function parseGlobalData(raw) {
 	const input = raw.split(MAIN_SEPARATOR).map(line => hardSplit(line).map(element => +element));
+	const globalInfos = input.shift();
 	const data = {
-		totalRounds: input.shift()[0],
+		totalRounds: globalInfos[0],
+		mapRingSize: globalInfos[1],
 		cells: []
 	};
 	while (input.length) {
 		const cell = input.shift();
 		data.cells.push({
+			index: cell[2],
 			q: cell[0],
-			r: cell[1],
-			index: cell[2]
+			r: cell[1]
 		});
 	}
 	return data;
