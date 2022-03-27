@@ -4,6 +4,8 @@ VALID MOVES:
 
 If an invalid move is made, or a bot times out, the opposing player wins and the game is over.
 
+<img src="https://github.com/Tishj/Codingame-Cluster/blob/main/config/resources/directions.png?raw=true" alt="drawing" width="300"/>
+
 ## Mappings
 `gravity`  
 0 - South  
