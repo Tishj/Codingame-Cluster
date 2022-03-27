@@ -40,6 +40,18 @@ public class Game {
 	int			turn = 0;
 	FrameType	currentFrameType = FrameType.ACTIONS;
 	FrameType	nextFrameType;
+	Cell[][] insertionPositions;
+
+	public void setInsertionPositions() {
+		this.insertionPositions = new Cell[Config.CELL_COUNT][6];
+		int index = 0;
+		for (Cell[] position : this.insertionPositions) {
+			for (Gravity direction : Gravity.values()) {
+				position[direction.getIndex()] = board.map.get(board.getTopOfColumn(direction, index));
+			}
+			index++;
+		}
+	}
 
 	public void init(long seed) {
 
@@ -49,8 +61,13 @@ public class Game {
 		board = BoardGenerator.generate(random);
 		chipManager.init(gameManager);
 		this.gravity = Gravity.SOUTH;
+		this.setInsertionPositions();
 
 		round = 0;
+	}
+
+	public FrameType getCurrentFrameType() {
+		return this.currentFrameType;
 	}
 
 	public static String getExpected() {
@@ -65,8 +82,7 @@ public class Game {
 
 		List<Integer> columns = new ArrayList<>(amountOfColumns);
 		for (int i = 0; i < amountOfColumns; i++) {
-			Cell cell = board.map.get(board.getTopOfColumn(gravity, i));
-			assert(cell != null);
+			Cell cell = insertionPositions[i][gravity.getIndex()];
 			Chip chip = cell.getChip();
 			if (chip == null) {
 				columns.add(i);
@@ -109,8 +125,6 @@ public class Game {
 		return lines;
 	}
 
-<<<<<<< Updated upstream
-=======
 	public Player getCurrentPlayer() {
 		return this.gameManager.getPlayer(round % 2);
 	}
@@ -126,7 +140,6 @@ public class Game {
 		return chipManager.populateSelectionForPlayer(player);
 	}
 
->>>>>>> Stashed changes
 	private List<Chip> getMatchLength(Chip chip, Gravity direction, List<Chip> connection) {
 		HexCoord coord = chip.coord.neighbour(direction);
 		Cell cell = getBoard().get(coord);
@@ -227,7 +240,12 @@ public class Game {
 		int amountOfColumns = Config.COLUMN_COUNT;
 		lines.add(String.valueOf(amountOfColumns));
 		for (int i = 0; i < amountOfColumns; i++) {
-			lines.add(getInsertColumnCellIndices(i));
+			lines.add(Stream.of(insertionPositions[i])
+				.map(cell -> {
+					return String.valueOf(cell.getIndex());
+				})
+				.collect(Collectors.joining(" "))
+			);
 		}
 
 		//yourColors
@@ -245,17 +263,17 @@ public class Game {
 		return lines;
 	}
 
-	private String getInsertColumnCellIndices(int column) {
-		List<Integer>	indices = new ArrayList<>(6);
-		for (Gravity direction : Gravity.values()) {
-			indices.add(
-				board.map.getOrDefault(board.getTopOfColumn(direction, column), Cell.NO_CELL).getIndex()
-			);
-		}
-		return indices.stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(" "));
-	}
+	// private String getInsertColumnCellIndices(int column) {
+	// 	List<Integer>	indices = new ArrayList<>(6);
+	// 	for (Gravity direction : Gravity.values()) {
+	// 		indices.add(
+	// 			board.map.getOrDefault(board.getTopOfColumn(direction, column), Cell.NO_CELL).getIndex()
+	// 		);
+	// 	}
+	// 	return indices.stream()
+	// 		.map(String::valueOf)
+	// 		.collect(Collectors.joining(" "));
+	// }
 
 	private String getNeighbourIds(HexCoord coord) {
 		List<Integer> orderedneighbourIds = new ArrayList<>(HexCoord.directions.length);
@@ -269,37 +287,19 @@ public class Game {
 			.collect(Collectors.joining(" "));
 	}
 
-<<<<<<< Updated upstream
-	public void resetGameTurnData() {
-	}
-
-	private Chip doDrop(Player player, Action action) throws GameException {
-		HexCoord startingLocation = board.getTopOfColumn(gravity, action.targetId);
-		assert(startingLocation != null);
-		Cell cell = getBoard().get(startingLocation);
-		if (cell == null || cell.getChip() != null) {
-			throw new CellAlreadyOccupiedException(cell.getIndex());
-		}
-=======
 	private Chip doDrop(Player player, Action action) {
 		Cell cell = insertionPositions[action.targetId][gravity.getIndex()];
->>>>>>> Stashed changes
 		//create the chip
-		Chip chip = chipManager.createChip(player, action.colorId, startingLocation);
+		Chip chip = chipManager.createChip(player, action.colorId, cell.getCoord());
 		cell = getBoard().get(chip.getCoord());
 		cell.setChip(chip);
-<<<<<<< Updated upstream
-		
-		dropChip(chip);
-=======
->>>>>>> Stashed changes
 
 		//move rest of selection back to remaining
 		chipManager.emptySelectionForPlayer(player);
 		return chip;
 	}
 
-	private void doRotate(Player player, Action action) throws GameException {
+	private void doRotate(Player player, Action action) {
 		gravity = gravity.rotate(action.cycleAmount);
 		//Burn the selected chips
 		chipManager.destroySelection();
