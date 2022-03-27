@@ -81,36 +81,38 @@ public class Referee extends AbstractReferee {
 		endGame();
 	}
 
-	@Override
-	public void gameTurn(int turn) {
-		// System.out.println(turn);
-		Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
-		
-		try {
-			game.preparePlayerDataForRound(player);
-		}
-		catch (GameException e) {
-			setWinner(gameManager.getPlayer(1 - player.getIndex()));
-			return ;
-		}
-		sendInputs(player);
-		player.execute();
-
+	public boolean handlePlayerCommand(Player player) {
 		try {
 			commandParser.parseCommands(player, player.getOutputs(), game);
-			if (player.isActive()) {
-				game.performGameUpdate(player);
-			}
-			else {
-				setWinner(gameManager.getPlayer(1 - player.getIndex()));
-				return ;
-			}
 		}
 		catch (TimeoutException e) {
 			commandParser.deactivatePlayer(player, "Timeout!");
 			gameSummaryManager.addPlayerTimeout(player);
 			gameSummaryManager.addPlayerDisqualified(player);
+			return false;
 		}
+		return true;
+	}
+
+	@Override
+	public void gameTurn(int turn) {
+		//Ran out of chips;
+		if (!game.setGameTurnData()) {
+			endGame();
+			return;
+		}
+		Player player = game.getCurrentPlayer();
+		if (game.getCurrentFrameType() == FrameType.ACTIONS) {
+			sendInputs(player);
+			player.execute();
+			if (!handlePlayerCommand(player)) {
+				endGame();
+				return;
+			}
+		}
+
+		game.performGameUpdate(player);
+
 		GameResult result = game.getWinner();
 		switch (result) {
 			case IN_PROGRESS: {

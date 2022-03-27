@@ -58,7 +58,6 @@ public class CommandParser {
 				player.setAction(new DropAction(targetId, colorId));
 				return;
 			}
-
 			throw new InvalidInputException(Game.getExpected(), command);
 
 		} catch (InvalidInputException e) {
