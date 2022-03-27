@@ -34,7 +34,6 @@ public class Game {
 	public static int MAX_ROUNDS = 30;
 
 	Board		board;
-	List<Chip>	placedChips;
 	Gravity		gravity;
 	Random		random;
 	int			round = 0;
@@ -48,7 +47,6 @@ public class Game {
 		board = BoardGenerator.generate(random);
 		chipManager.init(gameManager);
 		this.gravity = Gravity.SOUTH;
-		this.placedChips = new ArrayList<>(Config.CELL_COUNT);
 
 		round = 0;
 	}
@@ -175,16 +173,16 @@ public class Game {
 	public GameResult setWinnerAndDeleteChips(GameResult result, Connection[] biggestConnections) {
 		switch (result) {
 			case WIN_PLAYER_ONE: {
-				// this.placedChips.removeAll(biggestConnections[0].chips);
+				chipManager.removeListOfChips(biggestConnections[1].chips);
 				break;
 			}
 			case WIN_PLAYER_TWO: {
-				// this.placedChips.removeAll(biggestConnections[1].chips);
+				chipManager.removeListOfChips(biggestConnections[0].chips);
 				break;
 			}
 			case TIE: {
-				// this.placedChips.removeAll(biggestConnections[1].chips);
-				// this.placedChips.removeAll(biggestConnections[0].chips);
+				chipManager.removeListOfChips(biggestConnections[1].chips);
+				chipManager.removeListOfChips(biggestConnections[0].chips);
 				break;
 			}
 			case IN_PROGRESS: break;
@@ -193,7 +191,8 @@ public class Game {
 	}
 
 	public GameResult getWinner() {
-		if (placedChips.size() < Config.WIN_LENGTH) {
+		Map<Integer, Chip> chips = chipManager.getChips();
+		if (chips.size() < Config.WIN_LENGTH) {
 			return GameResult.IN_PROGRESS;
 		}
 		Connection[] biggestConnection = new Connection[gameManager.getPlayerCount()];
@@ -201,7 +200,7 @@ public class Game {
 			biggestConnection[i] = new Connection(-1);
 		}
 		//check match lengths
-		for (Chip chip : placedChips) {
+		for (Chip chip : chips.values()) {
 			for (Gravity direction : Gravity.values()) {
 				ArrayList<Chip> connection = new ArrayList<Chip>(Config.WIN_LENGTH);
 				connection.add(chip);
@@ -224,12 +223,12 @@ public class Game {
 			return this.setWinnerAndDeleteChips(GameResult.WIN_PLAYER_ONE, biggestConnection);
 		}
 		//Possible tie
-		long amountOfBlueChips = placedChips.stream()
+		long amountOfBlueChips = chips.values().stream()
 			.filter(c -> 
 				(c.colorId == biggestConnection[1].colorIndex &&
 				c.getOwner().getIndex() == 1))
 			.count();
-		long amountOfRedChips = placedChips.stream()
+		long amountOfRedChips = chips.values().stream()
 			.filter(c -> 
 				(c.colorId == biggestConnection[0].colorIndex &&
 				c.getOwner().getIndex() == 0))
@@ -316,8 +315,6 @@ public class Game {
 		Player other = gameManager.getPlayer(1 - player.getIndex());
 		player.addToUnknown(chip);
 		other.addToUnknown(chip);
-		//add it to the chips list
-		placedChips.add(chip);
 		cell = getBoard().get(chip.getCoord());
 		cell.setChip(chip);
 		
@@ -332,10 +329,10 @@ public class Game {
 
 	private void doRotate(Player player, Action action) throws GameException {
 		gravity = gravity.rotate(action.cycleAmount);
-
+		Map<Integer, Chip> chips = chipManager.getChips();
 		//Drop all chips
-		ArrayList<HexCoord> changedCells = new ArrayList<>(placedChips.size());
-		for (Chip chip: placedChips) {
+		ArrayList<HexCoord> changedCells = new ArrayList<>(chips.size());
+		for (Chip chip: chips.values()) {
 			HexCoord oldPosition = chip.getCoord();
 			if (dropChip(chip, changedCells)) {
 				changedCells.add(chip.getCoord());
@@ -465,8 +462,7 @@ public class Game {
 		return gravity;
 	}
 
-	public List<Chip> getChips() {
-		return this.placedChips;
+	public Map<Integer,Chip> getChips() {
+		return this.chipManager.getChips();
 	}
-
 }

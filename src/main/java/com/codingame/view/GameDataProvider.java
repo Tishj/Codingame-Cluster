@@ -24,7 +24,7 @@ public class GameDataProvider {
 	public FrameViewData getCurrentFrameData() {
 		FrameViewData data = new FrameViewData();
 
-		data.chips = game.getChips()
+		data.chips = game.getChips().values()
 			.stream()
 			.map(chip -> {
 				ChipData chipData = new ChipData();
