@@ -28,12 +28,12 @@ for `numberOfColumns` lines: 6 space-separated integers
 Next line: An integer `yourColors`  
 Next `yourColors` lines: 2 space-separated integers:
 - `index` for the color's index.  
-- `maxAmount` for the max amount of pellets of that color.  
+- `maxAmount` for the max amount of chips of that color.  
 
 Next line: An integer `opponentColors`  
 Next `opponentColors` lines: 2 space-separated integers:
 - `index` for the color's index.  
-- `maxAmount` for the max amount of pellets of that color.  
+- `maxAmount` for the max amount of chips of that color.  
 
 ### Input for One Game Turn
 First line: An integer `gravity` (between 0 and 5): the direction of gravity.  
@@ -42,31 +42,32 @@ Next line: `numberOfValidColumns`
 next `numberOfValidColumns` lines: 1 integer 
 - `column`: the column to use for a DROP command
 
-Next line: `numberOfNewPellets`  
-next `numberOfNewPellets` lines: 3 space-separated integers:  
-- `index`: index of the new pellet.  
-- `colorIndex`: index of the pellet's color.  
-- `isMine`: 1 if you are the owner of this pellet, 0 otherwise.
+Next line: `numberOfChips`  
+next `numberOfChips` lines: 4 space-separated integers:  
+- `index`: index of the new chip.  
+- `colorIndex`: index of the chip's color.  
+- `isMine`: 1 if you are the owner of this chip, 0 otherwise.  
+- `cellIndex`: index of the cell the chip is on.  
 
 Next line: `numberOfChangedCells`  
 next `numberOfChangedCells` lines: 2 space-separated integers:  
 - `cellIndex`: index of the cell 
 - `chipIndex`: index of the chip. (-1 if empty)
 
-Next line: `numberOfPelletsInHand`
-next `numberOfPelletsInHand` lines: 1 integer:
-- `colorIndex`: index of the pellet's color.
+Next line: `numberOfChipsInHand`
+next `numberOfChipsInHand` lines: 1 integer:
+- `colorIndex`: index of the chip's color.
 
 ## GAME END CONDITIONS
 
 ### Loss
-If you run out of pellets  
+If you run out of chips  
 If you timeout(bot only)  
 If you make an invalid move  
 
 ### Win
 Make a match bigger or equal to 4, and bigger than your opponent  
-If both players have an equal size match, the amount of pellets they have on the board of their winning color will serve as tie-breaker  
+If both players have an equal size match, the amount of chips they have on the board of their winning color will serve as tie-breaker  
 
 ### Tie
 Both players have a match of equal size, with equal number of tiles of their winning color on the board  

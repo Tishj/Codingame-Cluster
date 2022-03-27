@@ -38,6 +38,8 @@ public class Game {
 	Random		random;
 	int			round = 0;
 	int			turn = 0;
+	FrameType	currentFrameType = FrameType.ACTIONS;
+	FrameType	nextFrameType;
 
 	public void init(long seed) {
 
@@ -53,23 +55,6 @@ public class Game {
 
 	public static String getExpected() {
 		return "ROTATE <amount> | DROP <row> <color_idx>";
-	}
-
-	private HexCoord getCoordByIndex(int index) throws CellNotFoundException {
-		return board.map.entrySet()
-			.stream()
-			.filter(e -> e.getValue().getIndex() == index)
-			.findFirst()
-			.orElseThrow(() -> {
-				return new CellNotFoundException(index);
-			}).getKey();
-	}
-
-	private List<HexCoord> getBoardEdges() {
-		HexCoord centre = new HexCoord(0, 0, 0);
-		return board.coords.stream()
-			.filter(coord -> coord.distanceTo(centre) == Config.MAP_RING_COUNT)
-			.collect(Collectors.toList());
 	}
 
 	public List<String> getCurrentFrameInfoFor(Player player) {
@@ -93,33 +78,19 @@ public class Game {
 			lines.add(String.valueOf(idx));
 		}
 
-		//newChips
-		Chip[] newChips = player.getUnknown();
-		lines.add(String.valueOf(newChips.length));
-		for (Chip chip : (Chip[])newChips) {
-			lines.add(String.format("%d %d %d",
-				chip.getIndex(),
-				chip.getColorId(),
-				chip.getOwner().getIndex() == player.getIndex() ? 1 : 0
-				));
-		}
-
-		//changedChips
-		HashSet<HexCoord> changedCells = player.getChanged();
-		lines.add(String.valueOf(changedCells.size()));
-		changedCells.stream()
-			.map(coord -> {
-				return board.map.get(coord);
-			})
-			.forEach(cell -> {
-				Chip chip = cell.getChip();
-				int chipIndex = (chip == null) ? -1 : chip.getIndex();
-				lines.add(String.format("%d %d",
-					cell.getIndex(),
-					chipIndex
+		//chips
+		Map<Integer, Chip>	chips = chipManager.getChips();
+		lines.add(String.valueOf(chips.size()));
+		chips.values().stream()
+			.forEach(chip -> {
+				int cellIndex = getBoard().get(chip.getCoord()).getIndex();
+				lines.add(String.format("%d %d %d %d%n",
+					chip.getIndex(),
+					chip.getColorId(),
+					chip.getOwner().getIndex() == player.getIndex() ? 1 : 0,
+					cellIndex
 				));
 			});
-		player.clearChanged();
 
 		//selectedColors
 		int amountOfSelectedColors = chipManager.selectedAmount;
@@ -138,26 +109,6 @@ public class Game {
 		return lines;
 	}
 
-	private HexCoord hexAdd(HexCoord a, HexCoord b) {
-		return new HexCoord(a.getQ() + b.getQ(), a.getR() + b.getR(), a.getS() + b.getS());
-	}
-
-	private List<HexCoord> getCoordsInRange(HexCoord center, int N) {
-		List<HexCoord> results = new ArrayList<>();
-		for (int x = -N; x <= +N; x++) {
-			for (int y = Math.max(-N, -x - N); y <= Math.min(+N, -x + N); y++) {
-				int z = -x - y;
-				results.add(hexAdd(center, new HexCoord(x, y, z)));
-			}
-		}
-		return results;
-	}
-	// Slot* neighbour = pellet->slot->neighbours[direction];
-
-	// if (!neighbour || !neighbour->pellet || neighbour->pellet->color != pellet->color)
-	// 	return info;
-	// info.size += 1;
-	// return match_size(neighbour->pellet, info, direction);
 	private List<Chip> getMatchLength(Chip chip, Gravity direction, List<Chip> connection) {
 		HexCoord coord = chip.coord.neighbour(direction);
 		Cell cell = getBoard().get(coord);
@@ -312,15 +263,10 @@ public class Game {
 		}
 		//create the chip
 		Chip chip = chipManager.createChip(player, action.colorId, startingLocation);
-		Player other = gameManager.getPlayer(1 - player.getIndex());
-		player.addToUnknown(chip);
-		other.addToUnknown(chip);
 		cell = getBoard().get(chip.getCoord());
 		cell.setChip(chip);
 		
-		dropChip(chip, null);
-		player.addToChanged(chip.getCoord()); //add the position the chip has landed
-		other.addToChanged(chip.getCoord());
+		dropChip(chip);
 
 		//move rest of selection back to remaining
 		chipManager.emptySelectionForPlayer(player);
@@ -331,19 +277,8 @@ public class Game {
 		gravity = gravity.rotate(action.cycleAmount);
 		Map<Integer, Chip> chips = chipManager.getChips();
 		//Drop all chips
-		ArrayList<HexCoord> changedCells = new ArrayList<>(chips.size());
 		for (Chip chip: chips.values()) {
-			HexCoord oldPosition = chip.getCoord();
-			if (dropChip(chip, changedCells)) {
-				changedCells.add(chip.getCoord());
-				changedCells.add(oldPosition);
-			}
-		}
-		//Add the changed chips to the players(and other) changed chips
-		Player other = gameManager.getPlayer(1 - player.getIndex());
-		for (HexCoord coord : changedCells) {
-			other.addToChanged(coord);
-			player.addToChanged(coord);
+			dropChip(chip);
 		}
 		//Burn the selected chips
 		chipManager.destroySelection();
@@ -356,7 +291,7 @@ public class Game {
 	}
 
 	//@return true/false indicating whether the chip moved at least one place or not
-	public boolean dropChip(Chip chip, ArrayList<HexCoord> changedCells) {
+	public boolean dropChip(Chip chip) {
 		Map<HexCoord, Cell> board = getBoard();
 		//Move it downwards
 		boolean moved = false;
@@ -378,15 +313,10 @@ public class Game {
 			Chip neighbourChip = neighbour.getChip();
 			//Cell is not vacant
 			if (neighbourChip != null) {
-				if (!dropChip(neighbourChip, changedCells)) {
+				if (!dropChip(neighbourChip)) {
 					break;
 				}
 				//Chip moved, cell is now vacant
-				//Optional
-				if (changedCells != null) {
-					changedCells.add(coord); //might be redundant??
-					changedCells.add(neighbourChip.getCoord());
-				}
 			}
 			updateChipLocation(cell, neighbour, chip, coord);
 			moved = true;

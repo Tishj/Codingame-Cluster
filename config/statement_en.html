@@ -347,21 +347,14 @@ text-align: left;">
 				<li><var>column</var>: a column that isn't currently filled with chips.</li>
 			</ul>
 
-			<span class="statement-lineno">Next line:</span> <var>numberOfNewChips</var>.<br>
-			<span class="statement-lineno">Next <var>numberOfNewChips</var> lines:</span>
-			<const>3</const> space-separated integers:
+			<span class="statement-lineno">Next line:</span> <var>numberOfChips</var>.<br>
+			<span class="statement-lineno">Next <var>numberOfChips</var> lines:</span>
+			<const>4</const> space-separated integers:
 			<ul>
 				<li><var>index</var>: the index of the new chip.</li>
 				<li><var>colorIndex</var>: the color of the new chip.</li>
 				<li><var>isMine</var>: <const>1</const> if you are the owner of this chip.</li>
-			</ul>
-
-			<span class="statement-lineno">Next line:</span> <var>numberOfChangedCells</var>.<br>
-			<span class="statement-lineno">Next <var>numberOfChangedCells</var> lines:</span>
-			<const>2</const> space-separated integers:
-			<ul>
-				<li><var>cellIndex</var>: the index of the changed cell.</li>
-				<li><var>chipIndex</var>: the index of the chip at this cell (-1 if empty).</li>
+				<li><var>cellIndex</var>: the index of the cell the chip is currently on.</li>
 			</ul>
 
 			<span class="statement-lineno">Next line:</span> <var>numberOfColorsInHand</var>.<br>
