@@ -4,8 +4,10 @@ VALID MOVES:
 
 If an invalid move is made, or a bot times out, the opposing player wins and the game is over.
 
+<img src="https://github.com/Tishj/Codingame-Cluster/blob/main/config/resources/directions.png?raw=true" alt="drawing" width="300"/>
+
 ## Mappings
-`direction`  
+`gravity`  
 0 - South  
 1 - SouthWest  
 2 - NorthWest  
@@ -48,11 +50,6 @@ next `numberOfChips` lines: 4 space-separated integers:
 - `colorIndex`: index of the chip's color.  
 - `isMine`: 1 if you are the owner of this chip, 0 otherwise.  
 - `cellIndex`: index of the cell the chip is on.  
-
-Next line: `numberOfChangedCells`  
-next `numberOfChangedCells` lines: 2 space-separated integers:  
-- `cellIndex`: index of the cell 
-- `chipIndex`: index of the chip. (-1 if empty)
 
 Next line: `numberOfChipsInHand`
 next `numberOfChipsInHand` lines: 1 integer:
