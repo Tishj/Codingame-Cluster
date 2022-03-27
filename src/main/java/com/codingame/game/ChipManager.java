@@ -19,16 +19,22 @@ public class ChipManager {
 	public int selectedAmount;
 	int[][] remainingChips;
 	int[][] selectedChips;
+	int[][] placedChips;
 	Random	random;
-	TreeMap<Integer, Chip>	placedChips;
+	TreeMap<Integer, Chip>	chips;
 	private MultiplayerGameManager<Player> gameManager;
+	Board board;
 	
-	public void init(MultiplayerGameManager<Player> gameManager) {
+	public void init(MultiplayerGameManager<Player> gameManager, Board board) {
 		this.gameManager = gameManager;
 		this.random = new Random(gameManager.getSeed());
 		this.remainingChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
 		this.selectedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
-		this.placedChips = new TreeMap<Integer, Chip>();
+		this.placedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
+
+		this.board = board;
+
+		this.chips = new TreeMap<Integer, Chip>();
 		for (int[] chips : this.remainingChips) {
 			Arrays.fill(chips, Config.CHIP_MAX);
 		}
@@ -45,15 +51,20 @@ public class ChipManager {
 	public Chip createChip(Player owner, int colorId, HexCoord coord) {
 		int player = owner.getIndex();
 		selectedChips[player][colorId]--;
+		placedChips[player][colorId]++;
 
 		int index = this.indices.removeFirst();
 		Chip chip = new Chip(index, colorId, owner, coord);
-		placedChips.put(index, chip);
+		chips.put(index, chip);
 		return chip;
 	}
 
+	public int getAmountPresentOnBoard(Player player, int color) {
+		return this.placedChips[player.getIndex()][color];
+	}
+
 	public Map<Integer, Chip> getChips() {
-		return placedChips;
+		return chips;
 	}
 
 	public void removeChip(Chip chip) {
@@ -61,11 +72,13 @@ public class ChipManager {
 		int colorId = chip.getColorId();
 		int index = chip.getIndex();
 		//Refund the chip to the bag
+		board.map.get(chip.getCoord()).setChip(null);
+		placedChips[player][colorId]--;
 		remainingChips[player][colorId]++;
 		//Add the index to the back of the queue
 		indices.add(index);
 		//Remove the chip from the map
-		placedChips.remove(index);
+		chips.remove(index);
 	}
 
 	public void removeListOfChips(List<Chip> chips) {

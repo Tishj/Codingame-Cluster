@@ -75,12 +75,6 @@ public class Referee extends AbstractReferee {
 		}
 	}
 
-	private void setWinner(Player player) {
-		gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
-		player.setScore(100);
-		endGame();
-	}
-
 	public boolean handlePlayerCommand(Player player) {
 		try {
 			commandParser.parseCommands(player, player.getOutputs(), game);
@@ -112,32 +106,6 @@ public class Referee extends AbstractReferee {
 		}
 
 		game.performGameUpdate(player);
-
-		GameResult result = game.getWinner();
-		switch (result) {
-			case IN_PROGRESS: {
-				break;
-			}
-			case WIN_PLAYER_ONE: {
-				gameManager.getPlayer(1).setScore(100);
-				gameManager.getPlayer(0).setScore(0);
-				endGame();
-				break;
-			}
-			case WIN_PLAYER_TWO: {
-				gameManager.getPlayer(0).setScore(100);
-				gameManager.getPlayer(1).setScore(0);
-				endGame();
-				break;
-			}
-			case TIE: {
-				for (Player p : gameManager.getPlayers()) {
-					p.setScore(50);
-				}
-				endGame();
-				break;
-			}
-		}
 	}
 
 	private void endGame() {

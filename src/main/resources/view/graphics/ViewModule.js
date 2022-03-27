@@ -287,10 +287,10 @@ export class ViewModule {
 		const difference = Math.abs(oldDegrees - newDegrees);
 		const oldRadian = degreesToRadians(oldDegrees);
 		const newRadian = degreesToRadians(newDegrees);
-		const haltedProgress = unlerp(0, (3/4), progress);
-		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, haltedProgress);
+		// const haltedProgress = unlerp(0, (3/4), progress);
+		this.boardLayer.rotation = lerpAngle(oldRadian, newRadian, progress);
 		for (const [index, chip] of this.chips) {
-			chip.mainSprite.parent.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), haltedProgress);
+			chip.mainSprite.parent.rotation = lerpAngle(degreesToRadians(-oldDegrees), degreesToRadians(-newDegrees), progress);
 		}
 	}
 	
@@ -342,10 +342,11 @@ export class ViewModule {
 				// }
 				console.log("CHIP " + index + " DELETED!");
 			}
+			//chip is new
 			else if (!chipBefore && chipNow) {
 				console.log("CHIP " + index + " ADDED!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
-				chip.mainSprite.alpha = 1;
+				chip.mainSprite.alpha = lerp(0, 1, progress);
 				chip.mainSprite.visible = true;
 				const hexaP = hexToScreen(chipNow.q, chipNow.r);
 				chip.container.position.set(hexaP.x, hexaP.y);
@@ -363,8 +364,8 @@ export class ViewModule {
 					const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
 					const newHexaP = hexToScreen(chipNow.q, chipNow.r);
 					const ratio = 3 / 4;
-					const haltedProgress = unlerp(ratio, 1, progress);
-					chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
+					// const haltedProgress = unlerp(ratio, 1, progress);
+					chip.container.position = lerpPosition(oldHexaP, newHexaP, progress);
 				}
 			}
 			else {
