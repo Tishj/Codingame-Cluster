@@ -23,8 +23,8 @@ Next `numberOfCells` lines: 7 space-separated integers:
 - `index` for the cell's index.  
 - 6 `neigh` variables, one for each direction, containing the index of a neighboring cell or -1 if is there is no neighbor.  
 
-Next line: An integer `numberOfColumns`
-for `numberOfColumns` lines: 6 space-separated integers
+Next line: An integer `numberOfColumns`  
+Next `numberOfColumns` lines: 6 space-separated integers
 - 6 cellIndex variables, one for each direction, containing the index of the cell that is at the top of that column, for that direction.
 
 Next line: An integer `yourColors`  
