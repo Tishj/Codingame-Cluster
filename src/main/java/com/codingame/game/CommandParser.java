@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import com.codingame.game.action.DropAction;
 import com.codingame.game.action.RotateAction;
+import com.codingame.game.exception.CellAlreadyOccupiedException;
 import com.codingame.game.exception.ChipNotSelectedException;
 import com.codingame.game.exception.ColorOutOfRangeException;
 import com.codingame.game.exception.ColumnOutOfRangeException;
@@ -54,6 +55,9 @@ public class CommandParser {
 				}
 				if (!chipManager.colorIsSelected(player, colorId)) {
 					throw new ChipNotSelectedException(colorId);
+				}
+				if (game.insertionPositions[targetId][game.getGravity().getIndex()].getChip() != null) {
+					throw new CellAlreadyOccupiedException(targetId);
 				}
 				player.setAction(new DropAction(targetId, colorId));
 				return;

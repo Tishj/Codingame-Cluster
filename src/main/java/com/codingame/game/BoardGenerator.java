@@ -10,7 +10,7 @@ public class BoardGenerator {
 	static private int index = 0;
 
 	public static void generateCell(HexCoord coord) {
-		Cell cell = new Cell(index++);
+		Cell cell = new Cell(index++, coord);
 		board.put(coord, cell);
 	}
 
