@@ -49,11 +49,6 @@ next `numberOfChips` lines: 4 space-separated integers:
 - `isMine`: 1 if you are the owner of this chip, 0 otherwise.  
 - `cellIndex`: index of the cell the chip is on.  
 
-Next line: `numberOfChangedCells`  
-next `numberOfChangedCells` lines: 2 space-separated integers:  
-- `cellIndex`: index of the cell 
-- `chipIndex`: index of the chip. (-1 if empty)
-
 Next line: `numberOfChipsInHand`
 next `numberOfChipsInHand` lines: 1 integer:
 - `colorIndex`: index of the chip's color.
