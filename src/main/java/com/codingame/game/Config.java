@@ -8,11 +8,12 @@ public class Config {
 	public static int WIN_LENGTH = 4;
 	public static int COLORS_PER_PLAYER = 1;
 	public static int COLORS_PER_ROUND = 2;
-	public static int MAP_RING_COUNT = 5;
+	public static int MAP_RING_COUNT = 4;
 	public static int CELL_COUNT;
 	public static int CHIP_MAX;
 	public static int COLUMN_COUNT;
 	public static int MAX_ROUNDS;
+	public static int WIN_THRESHOLD = 200;
 
 	public static void load(Properties params) {
 		WIN_LENGTH = getFromParams(params, "WIN_LENGTH", WIN_LENGTH);

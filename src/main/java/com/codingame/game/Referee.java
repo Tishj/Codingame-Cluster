@@ -75,67 +75,37 @@ public class Referee extends AbstractReferee {
 		}
 	}
 
-	private void setWinner(Player player) {
-		gameManager.addToGameSummary(GameManager.formatSuccessMessage(player.getNicknameToken() + " won!"));
-		player.setScore(100);
-		endGame();
-	}
-
-	@Override
-	public void gameTurn(int turn) {
-		// System.out.println(turn);
-		Player player = gameManager.getPlayer(turn % gameManager.getPlayerCount());
-		
-		try {
-			game.preparePlayerDataForRound(player);
-		}
-		catch (GameException e) {
-			setWinner(gameManager.getPlayer(1 - player.getIndex()));
-			return ;
-		}
-		sendInputs(player);
-		player.execute();
-
+	public boolean handlePlayerCommand(Player player) {
 		try {
 			commandParser.parseCommands(player, player.getOutputs(), game);
-			if (player.isActive()) {
-				game.performGameUpdate(player);
-			}
-			else {
-				setWinner(gameManager.getPlayer(1 - player.getIndex()));
-				return ;
-			}
 		}
 		catch (TimeoutException e) {
 			commandParser.deactivatePlayer(player, "Timeout!");
 			gameSummaryManager.addPlayerTimeout(player);
 			gameSummaryManager.addPlayerDisqualified(player);
+			return false;
 		}
-		GameResult result = game.getWinner();
-		switch (result) {
-			case IN_PROGRESS: {
-				break;
-			}
-			case WIN_PLAYER_ONE: {
-				gameManager.getPlayer(1).setScore(100);
-				gameManager.getPlayer(0).setScore(0);
+		return true;
+	}
+
+	@Override
+	public void gameTurn(int turn) {
+		//Ran out of chips;
+		if (!game.setGameTurnData()) {
+			endGame();
+			return;
+		}
+		Player player = game.getCurrentPlayer();
+		if (game.getCurrentFrameType() == FrameType.ACTIONS) {
+			sendInputs(player);
+			player.execute();
+			if (!handlePlayerCommand(player)) {
 				endGame();
-				break;
-			}
-			case WIN_PLAYER_TWO: {
-				gameManager.getPlayer(0).setScore(100);
-				gameManager.getPlayer(1).setScore(0);
-				endGame();
-				break;
-			}
-			case TIE: {
-				for (Player p : gameManager.getPlayers()) {
-					p.setScore(50);
-				}
-				endGame();
-				break;
+				return;
 			}
 		}
+
+		game.performGameUpdate(player);
 	}
 
 	private void endGame() {
