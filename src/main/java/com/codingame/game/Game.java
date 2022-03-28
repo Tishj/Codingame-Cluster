@@ -76,7 +76,7 @@ public class Game {
 
 	public List<String> getCurrentFrameInfoFor(Player player) {
 		List<String> lines = new ArrayList<>();
-		lines.add(String.valueOf(gravity.getIndex()));
+		lines.add(String.valueOf(gravity.getIndex())); //gravity
 
 		int amountOfColumns = Config.COLUMN_COUNT;
 
@@ -88,29 +88,28 @@ public class Game {
 				columns.add(i);
 			}
 		}
-		//validColumns
-		lines.add(String.valueOf(columns.size()));
+
+		lines.add(String.valueOf(columns.size())); //numberOfValidColumns
 		for (int idx : columns) {
-			lines.add(String.valueOf(idx));
+			lines.add(String.valueOf(idx)); //columnIndex
 		}
 
-		//chips
 		Map<Integer, Chip>	chips = chipManager.getChips();
-		lines.add(String.valueOf(chips.size()));
+		lines.add(String.valueOf(chips.size())); //numberOfChips
 		chips.values().stream()
 			.forEach(chip -> {
 				int cellIndex = getBoard().get(chip.getCoord()).getIndex();
-				lines.add(String.format("%d %d %d %d%n",
-					chip.getIndex(),
-					chip.getColorId(),
-					chip.getOwner().getIndex() == player.getIndex() ? 1 : 0,
-					cellIndex
+				lines.add(String.format("%d %d %d %d",
+					chip.getIndex(), //index
+					chip.getColorId(), //colorIndex
+					chip.getOwner().getIndex() == player.getIndex() ? 1 : 0, //isMine
+					cellIndex //cellIndex
 				));
 			});
 
 		//selectedColors
 		int amountOfSelectedColors = chipManager.selectedAmount;
-		lines.add(String.valueOf(amountOfSelectedColors));
+		lines.add(String.valueOf(amountOfSelectedColors)); //numberOfColorsInHand
 		int[] selectedColors = new int[amountOfSelectedColors];
 		int index = 0;
 		for (int i = 0; i < Config.COLORS_PER_PLAYER; i++) {
@@ -119,7 +118,7 @@ public class Game {
 			}
 		}
 		for (int color : selectedColors) {
-			lines.add(String.valueOf(color));
+			lines.add(String.valueOf(color)); //colorIndex
 		}
 
 		return lines;
