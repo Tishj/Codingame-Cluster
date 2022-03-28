@@ -311,16 +311,33 @@ public class Game {
 				removeCompleteConnections();
 				nextFrameType = FrameType.ACTIONS;
 				gameManager.setFrameDuration(Constants.DELETE_FRAME_DURATION);
-				//TODO: change to drop/delete conditionally from here
+				boolean drop = chipManager.shouldDrop(gravity);
+				if (drop) {
+					//If gaps are created by deleting:
+					nextFrameType = FrameType.DROP_CHIPS;
+				}
+				else {
+					//check if there are more connections to delete
+					boolean winner = updateConnections();
+					if (winner) {
+						nextFrameType = FrameType.DELETE_CHIPS;
+					}
+					else {
+						nextFrameType = FrameType.ACTIONS;
+					}
+				}
 				break;
 			}
 			case DROP_CHIPS: {
 				int biggest_hexes_moved = chipManager.dropChips(gravity);
 				boolean winner = updateConnections();
-				nextFrameType = (winner == true) ?
-					FrameType.DELETE_CHIPS :
-					FrameType.ACTIONS;
-				gameManager.setFrameDuration((biggest_hexes_moved * Constants.HEX_TRAVEL_DURATION));
+				if (winner) {
+					nextFrameType = FrameType.DELETE_CHIPS;
+				}
+				else {
+					nextFrameType = FrameType.ACTIONS;
+				}
+				gameManager.setFrameDuration(biggest_hexes_moved * Constants.HEX_TRAVEL_DURATION);
 				break;
 			}
 			case NEW_CHIP: {
@@ -355,8 +372,7 @@ public class Game {
 			Chip chip = doDrop(player, action);
 			gameManager.setFrameDuration(300); //TODO: make this less hardcoded
 			//figure out if this chip has already "landed" (this doesnt work with MAP_RING_SIZE 1)
-			Cell directLowerNeighbour = board.map.get(chip.getCoord().neighbour(gravity));
-			if (directLowerNeighbour.getChip() == null) {
+			if (chipManager.shouldDrop(gravity) == true) {
 				nextFrameType = FrameType.DROP_CHIPS; //cell directly below is empty
 			}
 			else {
@@ -369,6 +385,7 @@ public class Game {
 			resetAllConnections(); //every old connection is potentially broken
 			doRotate(player, action);
 			int actualMovedCycles = (3 - (Math.abs(action.cycleAmount - 3)));
+			System.err.println(actualMovedCycles);
 			gameManager.setFrameDuration(Constants.ROTATION_CYCLE_TIME * actualMovedCycles);
 			boolean drop = chipManager.shouldDrop(gravity);
 			if (drop) {
@@ -388,6 +405,8 @@ public class Game {
 	private boolean gameOver() {
 		if (gameManager.getActivePlayers().size() <= 1)
 			return true;
+		if (nextFrameType == FrameType.DROP_CHIPS || nextFrameType == FrameType.DELETE_CHIPS)
+			return false;
 		if (Config.MAX_ROUNDS != 0 && round >= Config.MAX_ROUNDS)
 			return true;
 		for (Player player : gameManager.getActivePlayers()) {

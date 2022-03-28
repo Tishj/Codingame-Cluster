@@ -106,10 +106,17 @@ public class ChipManager {
 
 	public boolean shouldDrop(Gravity gravity) {
 		for (Chip chip : chips.values()) {
-			Cell neighbour = board.map.get(chip.getCoord().neighbour(gravity));
-			if (neighbour == null || neighbour.getChip() != null) {
+			HexCoord position = chip.getCoord();
+			Cell neighbour = board.map.get(position.neighbour(gravity));
+			//bottom of the board reached.
+			if (neighbour == null) {
+				continue;
+			}
+			//neighbour is empty
+			if (neighbour.getChip() == null) {
 				return true;
 			}
+
 		}
 		return false;
 	}
