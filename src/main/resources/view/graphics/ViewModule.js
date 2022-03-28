@@ -44,6 +44,13 @@ export class ViewModule {
 		this.dormants = new Map();
 		this.shadows = new Map();
 		this.debugData = new Map();
+		// this.colorMatrix = {
+		// 	'Red': new PIXI.filters.ColorMatrixFilter(),
+		// 	'Blue': new PIXI.filters.ColorMatrixFilter()
+		// };
+		// for (let [key, value] of Object.entries(this.colorMatrix)) {
+		// 	value.hue(key == 'Red' ? -25 : 25, true);
+		// }
 		// this.debugHUD = new Map();
 		window.debug = this;
 		this.tooltipManager = new TooltipManager();
@@ -356,6 +363,9 @@ export class ViewModule {
 			else if (!chipBefore && chipNow) {
 				console.log("CHIP " + index + " ADDED!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
+				// if (chipNow.color == 1) {
+				// 	chip.mainSprite.filters = [this.colorMatrix[colorName]];
+				// }
 				chip.mainSprite.alpha = lerp(0, 1, progress);
 				chip.mainSprite.visible = true;
 				const hexaP = hexToScreen(chipNow.q, chipNow.r);
@@ -364,6 +374,9 @@ export class ViewModule {
 			else if (chipBefore && chipNow) {
 				console.log("CHIP " + index + " PASSIVE!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
+				// if (chipNow.color == 1) {
+				// 	chip.mainSprite.filters = [this.colorMatrix[colorName]];
+				// }
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
 				//chip hasnt moved
