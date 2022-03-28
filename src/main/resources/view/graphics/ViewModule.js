@@ -325,6 +325,9 @@ export class ViewModule {
 			const colorName = ownerIdx === 0 ? 'Red' : 'Blue';
 			chip.mainSprite.scale.set(1);
 			chip.transitionSprite.scale.set(1);
+			chip.transitionSprite.visible = false;
+			chip.mainSprite.visible = true;
+			chip.mainSprite.alpha = 1;
 			//chip was deleted
 			if (chipBefore && !chipNow) {
 				// chip.mainSprite.texture = PIXI.Texture.from(`Arbre3_${colorName}.png`);
@@ -360,9 +363,11 @@ export class ViewModule {
 			}
 			else if (chipBefore && chipNow) {
 				console.log("CHIP " + index + " PASSIVE!");
+				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				chip.mainSprite.alpha = 1;
 				chip.mainSprite.visible = true;
 				//chip hasnt moved
+
 				if (chipBefore.q == chipNow.q && chipBefore.r == chipNow.r) {
 					const hexaP = hexToScreen(chipNow.q, chipNow.r);
 					chip.container.position.set(hexaP.x, hexaP.y);

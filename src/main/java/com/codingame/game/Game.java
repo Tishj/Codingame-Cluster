@@ -312,6 +312,7 @@ public class Game {
 				nextFrameType = FrameType.ACTIONS;
 				gameManager.setFrameDuration(Constants.DELETE_FRAME_DURATION);
 				boolean drop = chipManager.shouldDrop(gravity);
+				resetAllConnections();
 				if (drop) {
 					//If gaps are created by deleting:
 					nextFrameType = FrameType.DROP_CHIPS;
