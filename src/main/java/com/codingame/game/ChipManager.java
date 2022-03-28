@@ -20,6 +20,7 @@ public class ChipManager {
 	int[][] remainingChips;
 	int[][] selectedChips;
 	int[][] placedChips;
+	private int movedHexes = 0;
 	Random	random;
 	TreeMap<Integer, Chip>	chips;
 	private MultiplayerGameManager<Player> gameManager;
@@ -103,6 +104,16 @@ public class ChipManager {
 		return indices;
 	}
 
+	public boolean shouldDrop(Gravity gravity) {
+		for (Chip chip : chips.values()) {
+			Cell neighbour = board.map.get(chip.getCoord().neighbour(gravity));
+			if (neighbour == null || neighbour.getChip() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean populateSelectionForPlayer(Player player) {
 		int index = player.getIndex();
 		int selected = 0;
@@ -129,6 +140,52 @@ public class ChipManager {
 		}
 		this.selectedAmount = selected;
 		return selected != 0;
+	}
+
+	private void updateChipLocation(Cell oldCell, Cell newCell, Chip chip, HexCoord newCoord) {
+		oldCell.setChip(null);
+		newCell.setChip(chip);
+		chip.setCoord(newCoord);
+	}
+
+	//@return hexes moved
+	public int dropChip(Chip chip, Gravity gravity) {
+		HexCoord	originalPosition = chip.getCoord();
+
+		while (true) {
+			HexCoord coord = chip.getCoord();
+			Cell cell = board.map.get(coord);
+
+			coord = coord.neighbour(gravity);
+			Cell neighbour = board.map.get(coord);
+			if (neighbour == null) {
+				break;
+			}
+			Chip neighbourChip = neighbour.getChip();
+			if (neighbourChip != null && dropChip(neighbourChip, gravity) == 0) {
+				break;
+			}
+			updateChipLocation(cell, neighbour, chip, coord);
+		}
+		return chip.getCoord().distanceTo(originalPosition);
+	}
+
+	public int dropChips(Gravity gravity) {
+		int hexes_moved = 0;
+		for (Chip chip: chips.values()) {
+			int moved = dropChip(chip, gravity);
+			if (moved > hexes_moved) {
+				hexes_moved = moved;
+			}
+		}
+		this.movedHexes = hexes_moved;
+		return hexes_moved;
+	}
+
+	public int getAndResetHexesMoved() {
+		int moved = movedHexes;
+		movedHexes = 0;
+		return moved;
 	}
 
 	public void emptySelectionForPlayer(Player player) {

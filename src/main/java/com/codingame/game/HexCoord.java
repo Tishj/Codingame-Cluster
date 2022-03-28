@@ -58,6 +58,9 @@ public class HexCoord {
 	}
 
 	int distanceTo(HexCoord dst) {
+		if (dst == this) {
+			return 0;
+		}
 		return (Math.abs(q - dst.q) + Math.abs(r - dst.r) + Math.abs(s - dst.s)) / 2;
 	}
 

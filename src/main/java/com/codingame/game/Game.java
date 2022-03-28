@@ -221,43 +221,6 @@ public class Game {
 		chipManager.destroySelection();
 	}
 
-	private void updateChipLocation(Cell oldCell, Cell newCell, Chip chip, HexCoord newCoord) {
-		oldCell.setChip(null);
-		newCell.setChip(chip);
-		chip.setCoord(newCoord);
-	}
-
-	public boolean dropChip(Chip chip) {
-		Map<HexCoord, Cell> board = getBoard();
-		boolean moved = false;
-
-		while (true) {
-			HexCoord coord = chip.getCoord();
-			Cell cell = board.get(coord);
-
-			coord = coord.neighbour(gravity);
-			Cell neighbour = board.get(coord);
-			if (neighbour == null) {
-				break;
-			}
-			Chip neighbourChip = neighbour.getChip();
-			if (neighbourChip != null && !dropChip(neighbourChip)) {
-				break;
-			}
-			updateChipLocation(cell, neighbour, chip, coord);
-			moved = true;
-		}
-		return moved;
-	}
-
-	public void dropChips() {
-		Map<Integer, Chip> chips = chipManager.getChips();
-		//Drop all chips
-		for (Chip chip: chips.values()) {
-			dropChip(chip);
-		}
-	}
-
 	//TODO: fix how shitty this code is..
 	public boolean updateConnections() {
 		Map<Integer, Chip> chips = chipManager.getChips();
@@ -342,7 +305,6 @@ public class Game {
 			case ACTIONS: {
 				gameSummaryManager.addRound(round);
 				performActionUpdate(player);
-				nextFrameType = FrameType.DROP_CHIPS;
 				break;
 			}
 			case DELETE_CHIPS: {
@@ -353,12 +315,12 @@ public class Game {
 				break;
 			}
 			case DROP_CHIPS: {
-				dropChips();
+				int biggest_hexes_moved = chipManager.dropChips(gravity);
 				boolean winner = updateConnections();
 				nextFrameType = (winner == true) ?
 					FrameType.DELETE_CHIPS :
 					FrameType.ACTIONS;
-				gameManager.setFrameDuration(6 * Constants.HEX_TRAVEL_DURATION);
+				gameManager.setFrameDuration((biggest_hexes_moved * Constants.HEX_TRAVEL_DURATION));
 				break;
 			}
 			case NEW_CHIP: {
@@ -390,13 +352,32 @@ public class Game {
 
 		Action action = player.getAction();
 		if (action.isDrop()) {
-			doDrop(player, action);
+			Chip chip = doDrop(player, action);
 			gameManager.setFrameDuration(300); //TODO: make this less hardcoded
+			//figure out if this chip has already "landed" (this doesnt work with MAP_RING_SIZE 1)
+			Cell directLowerNeighbour = board.map.get(chip.getCoord().neighbour(gravity));
+			if (directLowerNeighbour.getChip() == null) {
+				nextFrameType = FrameType.DROP_CHIPS; //cell directly below is empty
+			}
+			else {
+				boolean winner = updateConnections();
+				nextFrameType = (winner == true) ?
+						FrameType.DELETE_CHIPS :
+						FrameType.ACTIONS;
+			}
 		} else if (action.isRotate()) {
 			resetAllConnections(); //every old connection is potentially broken
 			doRotate(player, action);
 			int actualMovedCycles = (3 - (Math.abs(action.cycleAmount - 3)));
 			gameManager.setFrameDuration(Constants.ROTATION_CYCLE_TIME * actualMovedCycles);
+			boolean drop = chipManager.shouldDrop(gravity);
+			if (drop) {
+				nextFrameType = FrameType.DROP_CHIPS;
+			}
+			else {
+				//If nothing had to move, we can be sure that there are no new connections either
+				nextFrameType = FrameType.ACTIONS;
+			}
 		}
 	}
 
@@ -407,7 +388,7 @@ public class Game {
 	private boolean gameOver() {
 		if (gameManager.getActivePlayers().size() <= 1)
 			return true;
-		if (round >= Config.MAX_ROUNDS)
+		if (Config.MAX_ROUNDS != 0 && round >= Config.MAX_ROUNDS)
 			return true;
 		for (Player player : gameManager.getActivePlayers()) {
 			if (player.getScore() >= Config.WIN_THRESHOLD)

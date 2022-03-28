@@ -7,4 +7,5 @@ public class FrameViewData {
 	public int round;
 	public List<ChipData> chips;
 	public int gravity;
+	public int duration;
 }

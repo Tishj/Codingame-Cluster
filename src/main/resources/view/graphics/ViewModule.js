@@ -1,9 +1,9 @@
 import { fitAspectRatio, lerp, lerpAngle, lerpColor, lerpPosition, unlerp } from '../core/utils.js';
 import { bell, ease, easeOut, easeIn, elastic } from '../core/transitions.js';
 import { HEIGHT, WIDTH } from '../core/constants.js';
-import { HEXAGON_RADIUS, HEXAGON_WIDTH, hexToScreen } from './hex.js';
+import { HEXAGON_RADIUS, HEXAGON_WIDTH, hexToScreen, hexDistance } from './hex.js';
 import { TooltipManager } from './TooltipManager.js';
-import { IDLE_FRAMES, SLEEP_FRAMES, SUN_DATA_LIST } from './assetConstants.js';
+import { HEX_TRAVEL_DURATION, IDLE_FRAMES, SLEEP_FRAMES, SUN_DATA_LIST } from './assetConstants.js';
 import { parseData, parseGlobalData } from './Deserializer.js';
 import { degreesToRadians } from './utils.js';
 const DIRT_PARTICLE_COUNT = 20;
@@ -294,6 +294,13 @@ export class ViewModule {
 		}
 	}
 	
+	lerpPosition (from, to, p) {
+		return {
+			x: lerp(from.x, to.x, p),
+			y: lerp(from.y, to.y, p)
+		}
+	}
+
 	updateTooltip(currentData) {
 		var _a, _b;
 		for (const [index, hex] of this.hexes) {
@@ -363,9 +370,13 @@ export class ViewModule {
 				else {
 					const oldHexaP = hexToScreen(chipBefore.q, chipBefore.r);
 					const newHexaP = hexToScreen(chipNow.q, chipNow.r);
-					const ratio = 3 / 4;
 					// const haltedProgress = unlerp(ratio, 1, progress);
-					chip.container.position = lerpPosition(oldHexaP, newHexaP, progress);
+					//calculate how fast the chip should fall
+					const hexesMoved = hexDistance(chipNow.q, chipNow.r, chipBefore.q, chipBefore.r);
+					const biggestMove = currentData.roundDuration / HEX_TRAVEL_DURATION;
+					const ratio = hexesMoved / biggestMove;
+					const haltedProgress = unlerp(0, ratio, progress);
+					chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
 				}
 			}
 			else {
@@ -863,7 +874,8 @@ export class ViewModule {
 			players: data.players,
 			round: data.round,
 			chips: chips,
-			gravity: data.gravity
+			gravity: data.gravity,
+			roundDuration: data.roundDuration
 		};
 		state.previous = previous || state;
 		this.states.push(state);

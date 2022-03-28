@@ -26,6 +26,7 @@ export const SUN_DATA_LIST = [
     { q: 2, r: 2, activeOrientations: [2, 3] },
     { q: 3, r: 1, activeOrientations: [2, 3] }
 ];
+export const HEX_TRAVEL_DURATION = 100;
 export const TILE_HEIGHT = 150;
 export const IDLE_FRAMES = [
     ['Debout_Red0001', 'Debout_Red0002', 'Debout_Red0003', 'Debout_Red0004', 'Debout_Red0005', 'Debout_Red0006', 'Debout_Red0007', 'Debout_Red0008', 'Debout_Red0009', 'Debout_Red0010', 'Debout_Red0011', 'Debout_Red0012', 'Debout_Red0013', 'Debout_Red0014', 'Debout_Red0015', 'Debout_Red0016', 'Debout_Red0017', 'Debout_Red0018', 'Debout_Red0019', 'Debout_Red0020', 'Debout_Red0021', 'Debout_Red0022', 'Debout_Red0023', 'Debout_Red0024', 'Debout_Red0025', 'Debout_Red0026', 'Debout_Red0027', 'Debout_Red0028', 'Debout_Red0029', 'Debout_Red0030', 'Debout_Red0031', 'Debout_Red0032', 'Debout_Red0033', 'Debout_Red0034', 'Debout_Red0035', 'Debout_Red0036', 'Debout_Red0037', 'Debout_Red0038', 'Debout_Red0039', 'Debout_Red0040', 'Debout_Red0041', 'Debout_Red0042', 'Debout_Red0043', 'Debout_Red0044', 'Debout_Red0045', 'Debout_Red0046', 'Debout_Red0047', 'Debout_Red0048', 'Debout_Red0049', 'Debout_Red0050', 'Debout_Red0051', 'Debout_Red0052'],

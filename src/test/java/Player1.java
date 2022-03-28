@@ -134,7 +134,7 @@ public class Player1 {
 			else {
 				int column = validColumns.get(random.nextInt(validColumns.size()));
 				int color = possibleColors[random.nextInt(possibleColors.length)];
-				System.out.printf("DROP %d %d%n", column, color);
+				System.out.printf("DROP %d %d%n", 6, color);
 			}
 		}
 	}

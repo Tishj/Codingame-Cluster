@@ -37,6 +37,7 @@ public class GameDataProvider {
 			})
 			.collect(Collectors.toList());
 
+		data.duration = gameManager.getFrameDuration();
 		data.gravity = game.getGravity().getIndex();
 		data.players = gameManager.getPlayers()
 			.stream()

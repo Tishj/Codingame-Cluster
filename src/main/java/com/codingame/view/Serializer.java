@@ -12,7 +12,8 @@ public class Serializer {
 		lines.add(
 			join(
 				frameViewData.round,
-				frameViewData.gravity
+				frameViewData.gravity,
+				frameViewData.duration
 			)
 		);
 		//ChipData

@@ -8,6 +8,7 @@ export function parseData(raw, globalData) {
 	const data = {
 		round: globalInfos[0],
 		gravity: globalInfos[1],
+		roundDuration: globalInfos[2],
 		players: [],
 		chips: []
 	};

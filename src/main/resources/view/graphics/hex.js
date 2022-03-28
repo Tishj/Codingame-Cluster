@@ -11,3 +11,9 @@ export function hexToScreen(q, r) {
 	const x = HEXAGON_RADIUS * 3 / 2 * q;
 	return { x, y };
 }
+
+export function hexDistance(newQ, newR, oldQ, oldR) {
+	const oldS = -oldQ - oldR;
+	const newS = -newQ - newR;
+	return (Math.abs(oldQ - newQ) + Math.abs(oldR - newR) + Math.abs(oldS - newS)) / 2;
+}
