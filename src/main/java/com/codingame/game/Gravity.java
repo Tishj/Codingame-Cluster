@@ -24,6 +24,13 @@ public enum Gravity {
 		return Gravity.values()[index + 3 % 6];
 	}
 	
+	static public int rotate(int dir, int cycles) {
+		if (cycles < 0) {
+			cycles = 6 - (Math.abs(cycles) % 6);
+		}
+		return ((dir + cycles) % 6);
+	}
+
 	public Gravity rotate(int cycles) {
 		int index = this.getIndex();
 		if (cycles < 0) {

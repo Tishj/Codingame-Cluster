@@ -223,6 +223,7 @@ public class Game {
 				HashSet<Integer> connection = new HashSet<>(Config.WIN_LENGTH);
 				connection.add(chip.getIndex());
 				getMatchLength(chip, dir, connection);
+				getMatchLength(chip, Gravity.rotate(dir, 3), connection);
 				Player player = chip.getOwner();
 				this.connection.add(chip.getColorId(), player, connection);
 			}
@@ -232,7 +233,7 @@ public class Game {
 	}
 
 	public boolean updateConnectionSingle(Chip chip) {
-		for (int dir = 0; dir < 3; dir++) {
+		for (int dir = 0; dir < 6; dir++) {
 			HashSet<Integer> connection = new HashSet<>(Config.WIN_LENGTH);
 			connection.add(chip.getIndex());
 			getMatchLength(chip, dir, connection);
@@ -275,7 +276,7 @@ public class Game {
 				removeChips(deletedChips);
 				gameManager.setFrameDuration(Constants.DELETE_FRAME_DURATION);
 				boolean drop = chipManager.shouldDrop(gravity);
-				resetAllConnections();
+				// resetAllConnections();
 				if (drop) {
 					//If gaps are created by deleting:
 					nextFrameType = FrameType.DROP_CHIPS;
@@ -295,8 +296,9 @@ public class Game {
 			case DROP_CHIPS: {
 				HashSet<Integer> movedChips = chipManager.dropChips(gravity);
 				int biggest_hexes_moved = chipManager.getAndResetHexesMoved();
+				HashSet<Integer> affectedChips = connection.invalidate(movedChips);
 
-				boolean winner = updateConnections(movedChips);
+				boolean winner = updateConnections(affectedChips);
 				if (winner) {
 					nextFrameType = FrameType.DELETE_CHIPS;
 				}
@@ -369,7 +371,7 @@ public class Game {
 	private boolean gameOver() {
 		if (gameManager.getActivePlayers().size() <= 1)
 			return true;
-		if (nextFrameType == FrameType.DROP_CHIPS || nextFrameType == FrameType.DELETE_CHIPS)
+		if (nextFrameType != FrameType.ACTIONS)
 			return false;
 		if (Config.MAX_ROUNDS != 0 && round >= Config.MAX_ROUNDS)
 			return true;

@@ -84,15 +84,19 @@ public class Connection {
 		return this.lastAdded;
 	}
 
-	public void invalidate(HashSet<Integer> chips) {
+	public HashSet<Integer> invalidate(HashSet<Integer> chips) {
+		HashSet<Integer> affectedChips = (HashSet<Integer>)chips.clone();
 		for (int i = completedConnections.size() - 1; i >= 0; i--) {
 			//Check if chips can be found in this connection;
 			boolean invalid = !Collections.disjoint(completedConnections.get(i).chips, chips);
 			if (invalid) {
+				affectedChips.addAll(completedConnections.get(i).chips);
 				completedConnections.remove(i);
 			}
 		}
+		return affectedChips;
 	}
+
 	public void invalidateSingle(int chipIndex) {
 		for (int i = completedConnections.size() - 1; i >= 0; i--) {
 			//Check if chip can be found in this connection;

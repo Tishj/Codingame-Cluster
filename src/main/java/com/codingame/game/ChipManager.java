@@ -181,6 +181,9 @@ public class ChipManager {
 		HashSet<Integer> cellIndices = new HashSet<>(chips.size());
 		for (Chip chip: chips.values()) {
 			int moved = dropChip(chip, gravity, cellIndices);
+			if (moved != 0) {
+				cellIndices.add(chip.getIndex());
+			}
 			if (moved > hexes_moved) {
 				hexes_moved = moved;
 			}
