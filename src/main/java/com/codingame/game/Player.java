@@ -1,16 +1,16 @@
 package com.codingame.game;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.codingame.game.action.Action;
 import com.codingame.gameengine.core.AbstractMultiplayerPlayer;
+import com.google.inject.Inject;
 
 public class Player extends AbstractMultiplayerPlayer {
 	private Action		action;
-	private Connection	connection;
 	
 	Player() {
-		this.connection = new Connection();
 	}
 	
 	@Override
@@ -28,18 +28,6 @@ public class Player extends AbstractMultiplayerPlayer {
 	
 	public Action getAction() {
 		return action;
-	}
-	
-	public void resetConnection() {
-		connection.reset();
-	}
-
-	public void updateConnection(int color, ArrayList<Chip> chips, int amountPresentOnBoard) {
-		this.connection.updateIfBigger(color, chips, amountPresentOnBoard);
-	}
-
-	public Connection getConnection() {
-		return this.connection;
 	}
 
 	public String scoreToString() {

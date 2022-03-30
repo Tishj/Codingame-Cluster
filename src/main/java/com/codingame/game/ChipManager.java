@@ -1,33 +1,28 @@
 package com.codingame.game;
 
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.ArrayDeque;
 
 import com.codingame.gameengine.core.MultiplayerGameManager;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class ChipManager {
-	private ArrayDeque<Integer> indices;
-	public int selectedAmount;
-	int[][] remainingChips;
-	int[][] selectedChips;
-	int[][] placedChips;
-	private int movedHexes = 0;
-	Random	random;
-	TreeMap<Integer, Chip>	chips;
-	private MultiplayerGameManager<Player> gameManager;
-	Board board;
+	private ArrayDeque<Integer> 					indices;
+	public int 										selectedAmount;
+	int[][] 										remainingChips;
+	int[][] 										selectedChips;
+	int[][] 										placedChips;
+	private int 									movedHexes = 0;
+	Random											random;
+	TreeMap<Integer, Chip>							chips;
+	@Inject private MultiplayerGameManager<Player>	gameManager;
+	Board 											board;
 	
-	public void init(MultiplayerGameManager<Player> gameManager, Board board) {
-		this.gameManager = gameManager;
+	public void init(Board board) {
+		// this.gameManager = gameManager;
 		this.random = new Random(gameManager.getSeed());
 		this.remainingChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
 		this.selectedChips = new int[gameManager.getPlayerCount()][Config.COLORS_PER_PLAYER];
@@ -82,9 +77,9 @@ public class ChipManager {
 		chips.remove(index);
 	}
 
-	public void removeListOfChips(List<Chip> chips) {
-		chips.forEach(chip -> {
-			removeChip(chip);
+	public void removeListOfChips(HashSet<Integer> chips) {
+		chips.forEach(chipIndex -> {
+			removeChip(this.chips.get(chipIndex));
 		});
 	}
 
@@ -156,7 +151,7 @@ public class ChipManager {
 	}
 
 	//@return hexes moved
-	public int dropChip(Chip chip, Gravity gravity) {
+	public int dropChip(Chip chip, Gravity gravity, HashSet<Integer> cellIndices) {
 		HexCoord	originalPosition = chip.getCoord();
 
 		while (true) {
@@ -169,24 +164,29 @@ public class ChipManager {
 				break;
 			}
 			Chip neighbourChip = neighbour.getChip();
-			if (neighbourChip != null && dropChip(neighbourChip, gravity) == 0) {
-				break;
+			if (neighbourChip != null) {
+				//neighbourChip hasnt moved
+				if (dropChip(neighbourChip, gravity, cellIndices) == 0) {
+					break;
+				}
+				cellIndices.add(neighbourChip.getIndex());
 			}
 			updateChipLocation(cell, neighbour, chip, coord);
 		}
 		return chip.getCoord().distanceTo(originalPosition);
 	}
 
-	public int dropChips(Gravity gravity) {
+	public HashSet<Integer> dropChips(Gravity gravity) {
 		int hexes_moved = 0;
+		HashSet<Integer> cellIndices = new HashSet<>(chips.size());
 		for (Chip chip: chips.values()) {
-			int moved = dropChip(chip, gravity);
+			int moved = dropChip(chip, gravity, cellIndices);
 			if (moved > hexes_moved) {
 				hexes_moved = moved;
 			}
 		}
 		this.movedHexes = hexes_moved;
-		return hexes_moved;
+		return cellIndices;
 	}
 
 	public int getAndResetHexesMoved() {
