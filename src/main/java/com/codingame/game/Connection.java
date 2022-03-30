@@ -37,18 +37,18 @@ public class Connection {
 		//2. most chips present on board
 		this.completedConnections.sort((ConnData a, ConnData b) -> {
 			if (a.chips.size() > b.chips.size())
-				return 1; //a is bigger
+				return -1; //a is bigger
 			if (b.chips.size() > a.chips.size())
-				return -1; //b is bigger;
+				return 1; //b is bigger;
 			int a_amount = chipManager.placedChips[a.playerId][a.color];
 			int b_amount = chipManager.placedChips[b.playerId][b.color];
 			if (a_amount == b_amount) {
 				return 0;
 			}
 			if (a_amount > b_amount) {
-				return 1;
+				return -1;
 			}
-			return -1;
+			return 1;
 		});
 		return this.completedConnections;
 	}
