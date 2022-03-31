@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class Connection {
@@ -57,11 +58,11 @@ public class Connection {
 		this.completedConnections.clear();
 	}
 
-	public LinkedList<ConnData> sortAndGet() {
+	public LinkedList<ConnData> sortAndGet(LinkedList<ConnData> unsorted) {
 		//Priorities:
 		//1. biggest length
 		//2. most chips present on board
-		this.completedConnections.sort((ConnData a, ConnData b) -> {
+		unsorted.sort((ConnData a, ConnData b) -> {
 			if (a.chips.size() > b.chips.size())
 				return -1; //a is bigger
 			if (b.chips.size() > a.chips.size())
@@ -76,7 +77,7 @@ public class Connection {
 			}
 			return 1;
 		});
-		return this.completedConnections;
+		return unsorted;
 	}
 
 	//@return at least one of the chips 'count' is > 1
@@ -115,6 +116,7 @@ public class Connection {
 				chipCount[chipIndex] = 0;
 				if (count < 2)
 					continue;
+
 				HashSet<Integer> combined = new HashSet<>();
 				Iterator<ConnData> tmp = connections.iterator();
 				ConnData connData = null;
@@ -143,30 +145,59 @@ public class Connection {
 			// counter = counter;
 			connections = combined_connections; //update the connections, for the next iteration
 		}
-		this.completedConnections = connections;
-		this.completedConnections = sortAndGet();
+		this.completedConnections = sortAndGet(connections);
 		return this.completedConnections.get(0).chips;
+	}
+
+	public HashSet<Integer> combineConnections(LinkedList<ConnData> connections) {
+		//create unordered_map of hashsets
+		//key = chipIndex
+		//value = combined connections this chip is in
+		
+		//for (key : keys)
+		//	create a hashset of chipIndexes
+
+		//we then loop over all the chips inside the set
+		//look up the set that this chip is connected to
+		//if not every chip is already a part of our collection, add it
+
+		// int highestChipIndex = chipManager.chips.lastKey() + 1;
+		TreeMap<Integer, ConnData>	individualClumps = new TreeMap<>();
+		for (ConnData connection : connections) {
+			for (int chipIndex : connection.chips) {
+				if (!individualClumps.containsKey(chipIndex)) {
+					individualClumps.put(chipIndex, connection);
+				}
+				else {
+					individualClumps.get(chipIndex).chips.addAll(connection.chips);
+				}
+			}
+		}
+
+		for (Map.Entry<Integer, ConnData> entry : individualClumps.entrySet()) {
+			int chipIndex = entry.getKey();
+			ConnData connection = entry.getValue();
+			HashSet<Integer> toAdd = new HashSet<>();
+			for (Integer chip : connection.chips) {
+				if (chip == chipIndex)
+					continue;
+				ConnData other = individualClumps.get(chip);
+				if (!toAdd.addAll(other.chips)) {
+					//??
+				}
+			}
+			connection.chips.addAll(toAdd);
+		}
+		
+		LinkedList<ConnData> sorted = sortAndGet(new LinkedList<ConnData>(individualClumps.values()));
+		return sorted.get(0).chips;
 	}
 
 	public HashSet<Integer> remove() {
 		if (this.completedConnections.size() == 0) {
 			return new HashSet<>();
 		}
-		HashSet<Integer> removedChips = getBiggest(this.completedConnections);
-		// HashSet<Integer> removedChips = new HashSet<>(chipManager.chips.size());
-
-		// ConnData connection = connections.get(0);
-
-		// removedChips.addAll(connection.chips);
-		// Iterator<ConnData> it = connections.iterator();
-		// it.next(); //Skip over the first connection
-		// while (it.hasNext()) {
-		// 	ConnData conn = it.next();
-		// 	//check if removed chips occur in the connection;
-		// 	if (!Collections.disjoint(conn.chips, removedChips)) {
-		// 		removedChips.addAll(conn.chips);
-		// 	}
-		// }
+		HashSet<Integer> removedChips = combineConnections(this.completedConnections);
 		invalidate(removedChips);
 		return removedChips;
 	}
