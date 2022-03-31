@@ -3,6 +3,7 @@ package com.codingame.game;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 @Singleton
@@ -19,6 +20,31 @@ public class Connection {
 			this.chips = chips;
 			this.playerId = playerId;
 		}
+	
+		// @Override public boolean equals(Object obj) {
+		// 	if (obj == null)
+		// 		return false;
+		// 	if (this == obj)
+		// 		return true;
+		// 	if (getClass() != obj.getClass())
+		// 		return false;
+		// 	ConnData other = (ConnData) obj;
+		// 	if (other.playerId != this.playerId)
+		// 		return false;
+		// 	if (other.color != this.color)
+		// 		return false;
+		// 	int other_size = other.chips.size();
+		// 	int my_size = this.chips.size();
+		// 	if (other_size < my_size)
+		// 		return false;
+		// 	if (other_size == my_size) {
+		// 		return other.chips.containsAll(this.chips);
+		// 	}
+		// 	else {
+		// 		//if we are a superset, dont 
+		// 		return !this.chips.containsAll(other.chips);
+		// 	}
+		// }
 	};
 	LinkedList<ConnData> completedConnections;
 
@@ -53,25 +79,95 @@ public class Connection {
 		return this.completedConnections;
 	}
 
+	//@return at least one of the chips 'count' is > 1
+	private boolean getChipCount(LinkedList<ConnData> connections, Integer[] count) {
+		Iterator<ConnData> it = connections.iterator();
+		boolean connected = false;
+
+		while (it.hasNext()) {
+			ConnData current = it.next();
+			HashSet<Integer> chips = current.chips;
+			for (int chipIndex : chips) {
+				count[chipIndex]++; //count how many times this chipIndex is seen in all the connections
+				connected = connected || count[chipIndex] >= 2;
+			}
+		}
+		return connected;
+	}
+
+	public HashSet<Integer>	getBiggest(LinkedList<ConnData> connections) {
+		int counter = 0; //DEBUG
+
+		Integer[] chipCount = new Integer[chipManager.chips.lastKey() + 1];
+		Arrays.fill(chipCount, 0);
+
+		while (getChipCount(connections, chipCount)) { //there are still unmerged sets
+			System.err.println("Combine occurrences loop counter: " + counter++);
+			LinkedList<ConnData> combined_connections = new LinkedList<>();
+
+			//Loop over the entire occurrences array, creating combined sets where chips meet
+			boolean[] connectionUsed = new boolean[connections.size()];
+			Arrays.fill(connectionUsed, false);
+
+			for (int chipIndex = 0; chipIndex < chipCount.length; chipIndex++) {
+				if (chipCount[chipIndex] == 1) {
+					chipCount[chipIndex]--;
+				}
+				if (chipCount[chipIndex] == 0)
+					continue;
+				HashSet<Integer> combined = new HashSet<>();
+				Iterator<ConnData> tmp = connections.iterator();
+				ConnData connData = null;
+	
+				for (int j = 0; chipCount[chipIndex] != 0 && tmp.hasNext(); j++) {
+					ConnData data = tmp.next();
+					if (connectionUsed[j])
+						continue;
+
+					HashSet<Integer> chips = data.chips;
+					if (chips.contains(chipIndex)) {
+						connectionUsed[j] = true;
+						chipCount[chipIndex]--;
+						if (chipCount[chipIndex] == 0) {
+							connData = data;
+						}
+						combined.addAll(chips);
+					}
+				}
+				// this is NULL if the set was already added to another connection
+				if (connData != null) {
+					ConnData newConnData = new ConnData(connData.color, connData.playerId, combined);
+					combined_connections.add(newConnData);
+				}
+				chipCount[chipIndex] = 0;
+			}
+			// counter = counter;
+			connections = combined_connections; //update the connections, for the next iteration
+		}
+		this.completedConnections = connections;
+		this.completedConnections = sortAndGet();
+		return this.completedConnections.get(0).chips;
+	}
+
 	public HashSet<Integer> remove() {
 		if (this.completedConnections.size() == 0) {
 			return new HashSet<>();
 		}
-		LinkedList<ConnData> connections = sortAndGet();
-		HashSet<Integer> removedChips = new HashSet<>(chipManager.chips.size());
+		HashSet<Integer> removedChips = getBiggest(this.completedConnections);
+		// HashSet<Integer> removedChips = new HashSet<>(chipManager.chips.size());
 
-		ConnData connection = connections.get(0);
+		// ConnData connection = connections.get(0);
 
-		removedChips.addAll(connection.chips);
-		Iterator<ConnData> it = connections.iterator();
-		it.next(); //Skip over the first connection
-		while (it.hasNext()) {
-			ConnData conn = it.next();
-			//check if removed chips occur in the connection;
-			if (!Collections.disjoint(conn.chips, removedChips)) {
-				removedChips.addAll(conn.chips);
-			}
-		}
+		// removedChips.addAll(connection.chips);
+		// Iterator<ConnData> it = connections.iterator();
+		// it.next(); //Skip over the first connection
+		// while (it.hasNext()) {
+		// 	ConnData conn = it.next();
+		// 	//check if removed chips occur in the connection;
+		// 	if (!Collections.disjoint(conn.chips, removedChips)) {
+		// 		removedChips.addAll(conn.chips);
+		// 	}
+		// }
 		invalidate(removedChips);
 		return removedChips;
 	}
@@ -110,7 +206,7 @@ public class Connection {
 	//add the connection if it's big enough
 	public boolean add(int color, Player player, HashSet<Integer> chips) {
 		int placedChipsOfThisColor = chipManager.placedChips[player.getIndex()][color];
-		//Not enough colors to even logicall form a connection
+		//Not enough colors to even logically form a connection
 		if (placedChipsOfThisColor < Config.WIN_LENGTH)
 			return false;
 		//This connection is not big enough to form a completed connection
@@ -122,7 +218,7 @@ public class Connection {
 				continue;
 			//chips is a superset of this connection
 			if (chips.containsAll(completedConnections.get(i).chips)) {
-				completedConnections.set(i,new ConnData(color, player.getIndex(), chips));
+				completedConnections.get(i).chips = chips;
 				return true;
 			}
 		}

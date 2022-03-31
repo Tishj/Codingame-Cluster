@@ -62,9 +62,10 @@ public class Player1 {
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		Random random = new Random();
-		long seed = random.nextLong();
-		System.err.println("Player2 random seed is " + seed);
+		// long seed = new Random().nextLong();
+		long seed = 3049155287956461818L;
+		Random random = new Random(seed);
+		System.err.println("Player1 random seed is " + seed);
 
 		//Start of Initial input
 		int numberOfCells = in.nextInt();

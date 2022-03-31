@@ -299,6 +299,11 @@ public class Game {
 				HashSet<Integer> affectedChips = connection.invalidate(movedChips);
 
 				boolean winner = updateConnections(affectedChips);
+				gameManager.addToGameSummary(String.format("Connections:\n"));
+				gameManager.addToGameSummary(connection.completedConnections.stream()
+					.map(conn -> {
+						return conn.chips.stream().map(String::valueOf).collect(Collectors.joining(","));
+					}).collect(Collectors.joining("\n")));
 				if (winner) {
 					nextFrameType = FrameType.DELETE_CHIPS;
 				}
@@ -343,6 +348,11 @@ public class Game {
 			}
 			else {
 				boolean winner = updateConnectionSingle(chip);
+				gameManager.addToGameSummary(String.format("Connections:\n"));
+				gameManager.addToGameSummary(connection.completedConnections.stream()
+					.map(conn -> {
+						return conn.chips.stream().map(String::valueOf).collect(Collectors.joining(","));
+					}).collect(Collectors.joining("\n")));
 				nextFrameType = (winner == true) ?
 						FrameType.DELETE_CHIPS :
 						FrameType.ACTIONS;

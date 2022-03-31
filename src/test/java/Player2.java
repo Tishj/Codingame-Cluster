@@ -62,8 +62,9 @@ public class Player2 {
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		Random random = new Random();
-		long seed = random.nextLong();
+		// long seed = new Random().nextLong();
+		long seed = -5580533626139288387L;
+		Random random = new Random(seed);
 		System.err.println("Player2 random seed is " + seed);
 
 		//Start of Initial input

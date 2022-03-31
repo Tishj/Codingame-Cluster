@@ -5,4 +5,5 @@ public class ChipData {
 	int color;
 	int owner;
 	int q, r;
+	int cellIndex;
 }

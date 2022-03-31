@@ -25,7 +25,8 @@ public class Serializer {
 					chipData.color,
 					chipData.owner,
 					chipData.q,
-					chipData.r
+					chipData.r,
+					chipData.cellIndex
 				)
 			);
 		});

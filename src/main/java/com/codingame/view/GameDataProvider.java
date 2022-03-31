@@ -33,6 +33,7 @@ public class GameDataProvider {
 				chipData.index = chip.getIndex();
 				chipData.q = chip.getCoord().getQ();
 				chipData.r = chip.getCoord().getR();
+				chipData.cellIndex = game.getBoard().get(chip.getCoord()).getIndex();
 				return chipData;
 			})
 			.collect(Collectors.toList());

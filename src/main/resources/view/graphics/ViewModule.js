@@ -310,12 +310,17 @@ export class ViewModule {
 
 	updateTooltip(currentData) {
 		var _a, _b;
+		const chips = {}
+		Object.values(currentData.chips).forEach(chip => {
+			chips[chip.cellIndex] = chip;
+		});
 		for (const [index, hex] of this.hexes) {
 			// const chip = currentData.chips[index];
 			this.registerTooltip(hex.container, {
 				index: index,
 				q: hex.data.q,
-				r: hex.data.r
+				r: hex.data.r,
+				chip: chips[index]
 			});
 			// this.registerTooltip(this.debugData.get(index).container, {
 			//     index: index,
@@ -786,7 +791,9 @@ export class ViewModule {
 	registerTooltip(container, data) {
 		container.interactive = true;
 		const text = `index: ${data.index}` +
-		`\nposition: Q:${data.q}, R:${data.r}, S:${-data.q - data.r}`;
+		`\nposition: Q:${data.q}, R:${data.r}, S:${-data.q - data.r}` +
+		(data.chip != null
+			? `\nchip: ${data.chip.index}` : '');
 		container.mouseover = () => {
 			this.tooltipManager.showTooltip(text);
 			container.mousemove = (event) => {

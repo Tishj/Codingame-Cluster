@@ -21,7 +21,8 @@ export function parseData(raw, globalData) {
 			color: chip[1],
 			owner: chip[2],
 			q: chip[3],
-			r: chip[4]
+			r: chip[4],
+			cellIndex: chip[5]
 		});
 	}
 	index = PLAYER_AMOUNT;
