@@ -98,37 +98,37 @@ public class Connection {
 	public HashSet<Integer>	getBiggest(LinkedList<ConnData> connections) {
 		int counter = 0; //DEBUG
 
-		Integer[] chipCount = new Integer[chipManager.chips.lastKey() + 1];
+		int highestChipIndex = chipManager.chips.lastKey() + 1;
+		Integer[] chipCount = new Integer[highestChipIndex];
 		Arrays.fill(chipCount, 0);
 
 		while (getChipCount(connections, chipCount)) { //there are still unmerged sets
 			System.err.println("Combine occurrences loop counter: " + counter++);
 			LinkedList<ConnData> combined_connections = new LinkedList<>();
 
-			//Loop over the entire occurrences array, creating combined sets where chips meet
+			//make sure every connection is only used once at the most
 			boolean[] connectionUsed = new boolean[connections.size()];
 			Arrays.fill(connectionUsed, false);
 
-			for (int chipIndex = 0; chipIndex < chipCount.length; chipIndex++) {
-				if (chipCount[chipIndex] == 1) {
-					chipCount[chipIndex]--;
-				}
-				if (chipCount[chipIndex] == 0)
+			for (int chipIndex = 0; chipIndex < highestChipIndex; chipIndex++) {
+				int count = chipCount[chipIndex];
+				chipCount[chipIndex] = 0;
+				if (count < 2)
 					continue;
 				HashSet<Integer> combined = new HashSet<>();
 				Iterator<ConnData> tmp = connections.iterator();
 				ConnData connData = null;
 	
-				for (int j = 0; chipCount[chipIndex] != 0 && tmp.hasNext(); j++) {
+				for (int conn = 0; count != 0 && tmp.hasNext(); conn++) {
 					ConnData data = tmp.next();
-					if (connectionUsed[j])
+					if (connectionUsed[conn])
 						continue;
 
 					HashSet<Integer> chips = data.chips;
 					if (chips.contains(chipIndex)) {
-						connectionUsed[j] = true;
-						chipCount[chipIndex]--;
-						if (chipCount[chipIndex] == 0) {
+						connectionUsed[conn] = true;
+						count--;
+						if (count == 0) {
 							connData = data;
 						}
 						combined.addAll(chips);
@@ -139,7 +139,6 @@ public class Connection {
 					ConnData newConnData = new ConnData(connData.color, connData.playerId, combined);
 					combined_connections.add(newConnData);
 				}
-				chipCount[chipIndex] = 0;
 			}
 			// counter = counter;
 			connections = combined_connections; //update the connections, for the next iteration
