@@ -1,4 +1,5 @@
 #include <array>
+#include <string>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,8 +11,6 @@
 #include <queue>
 #include <stack>
 #include <memory>
-
-using namespace std;
 
 typedef size_t idx_t;
 
@@ -69,7 +68,7 @@ class Side {
 			this->side = side;
 			return *this;
 		}
-		friend istream &operator>>( istream  &input, Side& side) {
+		friend std::istream &operator>>( std::istream  &input, Side& side) {
 			input >> side.side;
 			return input;
 		}
@@ -79,7 +78,52 @@ class Side {
 };
 
 class Cell;
-class Chip;
+
+class Chip {
+	//public variables and constructor
+	public:
+		int32_t index;
+		bool	isMine;
+		int32_t	color;
+		int32_t	cellIndex;
+		Chip() {
+			int32_t tmp;
+			std::cin >> index >> color >> tmp >> cellIndex; std::cin.ignore();
+			this->isMine = tmp == 1;
+		}
+		Chip(const Chip& other) :
+			index(other.index),
+			isMine(other.isMine),
+			color(other.color),
+			cellIndex(other.cellIndex) {}
+	//public methods
+	public:
+		bool operator == (const Chip& other) const {
+			return this->index == other.index;
+		}
+		int32_t getCellIndex() {
+			return this->cellIndex;
+		}
+		// struct HashFunction {
+		// 	size_t operator() (const Chip& chip) {
+		// 		return (size_t)chip.index;
+		// 	}
+		// };
+	//private methods
+	private:
+	//private variables
+	private:
+};
+
+namespace std {
+	template<>
+	struct hash<Chip> {
+		std::size_t operator() (const Chip& chip) const {
+			return chip.index;
+		}
+	};
+}
+
 class Game {
 	public:
 		Side								side;
@@ -127,51 +171,6 @@ enum Player {
 // 	SOUTH_EAST
 // };
 
-class Chip {
-	//public variables and constructor
-	public:
-		int32_t index;
-		bool	isMine;
-		int32_t	color;
-		int32_t	cellIndex;
-		Chip() {
-			int32_t tmp;
-			cin >> index >> color >> tmp >> cellIndex; cin.ignore();
-			this->isMine = tmp == 1;
-		}
-		Chip(const Chip& other) :
-			index(other.index),
-			isMine(other.isMine),
-			color(other.color),
-			cellIndex(other.cellIndex) {}
-	//public methods
-	public:
-		bool operator == (const Chip& other) {
-			return this->index == other.index;
-		}
-		int32_t getCellIndex() {
-			return this->cellIndex;
-		}
-	//private methods
-	private:
-	//private variables
-	private:
-};
-
-namespace std {
-	template <>
-	struct hash<Chip>
-	{
-		std::size_t operator()(const Chip& k) const
-		{
-			using std::size_t;
-			using std::hash;
-
-			return (hash<int32_t>()(k.index));
-		}
-	};
-}
-
 class Cell {
 	public:
 		int32_t					index;
@@ -179,7 +178,7 @@ class Cell {
 		int32_t					chip;
 		Cell() : neighbours() {
 			this->chip = -1;
-			cin >> index >> neighbours[0] >> neighbours[1] >> neighbours[2] >> neighbours[3] >> neighbours[4] >> neighbours[5]; cin.ignore();
+			std::cin >> index >> neighbours[0] >> neighbours[1] >> neighbours[2] >> neighbours[3] >> neighbours[4] >> neighbours[5]; std::cin.ignore();
 		}
 	public:
 		bool containsChip() const {
@@ -215,7 +214,7 @@ class Rotate {
 		Rotate(int32_t amount) : amount(amount) {}
 	public:
 		friend std::ostream& operator << (std::ostream& stream, const Rotate& obj) {
-			stream << "ROTATE" << " " << obj.amount << endl;
+			stream << "ROTATE" << " " << obj.amount << std::endl;
 			return stream;
 		}
 	private:
@@ -229,7 +228,7 @@ class Drop {
 		Drop(int32_t column, int32_t color) : column(column), color(color) {}
 	public:
 		friend std::ostream& operator << (std::ostream& stream, const Drop& obj) {
-			stream << "DROP" << " " << obj.column << " " << obj.color << endl;
+			stream << "DROP" << " " << obj.column << " " << obj.color << std::endl;
 			return stream;
 		}
 	private:
@@ -259,16 +258,16 @@ void Game::update() {
 
 void	Game::performRandomMove() {
 	if (rand() % 10 == 0) {
-		cout << "ROTATE " << 1 + rand() % 5 << endl;
+		std::cout << "ROTATE " << 1 + rand() % 5 << std::endl;
 	}
 	else {
-		cout << "DROP " << getEmptyColumn() << " " << getSelectedColor() << endl;
+		std::cout << "DROP " << getEmptyColumn() << " " << getSelectedColor() << std::endl;
 	}
 }
 
 void Game::initBoard() {
 	int32_t cellAmount; // amount of cells the board consists of
-	cin >> cellAmount; cin.ignore();
+	std::cin >> cellAmount; std::cin.ignore();
 	board.reserve(cellAmount);
 	for (int32_t i = 0; i < cellAmount; i++) {
 		board.emplace_back(Cell());
@@ -277,12 +276,12 @@ void Game::initBoard() {
 
 void Game::initColumns() {
 	int32_t numberOfColumns;
-	cin >> numberOfColumns; cin.ignore();
+	std::cin >> numberOfColumns; std::cin.ignore();
 	columns.reserve(numberOfColumns);
 	validColumns.reserve(numberOfColumns);
 	for (int32_t i = 0; i < numberOfColumns; i++) {
 		std::array<int32_t, 6> cellIndices;
-		cin >> cellIndices[0] >> cellIndices[1] >> cellIndices[2] >> cellIndices[3] >> cellIndices[4] >> cellIndices[5]; cin.ignore();
+		std::cin >> cellIndices[0] >> cellIndices[1] >> cellIndices[2] >> cellIndices[3] >> cellIndices[4] >> cellIndices[5]; std::cin.ignore();
 		columns.emplace_back(cellIndices);
 		validColumns.push_back(false);
 	}
@@ -291,7 +290,7 @@ void Game::initColumns() {
 void Game::initBags() {
 	for (int32_t player = PLAYER_ME; player < PLAYER_SIZE; player++) {
 		int32_t colorsAmount;
-		cin >> colorsAmount; cin.ignore();
+		std::cin >> colorsAmount; std::cin.ignore();
 		if (player == PLAYER_ME) {
 			this->selectedChips.reserve(colorsAmount);
 			clearSelection();
@@ -300,24 +299,24 @@ void Game::initBags() {
 		chipBag[player].reserve(colorsAmount);
 		for (int32_t i = 0; i < colorsAmount; i++) {
 			int32_t maxAmount;
-			cin >> maxAmount; cin.ignore();
+			std::cin >> maxAmount; std::cin.ignore();
 			chipBag[player].push_back(maxAmount);
 		}
 	}
 }
 
 void Game::updateSide() {
-	cin >> this->side; cin.ignore();
+	std::cin >> this->side; std::cin.ignore();
 }
 
 void Game::updateValidColumns() {
 	int number_of_valid_columns; // the amount of columns that aren't currently filled
-	cin >> number_of_valid_columns; cin.ignore();
+	std::cin >> number_of_valid_columns; std::cin.ignore();
 
 	std::fill(validColumns.begin(), validColumns.end(), false);
 	for (int32_t i = 0; i < number_of_valid_columns; i++) {
 		int32_t column;
-		cin >> column; cin.ignore();
+		std::cin >> column; std::cin.ignore();
 		this->validColumns[column] = true;
 	}
 }
@@ -325,7 +324,7 @@ void Game::updateValidColumns() {
 void Game::updateChips() {
 	this->chips.clear();
 	int number_of_chips; // the amount of chips currently on the board
-	cin >> number_of_chips; cin.ignore();
+	std::cin >> number_of_chips; std::cin.ignore();
 	this->chips.reserve(number_of_chips);
 	clearChipsFromCells();
 
@@ -381,8 +380,8 @@ std::vector<int32_t> Game::getReachableEmptyNeighbours() {
 	return reachableCells;
 }
 
-std::unordered_map<int32_t, unordered_set<Chip>>	Game::getChipGroupings() {
-	std::unordered_map<int32_t, unordered_set<Chip>> groupings(game->chips.size());
+std::unordered_map<int32_t, std::unordered_set<Chip>>	Game::getChipGroupings() {
+	std::unordered_map<int32_t, std::unordered_set<Chip>> groupings(game->chips.size());
 	//key: cellIndex;
 	//val: connectedChips
 
@@ -432,10 +431,10 @@ void Game::clearChipsFromCells() {
 void Game::updateSelection() {
 	clearSelection();
 	int number_of_colors_in_hand; // amount of chips drawn for you this round
-	cin >> number_of_colors_in_hand; cin.ignore();
+	std::cin >> number_of_colors_in_hand; std::cin.ignore();
 	for (int i = 0; i < number_of_colors_in_hand; i++) {
 		int color_index;
-		cin >> color_index; cin.ignore();
+		std::cin >> color_index; std::cin.ignore();
 		this->selectedChips[color_index]++;
 	}
 }
@@ -476,6 +475,6 @@ int main()
 		std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
 		//make a unordered_map<cellIndex, list<connectedChips>>
 		//then we can check the reachableNeighbours list, to see if we can connect two groups together
-		// cout << "ROTATE 1" << endl;
+		// std::cout << "ROTATE 1" << std::endl;
 	}
 }
