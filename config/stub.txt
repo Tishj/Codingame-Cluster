@@ -12,7 +12,7 @@ loop opponentColors read maxAmount:int
 
 gameloop
 
-read gravity:int
+read side:int
 
 read numberOfValidColumns:int
 loop numberOfValidColumns read columnIndex:int
@@ -28,10 +28,10 @@ write ROTATE 1
 INPUT
 numberOfCells: amount of cells the board consists of
 index: unique indentifier between 0 and numberOfCells
-neigh0: the index of the neighbouring cell for each gravity direction
+neigh0: the index of the neighbouring cell for each side
 numberOfColumns: amount of cell positions that chips can be inserted at
-cell0: the cell index at this position for each gravity direction
-gravity: the current direction of gravity, starts at 0(south): 0-5
+cell0: the cell index at this position for each side
+side: the current side that the board is leaning on, starts at 0(south): 0-5
 numberOfValidColumns: the amount of columns that aren't currently filled
 numberOfChips: the amount of chips currently on the board
 isMine: 1 if you own it

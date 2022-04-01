@@ -24,11 +24,9 @@
 	
 </div>
 
-<div style="padding: 20px;
+<div style="padding: 15px;
 margin-right: 15px;
-margin-bottom: 10px;
 text-align: left;">
-<em>Tutorial video by Gaurav Sen: <a href="https://youtu.be/gZMdOiqchDk" rel="noopener" target="_blank" >https://youtu.be/gZMdOiqchDk</a></em>
 </div>
 
 
@@ -42,9 +40,6 @@ text-align: left;">
 		<div>
 			Connect enough chips to <b>win</b> before your opponent.
 		</div>
-		<center style="margin: 20px">
-			<img src="https://static.codingame.com/servlet/fileservlet?id=61574189838986" style="margin-bottom: 5px">
-		</center>
 	</div>
 	Decide between placing chips at strategic positions, or to rotate the board to a different side.
 	
@@ -58,7 +53,7 @@ text-align: left;">
 	
 	<div class="statement-rules-content">
 		<div style="margin-bottom: 10px">
-			The game takes place on a hexagonal grid representing the <b>galaxy</b>.
+			The game takes place on a hexagonal grid representing the <b>board</b>.
 		</div>
 		<div style="margin-bottom: 10px">
 			The players take turns to take actions.
@@ -69,35 +64,71 @@ text-align: left;">
 		padding-top: 15px;
 		color: #838891;
 		padding-bottom: 15px;">
-		Galaxy</h3>
+		Sides</h3>
 		
 		<div style="margin-bottom: 10px">
-			The galaxy is made up of <const>37</const> hexagonal cells, arranged to form a larger hexagon.
+			The board is rotated to a <b>side</b>:
+			<ul>
+				<li>Side <const>0</const> the board is leaning on its <b>SOUTH</b> side.</li>
+				<li>Side <const>1</const> the board is leaning on its <b>SOUTH WEST</b> side.</li>
+				<li>Side <const>2</const> the board is leaning on its <b>NORTH WEST</b> side.</li>
+				<li>Side <const>3</const> the board is leaning on its <b>NORTH</b> side.</li>
+				<li>Side <const>4</const> the board is leaning on its <b>NORTH EAST</b> side.</li>
+				<li>Side <const>5</const> the board is leaning on its <b>SOUTH EAST</b> side.</li>
+			</ul>
+		</div>
+		
+		
+		<div style="margin-bottom: 10px">
+			<action>ROTATE</action> commands can be used to change the <b>side</b> by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
+		</div>
+		<div style="margin-bottom: 10px">
+			When chips fall, they will also travel over the board according to side that the board is leaning on.
+		</div>
+
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		Board</h3>
+		
+		<div style="margin-bottom: 10px">
+			The board is made up of hexagonal <b>cells</b>, arranged to form a larger hexagon.
 			<br>
-			<div class="statement-new-league-rule">
-				Each cell has an <b>index</b> and up to six neighbors. Each direction is labelled <const>0</const> to <const>5</const> and have a one-to-one relation with <b>gravity</b>.
+			Each cell has an <b>index</b> and up to six neighbors, one for each <b>side</b> of the board.<br>Each direction is labelled <const>0</const> to <const>5</const>.
 				
 				<center style="margin: 20px">
-					<img src="https://static.codingame.com/servlet/fileservlet?id=61694161023285"
-					style="height: 226px; margin-bottom: 5px">
+					<img src="https://raw.githubusercontent.com/Tishj/Codingame-Cluster/main/config/resources/directions.png?token=GHSAT0AAAAAABPSROMUZ4SUKPFFPQDXMSFIYSPGCTA"
+					style="height: 250px; margin-bottom: 5px">
 					<div>
-						<em>Hex directions</em>
+						<em>Hex sides</em>
 					</div>
 				</center>
 				<br>
-				
-				The distance between two cells equals the minimum number of cells to go through to get from one to the other.
-				
-			</div>
 		</div>
 		
 		
+		<h3 style="font-size: 14px;
+		font-weight: 700;
+		padding-top: 15px;
+		color: #838891;
+		padding-bottom: 15px;">
+		Columns</h3>
 		<div style="margin-bottom: 10px">
-			<div style="margin-bottom: 10px">
-				Each cell may contain a <b>chip</b>. Each chip is owned by one of the players.
-			</div>
+			Chips are inserted on set positions at the top of the board, called <b>columns</b>.
+		<br>
 		</div>
-		
+			<center style="margin: 20px;">
+				<div>
+					<img src="https://raw.githubusercontent.com/Tishj/Codingame-Cluster/main/config/resources/columns.png?token=GHSAT0AAAAAABPSROMU5Q5OYZKXGFKOXSGKYSPKIVA"
+				style="width: relative; height: 500px; margin-bottom: 5px">
+				</div>
+			</center>
+		<div style="margin-bottom: 10px">
+			At the start of the game, for every <b>side</b> the board can lean on, you are given the <const>cellIndex</const> that will be in that position.
+		</div>
+
 		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
@@ -108,46 +139,18 @@ text-align: left;">
 		
 
 		<div style="margin-bottom: 10px">
-			Every player has a bag of their chip color, at the start of each round <const>2</const> chips are selected from this bag.
+			Every player has a bag containing their chips, at the start of each round <const>2</const> chips are selected from this bag.
 		</div>
 
 		<div style="margin-bottom: 10px">
 			At the start of a turn, the player receives <b>chips</b> of a certain color from their bag.<br>
 			Then the player can place one of these chips on the board.<br>
-			When making a <b>DROP</b> action, the other selected chips go back into the bag. <br>
-			When a <b>ROTATE</b> action is made, the selected chips are destroyed.<br><br>
-			Chips are affected by <b>gravity</b> and will fall until they hit another chip or the board boundary.
+			When making a <action>DROP</action> action, the other selected chips go back into the bag. <br>
+			When a <action>ROTATE</action> action is made, the selected chips are destroyed.<br><br>
+			Chips will fall downwards according to the <b>side</b> the board is leaning on.<br>
+			They stop falling 
 		</div>
 
-		
-		<div class="statement-new-league-rule">
-			
-			
-			<h3 style="font-size: 14px;
-			font-weight: 700;
-			padding-top: 15px;
-			color: #838891;
-			padding-bottom: 15px;">
-			Gravity</h3>
-			
-			<div style="margin-bottom: 10px">
-				The board is rotated to a side, corresponding to the <b>gravity</b>:
-				<ul>
-					<li>Side <const>0</const> the board is leaning on its <b>SOUTH</b> side.</li>
-					<li>Side <const>1</const> the board is leaning on its <b>SOUTH WEST</b> side.</li>
-					<li>Side <const>2</const> the board is leaning on its <b>NORTH WEST</b> side.</li>
-					<li>Side <const>3</const> the board is leaning on its <b>NORTH</b> side.</li>
-					<li>Side <const>4</const> the board is leaning on its <b>NORTH EAST</b> side.</li>
-					<li>Side <const>5</const> the board is leaning on its <b>SOUTH EAST</b> side.</li>
-				</ul>
-			</div>
-			
-			<div style="margin-bottom: 10px">
-				<b>ROTATE</b> commands can be used to change the gravity by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
-			</div>
-			
-		</div>
-		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
 		padding-top: 15px;
@@ -165,13 +168,13 @@ text-align: left;">
 					<action>DROP column color</action>: Insert a chip of a specific color at the top of the board, at a specific column.
 				</li>
 				<li>
-					<action>ROTATE amount</action>: Rotate the board <b>clock-wise</b> by a certain amount of cycles (1-5), changing the <b>gravity</b>.
+					<action>ROTATE amount</action>: Rotate the board <b>clock-wise</b> by a certain amount of cycles (1-5), changing the <b>side</b>.
 				</li>
 			</ul>
 		</div>
 		
 		
-		<div class="statement-new-league-rule">
+		<div class="statement-section">
 			<h3 style="font-size: 14px;
 			font-weight: 700;
 			padding-top: 15px;
@@ -190,7 +193,7 @@ text-align: left;">
 			
 		</div>
 		
-		<div class="statement-new-league-rule">
+		<div class="statement-section">
 			<h3 style="font-size: 14px;
 			font-weight: 700;
 			padding-top: 15px;
@@ -205,7 +208,7 @@ text-align: left;">
 				You may only rotate by 1-5(inclusive) cycles.
 			</div>
 			<div style="margin-bottom: 10px">
-				Chips will fall according to this new <b>gravity</b>
+				Chips will "fall" according to the new <b>side</b> the board is leaning on.
 			</div>
 		</div>
 		
@@ -218,11 +221,7 @@ text-align: left;">
 		⛔ Game end</h3>
 		
 		<div style="margin-bottom: 10px">
-			The game lasts at most <b>34 rounds</b> or until one player has made a connection of <const>4</const> or more, and bigger than their opponent.
-		</div>
-		
-		<div style="margin-bottom: 10px">If players have a connection of the same length, the winner is decided by the color of the connection.<br>
-		The color with the least amount of chips of that color placed on the board wins.
+			The game lasts at most <const>34 rounds</const> or until one player has run out of chips to place.
 		</div>
 		
 		<div class="statement-victory-conditions">
@@ -231,7 +230,7 @@ text-align: left;">
 				<div class="title">Victory Conditions</div>
 				<div class="text">
 					<ul style="padding-top:0; padding-bottom: 0;">
-						The winner is the player with the biggest <b>connection</b>
+						The winner is the player with the highest <b>score</b> at the end of the game.
 					</ul>
 				</div>
 			</div>
@@ -273,7 +272,19 @@ text-align: left;">
 	<div class="statement-expert-rules-content">
 		<ul style="padding-left: 20px;padding-bottom: 0">
 			<li>
-				Chips are initialized to <b>cellAmount</b> / <const>playerAmount(2)</const> * <const>colorsPerPlayer(2)</const> rounded down to the first multiple of (2 * 2)
+				Chips are initialized with the formula:<br>
+				(<var>numberOfCells</var> / (<const>2</const> * <var>yourColors</var>)) - ((<var>numberOfCells</var> / (<const>2</const> * <var>yourColors</var>)) % (<const>2</const> * <var>yourColors</var>)
+			</li>
+			<li>
+				Chip connections are prioritized by:<br>
+				<ul>
+					<li>
+						Size of the connection.
+					</li>
+					<li>
+						Amount of chips of that type placed on the board.
+					</li>
+				</ul>
 			</li>
 			<li>
 				You can check out the source code of this game <a rel="nofollow" target="_blank"
@@ -300,7 +311,7 @@ text-align: left;">
 		<ul>
 			<li><var>index</var> for the cell's index.</li>
 			<li>
-				<const>6</const> <var>neigh</var> variables, one for each <b>direction</b>, containing the index of a
+				<const>6</const> <var>neigh</var> variables, one for each <b>side</b>, containing the index of a
 				neighboring cell or <const>-1</const> if there is no neighbor.
 			</li>
 		</ul>
@@ -309,7 +320,7 @@ text-align: left;">
 		<const>6</const> space-separated integers:
 		<ul>
 			<li>
-				<const>6</const> <var>cell</var> variables, one for each <b>direction</b>, containing the index of the cell at this position for every <b>direction</b>.
+				<const>6</const> <var>cell</var> variables, one for each <b>side</b>, containing the index of the cell at this position for every <b>side</b>.
 			</li>
 		</ul>
 		<div class="text">
@@ -337,8 +348,8 @@ text-align: left;">
 		<div class="title">Input for One Game Turn</div>
 		<div class="text">
 			
-			<span class="statement-lineno">First line:</span> An integer <var>gravity</var>:
-			the current direction of gravity. (between 0 and 5)<br>
+			<span class="statement-lineno">First line:</span> An integer <var>side</var>:
+			the current side the board is leaning on. (between 0 and 5)<br>
 			
 			<span class="statement-lineno">Next line:</span> <var>numberOfValidColumns</var>.<br>
 			<span class="statement-lineno">Next <var>numberOfValidColumns</var> lines:</span>
@@ -373,7 +384,7 @@ text-align: left;">
 		<div class="text">
 			A single line with your command:
 			
-			<div class="statement-new-league-rule">
+			<div class="statement-section">
 				
 				<ul style="padding-left: 20px;padding-top: 0">
 					<li>

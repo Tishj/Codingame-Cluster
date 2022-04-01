@@ -4,7 +4,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		MultiplayerGameRunner gameRunner = new MultiplayerGameRunner();
-		gameRunner.setSeed(-7347867073429989282L);
+		// gameRunner.setSeed(-7347867073429989282L);
 		gameRunner.addAgent(Player1.class,
 			"Tororo",
 			"https://static.codingame.com/servlet/fileservlet?id=61910307869345"

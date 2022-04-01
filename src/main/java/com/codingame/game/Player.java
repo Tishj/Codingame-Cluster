@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 
 public class Player extends AbstractMultiplayerPlayer {
 	private Action		action;
+	public int			multiplier = 0;
 	
 	Player() {
 	}
@@ -17,7 +18,7 @@ public class Player extends AbstractMultiplayerPlayer {
 	public int getExpectedOutputLines() {
 		return 1;
 	}
-	
+
 	public void addScore(int score) {
 		this.setScore(this.getScore() + score);
 	}

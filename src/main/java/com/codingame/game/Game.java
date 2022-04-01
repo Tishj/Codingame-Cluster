@@ -248,17 +248,41 @@ public class Game {
 			return ;
 		//Ew..
 		Player player = chipManager.chips.get(chips.iterator().next()).owner;
+		
+		long bonusPoints = 0;
+		for (int i = 0; i < player.multiplier; i++) {
+			bonusPoints += bonusPoints + 5;
+		}
 
-		long points = chips.size();
-		player.addScore((int)points);
-		gameManager.addTooltip(
+		long points = chips.size() * Constants.CHIP_VALUE;
+		player.addScore((int)points + (int)bonusPoints);
+		if (bonusPoints != 0) {
+			gameManager.addTooltip(
 				player, String.format(
-						"%s scores %d points",
-						player.getNicknameToken(),
-						points
+					"%s scores %d points (%d bonus)",
+					player.getNicknameToken(),
+					points + bonusPoints,
+					bonusPoints
 				)
-		);
+			);
+		}
+		else {
+			gameManager.addTooltip(
+				player, String.format(
+					"%s scores %d points",
+					player.getNicknameToken(),
+					points
+				)
+			);
+		}
+		player.multiplier++;
 		chipManager.removeListOfChips(chips);
+	}
+
+	public void resetMultipliers() {
+		for (Player player : gameManager.getActivePlayers()) {
+			player.multiplier = 0;
+		}
 	}
 
 	public void performGameUpdate(Player player) {
@@ -267,6 +291,7 @@ public class Game {
 
 		switch (currentFrameType) {
 			case ACTIONS: {
+				resetMultipliers();
 				gameSummaryManager.addRound(round);
 				performActionUpdate(player);
 				break;
