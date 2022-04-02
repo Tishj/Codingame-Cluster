@@ -16,15 +16,19 @@ public class BoardGenerator {
 
 	public static Board generate(Random random) {
 		board = new HashMap<>();
-		for (int q = -Config.MAP_RING_COUNT + 1; q < Config.MAP_RING_COUNT; q++) {
-			for (int r = -Config.MAP_RING_COUNT + 1; r < Config.MAP_RING_COUNT; r++) {
-				for (int s = -Config.MAP_RING_COUNT + 1; s < Config.MAP_RING_COUNT; s++) {
-					if (q + r + s == 0) {
-						generateCell(new HexCoord(q, r, s));
-					}
-				}
-			}
-		}
+		HexCoord coord = new HexCoord(0,0,0);
+		generateCell(coord);
+		coord = coord.neighbour(0);
+		
+        for (int distance = 1; distance < Config.MAP_RING_COUNT; distance++) {
+            for (int orientation = 0; orientation < 6; orientation++) {
+                for (int count = 0; count < distance; count++) {
+                    generateCell(coord);
+                    coord = coord.neighbour((orientation + 2) % 6);
+                }
+            }
+            coord = coord.neighbour(0);
+        }
 
 		createHoles(random);
 
