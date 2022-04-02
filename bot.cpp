@@ -12,13 +12,30 @@
 #include <stack>
 #include <memory>
 #include <assert.h>
+#include <bitset>
 
 typedef size_t idx_t;
 
+#define MAP_RING_SIZE 6
+#define CELL_COUNT ((MAP_RING_SIZE * MAP_RING_SIZE - MAP_RING_SIZE) * 3 + 1)
+#define COLUMN_COUNT ((MAP_RING_SIZE * 2) - 1)
+
+#define BOARD_SIZE 91
 #define NO_NEIGHBOUR -1
 #define NO_CHIP -1
 #define NOT_REACHABLE -1
 #define WIN_LENGTH 3
+
+enum Player {
+	PLAYER_ME,
+	PLAYER_OPP,
+	PLAYER_SIZE
+};
+
+enum ActionType {
+	DROP,
+	ROTATE
+};
 
 static const char* sideToString[] = {
 	"SOUTH",
@@ -138,13 +155,13 @@ namespace std {
 
 class Game {
 	public:
-		Side								side;
-		std::vector<Cell>					board;
-		std::vector<std::unique_ptr<Chip>> 	chips;
-		std::vector<std::array<int32_t, 6>>	columns;
-		std::vector<bool>					validColumns;
-		std::array<std::vector<int32_t>, 2>	chipBag;
-		std::vector<int32_t>				selectedChips;
+		Side											side;
+		std::array<std::unique_ptr<Cell>, CELL_COUNT>	board;
+		std::vector<std::unique_ptr<Chip>> 				chips;
+		std::vector<std::array<int32_t, 6>>				columns;
+		std::vector<bool>								validColumns;
+		std::array<std::vector<int32_t>, 2>				chipBag;
+		std::vector<int32_t>							selectedChips;
 
 		Game();
 	public:
@@ -171,21 +188,6 @@ class Game {
 };
 std::unique_ptr<Game> game;
 
-enum Player {
-	PLAYER_ME,
-	PLAYER_OPP,
-	PLAYER_SIZE
-};
-
-// enum BoardSide {
-// 	SOUTH,
-// 	SOUTH_WEST,
-// 	NORTH_WEST,
-// 	NORTH,
-// 	NORTH_EAST,
-// 	SOUTH_EAST
-// };
-
 class Cell {
 	public:
 		int32_t					index;
@@ -204,11 +206,11 @@ class Cell {
 			int32_t cellIndex = this->index;
 			int32_t last = cellIndex;
 			do {
-				if (cellIndex != this->index && game->board[cellIndex].containsChip()) {
+				if (cellIndex != this->index && game->board[cellIndex]->containsChip()) {
 					return NOT_REACHABLE;
 				}
 				last = cellIndex;
-				cellIndex = game->board[cellIndex].neighbours[direction];
+				cellIndex = game->board[cellIndex]->neighbours[direction];
 			}
 			while (cellIndex != NO_NEIGHBOUR);
 			return last;
@@ -286,9 +288,8 @@ void	Game::performRandomMove() {
 void Game::initBoard() {
 	int32_t cellAmount; // amount of cells the board consists of
 	std::cin >> cellAmount; std::cin.ignore();
-	board.reserve(cellAmount);
 	for (int32_t i = 0; i < cellAmount; i++) {
-		board.emplace_back(Cell());
+		board[i] = std::make_unique<Cell>();
 	}
 }
 
@@ -351,7 +352,7 @@ void Game::updateChips() {
 
 	for (int i = 0; i < number_of_chips; i++) {
 		std::unique_ptr<Chip> chip = std::make_unique<Chip>(Chip());
-		this->board[chip->cellIndex].chip = chip->index;
+		this->board[chip->cellIndex]->chip = chip->index;
 		this->chips[chip->index].swap(chip);
 	}
 }
@@ -363,12 +364,12 @@ void Game::updateChipConnections() {
 		Chip& chip = *(it->get());
 		auto& connections = chip.connections;
 		for (idx_t i = 0; i < 6; i++) {
-			const int32_t neighbourCellIndex = this->board[chip.cellIndex].neighbours[i];
+			const int32_t neighbourCellIndex = this->board[chip.cellIndex]->neighbours[i];
 			chip.connections[i] = NULL;
 			if (!containsSameChip(chip, neighbourCellIndex)) {
 				continue;
 			}
-			chip.connections[i] = this->chips[this->board[neighbourCellIndex].chip].get();
+			chip.connections[i] = this->chips[this->board[neighbourCellIndex]->chip].get();
 		}
 	}
 }
@@ -383,7 +384,7 @@ std::vector<int32_t> Game::getReachableEmptyNeighbours() {
 		Chip& chip = *(it->get());
 		if (!chip.isMine)
 			continue;
-		Cell& cell = game->board[chip.cellIndex];
+		Cell& cell = *(game->board[chip.cellIndex]);
 		for (idx_t dir = 0 ; dir < 6; dir++) {
 			//there cant be a vacant cell directly under the one that is being occupied by this chip
 			if (dir == game->side) {
@@ -393,12 +394,12 @@ std::vector<int32_t> Game::getReachableEmptyNeighbours() {
 			if (index == NO_NEIGHBOUR) {
 				continue;
 			}
-			Cell& other = this->board[index];
+			Cell& other = *(this->board[index]);
 			if (other.containsChip()) {
 				continue;
 			}
 			//if there's no chip underneath this, a chip cant end up here
-			if (other.neighbours[side] != NO_NEIGHBOUR && !this->board[other.neighbours[side]].containsChip()) {
+			if (other.neighbours[side] != NO_NEIGHBOUR && !this->board[other.neighbours[side]]->containsChip()) {
 				continue ;
 			}
 			if (other.isReachable() == NOT_REACHABLE) {
@@ -413,7 +414,7 @@ std::vector<int32_t> Game::getReachableEmptyNeighbours() {
 bool Game::containsSameChip(const Chip& reference, int32_t cellIndex) {
 	if (cellIndex == NO_NEIGHBOUR)
 		return false;
-	const Cell& cell = game->board[cellIndex];
+	const Cell& cell = *(game->board[cellIndex]);
 	if (!cell.containsChip())
 		return false;
 	const Chip& other = *(game->chips[cell.chip]);
@@ -439,12 +440,12 @@ std::unordered_map<int32_t, std::unordered_set<Chip>>	Game::getChipGroupings() {
 		}
 		std::unordered_set<Chip>& group = groupings[chip.cellIndex];
 		group.insert(chip);
-		const Cell& cell = game->board[it->get()->getCellIndex()];
+		const Cell& cell = *(game->board[it->get()->getCellIndex()]);
 		for (idx_t i = 0; i < 6; i++) {
 			const int32_t neighbourCellIndex = cell.neighbours[i];
 			if (!containsSameChip(chip, neighbourCellIndex))
 				continue;
-			Chip& neighbourChip = *(game->chips[game->board[neighbourCellIndex].chip]);
+			Chip& neighbourChip = *(game->chips[game->board[neighbourCellIndex]->chip]);
 			std::unordered_set<Chip>& otherGroup = groupings[neighbourCellIndex];
 			//TODO: maybe check if it's empty and then save the pair to evaluate later
 			if (otherGroup.empty()) {
@@ -462,7 +463,7 @@ void Game::clearChipsFromCells() {
 	for (auto it = this->chips.begin(); it != this->chips.end(); it++) {
 		if (it->get() == NULL)
 			continue;
-		this->board[it->get()->cellIndex].chip = NO_CHIP;
+		this->board[it->get()->cellIndex]->chip = NO_CHIP;
 	}
 }
 
@@ -504,7 +505,7 @@ int32_t Game::getSelectedColor() {
 Chip* getChipAtCellPosition(int32_t cellIndex, bool mine, int32_t color) {
 	if (cellIndex == NO_NEIGHBOUR)
 		return NULL;
-	Cell& neighbour = game->board[cellIndex];
+	Cell& neighbour = *(game->board[cellIndex]);
 	if (neighbour.chip == NO_CHIP) {
 		return NULL;
 	}
@@ -530,7 +531,7 @@ int32_t Game::findColumn(int32_t cellIndex) {
 	if (cellIndex == NO_NEIGHBOUR) {
 		return -1; //throw exception
 	}
-	int32_t columnCellIndex = this->board[cellIndex].isReachable();
+	int32_t columnCellIndex = this->board[cellIndex]->isReachable();
 	for (idx_t i = 0; i < this->columns.size(); i++) {
 		if (this->columns[i][side] == columnCellIndex) {
 			return i;
@@ -549,7 +550,7 @@ bool makeInformedDecision(std::vector<int32_t>& cells) {
 	//check every reachableCell
 	for (auto it = cells.begin(); it != cells.end(); it++) {
 		//check half of all directions
-		Cell& cell = game->board[*it];
+		Cell& cell = *(game->board[*it]);
 		for (idx_t color = 0; color < game->selectedChips.size(); color++) {
 			if (game->selectedChips[color] == 0) {
 				continue;
@@ -608,7 +609,7 @@ std::ostream& operator << (std::ostream& stream, Game& obj) {
 	stream << "-- Game --" << "\n";
 	stream << "cellAmount: " << obj.board.size() << "\n";
 	for (idx_t i = 0; i < obj.board.size(); i++) {
-		stream << obj.board[i] << std::endl;
+		stream << *(obj.board[i]) << std::endl;
 	}
 	stream << "chipsAmount: " << obj.chips.size() << "\n";
 	for (idx_t i = 0; i < obj.chips.size(); i++) {
@@ -645,11 +646,9 @@ int main()
 		// std::cerr << *game;
 		//collect all the empty neighbours that are reachable
 		std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
+		std::bitset<CELL_COUNT> test;
 		// debugReachableCells(cells);
 		if (!makeInformedDecision(cells))
 			game->performRandomMove();
-		//make a unordered_map<cellIndex, list<connectedChips>>
-		//then we can check the reachableNeighbours list, to see if we can connect two groups together
-		// std::cout << "ROTATE 1" << std::endl;
 	}
 }
