@@ -167,10 +167,14 @@ class Game {
 	public:
 		void update();
 		void	performRandomMove();
+		bool	performRotateAction();
 		std::vector<int32_t> getReachableEmptyNeighbours();
 		std::unordered_map<int32_t, std::unordered_set<Chip>> getChipGroupings();
 		int32_t findColumn(int32_t cellIndex);
+		bool	performDropAction();
 	private:
+		int32_t	calculateRotateValue(Side side);
+		Cell&	getLastEmptyCell(int32_t cellIndex, int32_t direction);
 		void initBoard();
 		void initColumns();
 		void initBags();
@@ -370,6 +374,9 @@ void Game::updateChipConnections() {
 				continue;
 			}
 			chip.connections[i] = this->chips[this->board[neighbourCellIndex]->chip].get();
+			if (!chip.isMine) {
+				dprintf(2, "ENEMY CONNECTION ADDED\n");
+			}
 		}
 	}
 }
@@ -636,6 +643,137 @@ void	debugReachableCells(std::vector<int32_t>& cells) {
 	}
 }
 
+Cell&	Game::getLastEmptyCell(int32_t cellIndex, int32_t direction) {
+	//ASSUME: cellIndex is empty
+	while (true) {
+		// dprintf(2, "getLastEmptyCell - cellIndex: %d\n", cellIndex);
+		int32_t neighbour = board[cellIndex]->neighbours[direction];
+		if (neighbour == NO_NEIGHBOUR)
+			break;
+		if (board[neighbour]->chip != NO_CHIP) {
+			break;
+		}
+		cellIndex = neighbour;
+	}
+	return *(board[cellIndex]);
+}
+
+int32_t	calculateValueOfDrop(Cell& cell, int32_t color) {
+	int32_t	value = 0;
+	for (idx_t direction = 0; direction < 3; direction++) {
+		std::vector<int32_t> connection;
+		std::vector<int32_t> interruptedConnection;
+
+		//check how big the connection is on both sides
+		for (idx_t i = 0; i < 2; i++) {
+			Side side(direction);
+			if (i != 0) {
+				side = side.invert();
+			}
+			int32_t neighbour = cell.neighbours[side];
+			if (neighbour == NO_NEIGHBOUR) {
+				continue;
+			}
+			int32_t chipIndex = game->board[neighbour]->chip;
+			if (chipIndex == NO_CHIP) {
+				continue;
+			}
+			Chip& chip = *(game->chips[chipIndex]);
+			if (!chip.isMine) {
+				getConnectionSize(&chip, (int32_t)side, interruptedConnection);
+				dprintf(2, "CHIP FOUND FOR ENEMY\n");
+			}
+			else {
+				if (chip.color != color) {
+					continue;
+				}
+				getConnectionSize(&chip, (int32_t)side, connection);
+			}
+			dprintf(2, "Direction['%s'] - EnemyConnection: %ld | MyConnection: %ld\n", sideToString[side], interruptedConnection.size(), connection.size());
+		}
+		if (connection.size() + 1 >= WIN_LENGTH) {
+			value += 5 * (connection.size() + 1);
+		}
+		else {
+			value += connection.size();
+		}
+		if (interruptedConnection.size() + 1 >= WIN_LENGTH) {
+			value += 10 * (interruptedConnection.size() + 1);
+		}
+		else {
+			value += (2 * interruptedConnection.size());
+		}
+	}
+	return value;
+}
+
+bool	Game::performDropAction() {
+	int32_t chosenColumn = -1;
+	int32_t chosenColor = -1;
+	int32_t biggestValue = -1;
+
+	for (idx_t column = 0; column < columns.size(); column++) {
+		if (!validColumns[column]) {
+			continue;
+		}
+		int32_t cellIndex = columns[column][side];
+		Cell& cell = getLastEmptyCell(cellIndex, side);
+		dprintf(2, "Column[%ld] - CellIndex: %d\n", column, cell.index);
+
+		for (idx_t color = 0; color < game->selectedChips.size(); color++) {
+			if (game->selectedChips[color] == 0) {
+				continue;
+			}
+			//we know the column of this position and the color we can place here
+			//now it's time to figure out how worth it would be to place a chip here
+
+			int32_t value = calculateValueOfDrop(cell, color);
+			dprintf(2, "Color: %ld - value: %d\n", color, value);
+			if (value > biggestValue) {
+				chosenColumn = column;
+				chosenColor = color;
+				biggestValue = value;
+			}
+		}
+	}
+	if (biggestValue != -1) {
+		std::cout << Drop(chosenColumn, chosenColor);
+		std::cerr << "Value: " << biggestValue << std::endl;
+		return true;
+	}
+	return false;
+}
+
+// int32_t	Game::calculateRotateValue(Side side) {
+// 	int32_t	value = 0;
+
+// 	for (auto&& chip : game->chips) {
+// 		if (chip == NULL)
+// 			continue;
+// 		if (chip->isMine) {
+
+// 		}
+// 		else {
+
+// 		}
+// 	}
+// }
+
+// bool	Game::performRotateAction() {
+// 	int32_t biggestValue = -1;
+
+// 	for (idx_t cycle = 1; cycle < 6; cycle++) {
+// 		if (cycle == 3) { //nothing can be gained by rotating the entire field
+// 			continue;
+// 		}
+// 		Side side = game->side.rotate(cycle);
+
+// 		std::vector<std::unique_ptr<Chip>> chips;
+// 	}
+
+// 	return false;
+// }
+
 int main()
 {
 	game = std::make_unique<Game>();
@@ -645,10 +783,11 @@ int main()
 		game->update();
 		// std::cerr << *game;
 		//collect all the empty neighbours that are reachable
-		std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
-		std::bitset<CELL_COUNT> test;
+		// std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
+		// std::bitset<CELL_COUNT> test;
 		// debugReachableCells(cells);
-		if (!makeInformedDecision(cells))
+		if (!game->performDropAction()) {
 			game->performRandomMove();
+		}
 	}
 }
