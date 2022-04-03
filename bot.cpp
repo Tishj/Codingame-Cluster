@@ -46,6 +46,34 @@ static const char* sideToString[] = {
 	"NORTH WEST",
 };
 
+class CubeCoord {
+	public:
+		int32_t x;
+		int32_t y;
+		int32_t z;
+		CubeCoord(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {}
+		CubeCoord(const CubeCoord& other) : x(other.x), y(other.y), z(other.z) {}
+		CubeCoord neighbour(int32_t direction) {
+			static const int32_t directions[6][3] {
+				{ 0, 1,-1},
+				{-1, 1, 0},
+				{-1, 0, 1},
+				{ 0,-1, 1},
+				{ 1,-1, 0},
+				{ 1, 0,-1}
+			};
+			return CubeCoord(x + directions[direction][0], y + directions[direction][1], z + directions[direction][2]);
+		}
+	public:
+	private:
+	private:
+};
+
+std::ostream& operator << (std::ostream& stream, CubeCoord& obj) {
+	stream << "X: " << obj.x << " | Y: " << obj.y << " | Z: " << obj.z; 
+	return stream;
+}
+
 class Side {
 	public:
 		enum e_side {
@@ -197,7 +225,8 @@ class Cell {
 		int32_t					index;
 		std::array<int32_t, 6>	neighbours;
 		int32_t					chip;
-		Cell() : neighbours() {
+		CubeCoord				coord;
+		Cell(CubeCoord& coord) : neighbours(), coord(coord) {
 			this->chip = NO_CHIP;
 			std::cin >> index >> neighbours[0] >> neighbours[1] >> neighbours[2] >> neighbours[3] >> neighbours[4] >> neighbours[5]; std::cin.ignore();
 		}
@@ -290,10 +319,45 @@ void	Game::performRandomMove() {
 }
 
 void Game::initBoard() {
+	// int32_t distance = 1;
+	// int32_t orientation = 0;
+	// int32_t count = 0;
+
+	CubeCoord coord(0,0,0);
+
 	int32_t cellAmount; // amount of cells the board consists of
 	std::cin >> cellAmount; std::cin.ignore();
-	for (int32_t i = 0; i < cellAmount; i++) {
-		board[i] = std::make_unique<Cell>();
+	// for (int32_t i = 0; i < cellAmount; i++) {
+	// 	board[i] = std::make_unique<Cell>(coord);
+	// 	if (!i) {
+	// 		coord = coord.neighbour(0);
+	// 	}
+	// 	else {
+	// 		coord = coord.neighbour((orientation + 2) % 6);
+	// 		count++;
+	// 	}
+	// 	if (count >= distance) {
+	// 		count = 0;
+	// 		orientation++;
+	// 	}
+	// 	if (orientation == 6) {
+	// 		orientation = 0;
+	// 		distance++;
+	// 		coord = coord.neighbour(0);
+	// 	}
+	// 	// std::cerr << coord << std::endl;
+	// }
+	int32_t i = 0;
+	board[i++] = std::make_unique<Cell>(coord);
+	coord = coord.neighbour(0);
+	for (int32_t distance = 1; distance < MAP_RING_SIZE; distance++) {
+		for (int32_t orientation = 0; orientation < 6; orientation++) {
+			for (int32_t count = 0; count < distance; count++) {
+				board[i++] = std::make_unique<Cell>(coord);
+				coord = coord.neighbour((orientation + 2) % 6);
+			}
+		}
+		coord = coord.neighbour(0);
 	}
 }
 
@@ -609,6 +673,7 @@ std::ostream& operator << (std::ostream& stream, Cell& obj) {
 	for (idx_t i = 0; i < 6; i++) {
 		stream << "side[" << sideToString[i] << "] = " << obj.neighbours[i] << std::endl;
 	}
+	stream << "coord: " << obj.coord << "\n";
 	return stream;
 }
 
@@ -781,7 +846,7 @@ int main()
 
 	while (1) {
 		game->update();
-		// std::cerr << *game;
+		std::cerr << *game;
 		//collect all the empty neighbours that are reachable
 		// std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
 		// std::bitset<CELL_COUNT> test;
