@@ -116,7 +116,9 @@ text-align: left;">
 		padding-bottom: 15px;">
 		Columns</h3>
 		<div style="margin-bottom: 10px">
-			Chips are inserted on set positions at the top of the board, called <b>columns</b>.
+			Chips can only be inserted onto cells at the current "top" of the board, relative to the current <b>side</b><br>
+			At the start of the game, these cells are given to you in the <var>numberOfColumns</var>.<br>
+			These calls can also be identified as the only cells with <const>-1</const> as <b>neighbour</b> for that <b>side</b>.
 		<br>
 		</div>
 			<center style="margin: 20px;">
@@ -125,11 +127,7 @@ text-align: left;">
 				style="width: relative; height: 500px; margin-bottom: 5px">
 				</div>
 			</center>
-		<div style="margin-bottom: 10px">
-			At the start of the game, for every <b>side</b> the board can lean on, you are given the <const>cellIndex</const> that will be in that position.
-		</div>
 
-		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
 		padding-top: 15px;
@@ -165,7 +163,7 @@ text-align: left;">
 			The possible actions are:
 			<ul>
 				<li>
-					<action>DROP column color</action>: Insert a chip of a specific color at the top of the board, at a specific column.
+					<action>DROP cell color</action>: Insert a chip of a specific color at a cell.
 				</li>
 				<li>
 					<action>ROTATE amount</action>: Rotate the board <b>clock-wise</b> by a certain amount of cycles (1-5), changing the <b>side</b>.
@@ -187,7 +185,8 @@ text-align: left;">
 				The other selected chips go back into the <b>bag</b>.
 			</div>
 			<div style="margin-bottom: 10px">
-				You may not drop onto a column that is currently filled.<br>
+				You are only allowed to drop onto cells that were given in <var>numberOfColumns</var> for that <b>side</b>.<br>
+				You may not drop onto a cell that currently contains a chip.<br>
 				You can only drop a color that has been selected for you for that round.
 			</div>
 			
@@ -355,7 +354,8 @@ text-align: left;">
 			<span class="statement-lineno">Next <var>numberOfValidColumns</var> lines:</span>
 			<const>1</const> integer:
 			<ul>
-				<li><var>column</var>: a column that isn't currently filled with chips.</li>
+				<li><var>cellIndex</var>: a cell that can be used with a <action>DROP</action> action for this turn.<br>
+				guaranteed to not contain a <b>chip</b> on this turn.</li>
 			</ul>
 
 			<span class="statement-lineno">Next line:</span> <var>numberOfChips</var>.<br>
@@ -388,7 +388,7 @@ text-align: left;">
 				
 				<ul style="padding-left: 20px;padding-top: 0">
 					<li>
-						<action>DROP column color</action>: drop a chip of type <action>color</action> onto the board at <action>column</action>.
+						<action>DROP cell color</action>: drop a chip of type <action>color</action> onto the board at <action>cell</action>.
 					</li>
 					<li>
 						<action>ROTATE amount</action>: rotate the board by <action>amount</action> cycles (clock-wise).

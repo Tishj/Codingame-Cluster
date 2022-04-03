@@ -378,9 +378,8 @@ void Game::updateValidColumns() {
 
 	std::fill(validColumns.begin(), validColumns.end(), false);
 	for (int32_t i = 0; i < number_of_valid_columns; i++) {
-		int32_t column;
-		std::cin >> column; std::cin.ignore();
-		this->validColumns[column] = true;
+		int32_t cellIndex;
+		std::cin >> cellIndex; std::cin.ignore();
 	}
 }
 
@@ -533,11 +532,11 @@ void Game::clearSelection() {
 
 int32_t	Game::getEmptyColumn() {
 	int32_t column = rand() % this->columns.size();
-	while (!this->validColumns[column]) {
+	while (this->board[this->columns[column][this->side]]->containsChip()) {
 		column = (column + 1) % this->columns.size();
 		dprintf(2, "getEmptyColumn loop\n");
 	}
-	return column;
+	return this->columns[column][this->side];
 }
 
 int32_t Game::getSelectedColor() {
@@ -749,7 +748,7 @@ int32_t	calculateValueOfDrop(Cell& cell, int32_t color) {
 }
 
 bool	Game::performDropAction() {
-	int32_t chosenColumn = -1;
+	int32_t chosenCell = -1;
 	int32_t chosenColor = -1;
 	int32_t biggestValue = -1;
 
@@ -771,14 +770,14 @@ bool	Game::performDropAction() {
 			int32_t value = calculateValueOfDrop(cell, color);
 			dprintf(2, "Color: %ld - value: %d\n", color, value);
 			if (value > biggestValue) {
-				chosenColumn = column;
+				chosenCell = cellIndex;
 				chosenColor = color;
 				biggestValue = value;
 			}
 		}
 	}
 	if (biggestValue != -1) {
-		std::cout << Drop(chosenColumn, chosenColor);
+		std::cout << Drop(chosenCell, chosenColor);
 		std::cerr << "Value: " << biggestValue << std::endl;
 		return true;
 	}
@@ -822,7 +821,7 @@ int main()
 
 	while (1) {
 		game->update();
-		std::cerr << *game;
+		// std::cerr << *game;
 		//collect all the empty neighbours that are reachable
 		// std::vector<int32_t> cells = game->getReachableEmptyNeighbours();
 		// std::bitset<CELL_COUNT> test;
