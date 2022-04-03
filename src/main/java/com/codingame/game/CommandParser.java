@@ -27,6 +27,15 @@ public class CommandParser {
 		"^DROP (?<targetId>\\d+) (?<colorId>\\d+)"
 	);
 
+	private int findColumn(Cell[] cells, int cellIndex) {
+		for (int i = 0; i < cells.length; i++) {
+			if (cells[i].index == cellIndex) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	public void parseCommands(Player player, List<String> lines, Game game) {
 		String command = lines.get(0);
 
@@ -46,7 +55,8 @@ public class CommandParser {
 			match = PLAYER_DROP_PATTERN.matcher(command);
 			if (match.matches()) {
 				int targetId = Integer.parseInt(match.group("targetId"));
-				if (targetId < 0 || targetId >= Config.COLUMN_COUNT) {
+				int column = findColumn(game.insertionPositions[game.gravity.getIndex()], targetId);
+				if (column == -1) {
 					throw new ColumnOutOfRangeException(targetId);
 				}
 				int colorId = Integer.parseInt(match.group("colorId"));
@@ -56,10 +66,10 @@ public class CommandParser {
 				if (!chipManager.colorIsSelected(player, colorId)) {
 					throw new ChipNotSelectedException(colorId);
 				}
-				if (game.insertionPositions[targetId][game.getGravity().getIndex()].getChip() != null) {
+				if (game.insertionPositions[game.getGravity().getIndex()][column].getChip() != null) {
 					throw new CellAlreadyOccupiedException(targetId);
 				}
-				player.setAction(new DropAction(targetId, colorId));
+				player.setAction(new DropAction(column, colorId));
 				return;
 			}
 			throw new InvalidInputException(Game.getExpected(), command);

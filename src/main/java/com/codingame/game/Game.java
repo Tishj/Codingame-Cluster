@@ -34,13 +34,11 @@ public class Game {
 	Cell[][] insertionPositions;
 
 	public void setInsertionPositions() {
-		this.insertionPositions = new Cell[Config.CELL_COUNT][6];
-		int index = 0;
-		for (Cell[] position : this.insertionPositions) {
-			for (Gravity direction : Gravity.values()) {
-				position[direction.getIndex()] = board.map.get(board.getTopOfColumn(direction, index));
+		this.insertionPositions = new Cell[6][Config.CELL_COUNT];
+		for (Gravity direction : Gravity.values()) {
+			for (int i = 0; i < Config.CELL_COUNT; i++) {
+				this.insertionPositions[direction.getIndex()][i] = board.map.get(board.getTopOfColumn(direction, i));
 			}
-			index++;
 		}
 	}
 
@@ -75,7 +73,7 @@ public class Game {
 
 		List<Integer> columns = new ArrayList<>(amountOfColumns);
 		for (int i = 0; i < amountOfColumns; i++) {
-			Cell cell = insertionPositions[i][gravity.getIndex()];
+			Cell cell = insertionPositions[gravity.getIndex()][i];
 			Chip chip = cell.getChip();
 			if (chip == null) {
 				columns.add(i);
@@ -84,7 +82,7 @@ public class Game {
 
 		lines.add(String.valueOf(columns.size())); //numberOfValidColumns
 		for (int idx : columns) {
-			lines.add(String.valueOf(idx)); //columnIndex
+			lines.add(String.valueOf(insertionPositions[gravity.getIndex()][idx].getIndex())); //cellIndex
 		}
 
 		Map<Integer, Chip>	chips = chipManager.getChips();
@@ -160,12 +158,14 @@ public class Game {
 		int amountOfColumns = Config.COLUMN_COUNT;
 		lines.add(String.valueOf(amountOfColumns));
 		for (int i = 0; i < amountOfColumns; i++) {
-			lines.add(Stream.of(insertionPositions[i])
-				.map(cell -> {
-					return String.valueOf(cell.getIndex());
-				})
-				.collect(Collectors.joining(" "))
-			);
+			lines.add(String.format("%d %d %d %d %d %d",
+				insertionPositions[0][i].getIndex(),
+				insertionPositions[1][i].getIndex(),
+				insertionPositions[2][i].getIndex(),
+				insertionPositions[3][i].getIndex(),
+				insertionPositions[4][i].getIndex(),
+				insertionPositions[5][i].getIndex()
+			));
 		}
 
 		//yourColors
@@ -196,7 +196,7 @@ public class Game {
 	}
 
 	private Chip doDrop(Player player, Action action) {
-		Cell cell = insertionPositions[action.targetId][gravity.getIndex()];
+		Cell cell = insertionPositions[gravity.getIndex()][action.targetId];
 		//create the chip
 		Chip chip = chipManager.createChip(player, action.colorId, cell.getCoord());
 		cell = getBoard().get(chip.getCoord());

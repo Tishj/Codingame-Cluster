@@ -60,12 +60,21 @@ public class Player2 {
 		}
 	}
 
+	private static int getFirstVacantCellIndex(ArrayList<InsertPosition> positions, ArrayList<Cell> board, int gravity) {
+		for (InsertPosition position : positions) {
+			if (board.get(position.cellIndex[gravity]).chipIndex == -1) {
+				return position.cellIndex[gravity];
+			}
+		}
+		return -1;
+	}
+
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		long seed = new Random().nextLong();
-		// long seed = -5580533626139288387L;
+		// long seed = 3049155287956461818L;
 		Random random = new Random(seed);
-		System.err.println("Player2 random seed is " + seed);
+		System.err.println("Player1 random seed is " + seed);
 
 		//Start of Initial input
 		int numberOfCells = in.nextInt();
@@ -110,6 +119,10 @@ public class Player2 {
 				validColumns.add(in.nextInt());
 			}
 
+			for (Cell cell : board) {
+				cell.setChipIndex(-1);
+			}
+			
 			int numberOfChips = in.nextInt();
 			chips.clear();
 			for (int i = 0; i < numberOfChips; i++) {
@@ -120,6 +133,7 @@ public class Player2 {
 				Chip chip = new Chip(index, colorIndex, isMine == 1);
 				chips.add(chip);
 				chip.updatePosition(cellIndex);
+				board.get(cellIndex).setChipIndex(index);
 			}
 
 			int numberOfPelletsInHand = in.nextInt();
@@ -133,9 +147,9 @@ public class Player2 {
 				System.out.printf("ROTATE %d%n", 1 + random.nextInt(5));
 			}
 			else {
-				int column = validColumns.get(random.nextInt(validColumns.size()));
+				int cellIndex = validColumns.get(random.nextInt(validColumns.size()));
 				int color = possibleColors[random.nextInt(possibleColors.length)];
-				System.out.printf("DROP %d %d%n", column, color);
+				System.out.printf("DROP %d %d%n", cellIndex, color);
 			}
 		}
 	}

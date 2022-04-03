@@ -15,7 +15,7 @@ gameloop
 read side:int
 
 read numberOfValidColumns:int
-loop numberOfValidColumns read columnIndex:int
+loop numberOfValidColumns read cellIndex:int
 
 read numberOfChips:int
 loop numberOfChips read index:int colorIndex:int isMine:int cellIndex:int
@@ -39,4 +39,4 @@ numberOfColorsInHand: amount of chips drawn for you this round
 colorIndex: the color of this chip
 
 OUTPUT
-DROP columnIdx colorIdx | ROTATE cycleAmount
+DROP cellIdx colorIdx | ROTATE cycleAmount
