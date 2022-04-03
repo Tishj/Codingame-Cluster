@@ -319,34 +319,10 @@ void	Game::performRandomMove() {
 }
 
 void Game::initBoard() {
-	// int32_t distance = 1;
-	// int32_t orientation = 0;
-	// int32_t count = 0;
-
 	CubeCoord coord(0,0,0);
 
 	int32_t cellAmount; // amount of cells the board consists of
 	std::cin >> cellAmount; std::cin.ignore();
-	// for (int32_t i = 0; i < cellAmount; i++) {
-	// 	board[i] = std::make_unique<Cell>(coord);
-	// 	if (!i) {
-	// 		coord = coord.neighbour(0);
-	// 	}
-	// 	else {
-	// 		coord = coord.neighbour((orientation + 2) % 6);
-	// 		count++;
-	// 	}
-	// 	if (count >= distance) {
-	// 		count = 0;
-	// 		orientation++;
-	// 	}
-	// 	if (orientation == 6) {
-	// 		orientation = 0;
-	// 		distance++;
-	// 		coord = coord.neighbour(0);
-	// 	}
-	// 	// std::cerr << coord << std::endl;
-	// }
 	int32_t i = 0;
 	board[i++] = std::make_unique<Cell>(coord);
 	coord = coord.neighbour(0);
