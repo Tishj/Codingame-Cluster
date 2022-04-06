@@ -12,8 +12,6 @@
 	<div style="text-align: center; margin-bottom: 6px">
 		<img src="//cdn.codingame.com/smash-the-code/statement/league_wood_04.png" />
 	</div>
-	
-	TEST TEST TEST
 
 	<p style="text-align: center; font-weight: 700; margin-bottom: 6px;">
 		This is a <b>league based</b> challenge.
@@ -40,10 +38,10 @@ text-align: left;">
 	</h2>
 	<div style="margin-bottom: 10px" class="statement-goal-content">
 		<div>
-			Connect enough chips to <b>win</b> before your opponent.
+			Connect <const>3+</const>> chips to <b>win</b> before your opponent.
 		</div>
 	</div>
-	Decide between placing chips at strategic positions, or to rotate the board to a different side.
+	Place chips on strategic positions.
 	
 </div>
 <!-- RULES -->
@@ -71,7 +69,7 @@ text-align: left;">
 		<div style="margin-bottom: 10px">
 			The board is rotated to a <b>side</b>:
 			<ul>
-				<li>Side <const>0</const> the board is leaning on its <b>SOUTH</b> side.</li>
+				<li>Side <const>0</const> the board is leaning on its <b>SOUTH</b> side. (default)</li>
 				<li>Side <const>1</const> the board is leaning on its <b>SOUTH WEST</b> side.</li>
 				<li>Side <const>2</const> the board is leaning on its <b>NORTH WEST</b> side.</li>
 				<li>Side <const>3</const> the board is leaning on its <b>NORTH</b> side.</li>
@@ -79,13 +77,13 @@ text-align: left;">
 				<li>Side <const>5</const> the board is leaning on its <b>SOUTH EAST</b> side.</li>
 			</ul>
 		</div>
-		
-		
 		<div style="margin-bottom: 10px">
-			<action>ROTATE</action> commands can be used to change the <b>side</b> by <const>cycleAmount</const>, coming back to <const>0</const> after passing <const>5</const>.<br>
+			The board starts of on the <b>SOUTH</b> side. (wont be changed this league)
 		</div>
+		
+		
 		<div style="margin-bottom: 10px">
-			When chips fall, they will also travel over the board according to side that the board is leaning on.
+			When chips fall, they will travel over the board according to side that the board is leaning on.
 		</div>
 
 		<h3 style="font-size: 14px;
@@ -98,7 +96,7 @@ text-align: left;">
 		<div style="margin-bottom: 10px">
 			The board is made up of hexagonal <b>cells</b>, arranged to form a larger hexagon.
 			<br>
-			Each cell has an <b>index</b> and up to six neighbors, one for each <b>side</b> of the board.<br>Each direction is labelled <const>0</const> to <const>5</const>.
+			Each cell has an <b>index</b> and up to six neighbors.<br>Each direction is labelled <const>0</const> to <const>5</const>.
 				
 				<center style="margin: 20px">
 					<img src="https://raw.githubusercontent.com/Tishj/Codingame-Cluster/main/config/resources/directions.png?token=GHSAT0AAAAAABPSROMUZ4SUKPFFPQDXMSFIYSPGCTA"
@@ -118,14 +116,14 @@ text-align: left;">
 		padding-bottom: 15px;">
 		Columns</h3>
 		<div style="margin-bottom: 10px">
-			Chips can only be inserted onto cells at the current "top" of the board, relative to the current <b>side</b><br>
+			Chips can only be inserted onto cells at the top of the board.</b><br>
 			At the start of the game, these cells are given to you in the <var>numberOfColumns</var>.<br>
-			These calls can also be identified as the only cells with <const>-1</const> as <b>neighbour</b> for that <b>side</b>.
+			These cells can also be identified as the only cells with <const>-1</const> as <b>neighbour</b> for that <b>side</b>.
 		<br>
 		</div>
 			<center style="margin: 20px;">
 				<div>
-					<img src="https://raw.githubusercontent.com/Tishj/Codingame-Cluster/main/config/resources/columns.png?token=GHSAT0AAAAAABPSROMU5Q5OYZKXGFKOXSGKYSPKIVA"
+					<img src="https://raw.githubusercontent.com/Tishj/Codingame-Cluster/main/config/resources/column_s.png?token=GHSAT0AAAAAABPSROMU6L7HEXVBUQ4AW73MYSW6XRQ"
 				style="width: relative; height: 500px; margin-bottom: 5px">
 				</div>
 			</center>
@@ -143,12 +141,10 @@ text-align: left;">
 		</div>
 
 		<div style="margin-bottom: 10px">
-			At the start of a turn, the player receives <b>chips</b> of a certain color from their bag.<br>
+			At the start of a turn, the player receives <const>2</const> chips from their bag.<br>
 			Then the player can place one of these chips on the board.<br>
 			When making a <action>DROP</action> action, the other selected chips go back into the bag. <br>
-			When a <action>ROTATE</action> action is made, the selected chips are destroyed.<br><br>
 			Chips will fall downwards according to the <b>side</b> the board is leaning on.<br>
-			They stop falling 
 		</div>
 
 		<h3 style="font-size: 14px;
@@ -166,9 +162,6 @@ text-align: left;">
 			<ul>
 				<li>
 					<action>DROP cell color</action>: Insert a chip of a specific color at a cell.
-				</li>
-				<li>
-					<action>ROTATE amount</action>: Rotate the board <b>clock-wise</b> by a certain amount of cycles (1-5), changing the <b>side</b>.
 				</li>
 			</ul>
 		</div>
@@ -194,26 +187,6 @@ text-align: left;">
 			
 		</div>
 		
-		<div class="statement-section">
-			<h3 style="font-size: 14px;
-			font-weight: 700;
-			padding-top: 15px;
-			color: #838891;
-			padding-bottom: 15px;">
-			Rotate action</h3>
-			
-			<div style="margin-bottom: 10px">
-				When performing a rotate action, you <b>destroy</b> all of the chips that were selected for you at the start of the round. (reducing the amount remaining)
-			</div>
-			<div style="margin-bottom: 10px">
-				You may only rotate by 1-5(inclusive) cycles.
-			</div>
-			<div style="margin-bottom: 10px">
-				Chips will "fall" according to the new <b>side</b> the board is leaning on.
-			</div>
-		</div>
-		
-		
 		<h3 style="font-size: 14px;
 		font-weight: 700;
 		padding-top: 15px;
@@ -222,7 +195,7 @@ text-align: left;">
 		⛔ Game end</h3>
 		
 		<div style="margin-bottom: 10px">
-			The game lasts at most <const>34 rounds</const> or until one player has run out of chips to place.
+			The game lasts at most <const>16 rounds</const> or until one player has run out of chips to place.
 		</div>
 		
 		<div class="statement-victory-conditions">
@@ -231,7 +204,7 @@ text-align: left;">
 				<div class="title">Victory Conditions</div>
 				<div class="text">
 					<ul style="padding-top:0; padding-bottom: 0;">
-						The winner is the player with the highest <b>score</b> at the end of the game.
+						The winner is the first player to make a connection of <const>3</const> or more chips.
 					</ul>
 				</div>
 			</div>
@@ -274,7 +247,7 @@ text-align: left;">
 		<ul style="padding-left: 20px;padding-bottom: 0">
 			<li>
 				Chips are initialized with the formula:<br>
-				(<var>numberOfCells</var> / (<const>2</const> * <var>yourColors</var>)) - ((<var>numberOfCells</var> / (<const>2</const> * <var>yourColors</var>)) % (<const>2</const> * <var>yourColors</var>)
+				(<var>numberOfCells</var> / <const>2</const>) - ((<var>numberOfCells</var> / <const>2</const>) % <const>2</const>
 			</li>
 			<li>
 				Chip connections are prioritized by:<br>
@@ -306,7 +279,7 @@ text-align: left;">
 	<!-- Protocol block -->
 	<div class="blk">
 		<div class="title">Initialization Input</div>
-		<span class="statement-lineno">First line:</span> <var>numberOfCells</var>.<br>
+		<span class="statement-lineno">First line:</span> <var>numberOfCells</var> --always <const>19</const> for this league.<br>
 		<span class="statement-lineno">Next <var>numberOfCells</var> lines:</span>
 		<const>7</const> space-separated integers:
 		<ul>
@@ -350,7 +323,7 @@ text-align: left;">
 		<div class="text">
 			
 			<span class="statement-lineno">First line:</span> An integer <var>side</var>:
-			the current side the board is leaning on. (between 0 and 5)<br>
+			the current side the board is leaning on. (between 0 and 5) --ignore for this league<br>
 			
 			<span class="statement-lineno">Next line:</span> <var>numberOfValidColumns</var>.<br>
 			<span class="statement-lineno">Next <var>numberOfValidColumns</var> lines:</span>
@@ -392,9 +365,6 @@ text-align: left;">
 					<li>
 						<action>DROP cell color</action>: drop a chip of type <action>color</action> onto the board at <action>cell</action>.
 					</li>
-					<li>
-						<action>ROTATE amount</action>: rotate the board by <action>amount</action> cycles (clock-wise).
-					</li>
 				</ul>
 				
 			</div>
@@ -424,6 +394,15 @@ text-align: left;">
 	</div>
 	Extra rules available in higher leagues are:
 	<ul>
+		<li>
+			ROTATE command
+		</li>
+		<li>
+			More chip colors
+		</li>
+		<li>
+			Bigger board
+		</li>
 	</ul>
 </div>
 </div>

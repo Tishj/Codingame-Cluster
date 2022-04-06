@@ -1,0 +1,42 @@
+read numberOfCells:int
+loop numberOfCells read index:int neigh0:int neigh1:int neigh2:int neigh3:int neigh4:int neigh5:int
+
+read numberOfColumns:int
+loop numberOfColumns read cell0:int cell1:int cell2:int cell3:int cell4:int cell5:int
+
+read yourColors:int
+loop yourColors read maxAmount:int
+
+read opponentColors:int
+loop opponentColors read maxAmount:int
+
+gameloop
+
+read side:int
+
+read numberOfValidColumns:int
+loop numberOfValidColumns read cellIndex:int
+
+read numberOfChips:int
+loop numberOfChips read index:int colorIndex:int isMine:int cellIndex:int
+
+read numberOfColorsInHand:int
+loop numberOfColorsInHand read colorIndex:int
+
+write DROP 11 0
+
+INPUT
+numberOfCells: amount of cells the board consists of
+index: unique indentifier between 0 and numberOfCells
+neigh0: the index of the neighbouring cell for each side
+numberOfColumns: amount of cell positions that chips can be inserted at
+cell0: the cell index at this position for each side
+side: the current side that the board is leaning on, starts at 0(south): 0-5
+numberOfValidColumns: the amount of columns that aren't currently filled
+numberOfChips: the amount of chips currently on the board
+isMine: 1 if you own it
+numberOfColorsInHand: amount of chips drawn for you this round
+colorIndex: the color of this chip
+
+OUTPUT
+DROP cellIdx colorIdx

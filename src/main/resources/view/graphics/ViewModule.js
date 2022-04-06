@@ -362,11 +362,9 @@ export class ViewModule {
 				// 	const haltedProgress = unlerp(ratio, 1, progress);
 				// 	chip.container.position = lerpPosition(oldHexaP, newHexaP, haltedProgress);
 				// }
-				console.log("CHIP " + index + " DELETED!");
 			}
 			//chip is new
 			else if (!chipBefore && chipNow) {
-				console.log("CHIP " + index + " ADDED!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				// if (chipNow.color == 1) {
 				// 	chip.mainSprite.filters = [this.colorMatrix[colorName]];
@@ -377,7 +375,6 @@ export class ViewModule {
 				chip.container.position.set(hexaP.x, hexaP.y);
 			}
 			else if (chipBefore && chipNow) {
-				console.log("CHIP " + index + " PASSIVE!");
 				chip.mainSprite.texture = PIXI.Texture.from(`Star${colorName}${chipNow.color}.png`);
 				// if (chipNow.color == 1) {
 				// 	chip.mainSprite.filters = [this.colorMatrix[colorName]];
@@ -403,7 +400,6 @@ export class ViewModule {
 				}
 			}
 			else {
-				// console.log("CHIP INACTIVE!");
 				chip.mainSprite.alpha = 0;
 				chip.mainSprite.visible = false;
 				// if (previousData.previous.chips[index] && !previousData.chips[index]) {
@@ -611,7 +607,6 @@ export class ViewModule {
 			frame.scale.x = player.index === 0 ? -1 : 1;
 			frame.x = WIDTH * player.index;
 			const playerAvatar = player.avatar;
-			console.log(playerAvatar);
 			const avatar = new PIXI.Sprite(player.avatar);
 			avatar.anchor.set(0.5);
 			avatar.width = avatar.height = 128;

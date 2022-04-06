@@ -51,6 +51,7 @@ class CubeCoord {
 		int32_t x;
 		int32_t y;
 		int32_t z;
+		CubeCoord() : x(0), y(0), z(0) {}
 		CubeCoord(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {}
 		CubeCoord(const CubeCoord& other) : x(other.x), y(other.y), z(other.z) {}
 		CubeCoord neighbour(int32_t direction) {
@@ -147,17 +148,9 @@ class Chip {
 		bool					isMine;
 		int32_t					color;
 		int32_t					cellIndex;
-		Chip() : connections() {
-			int32_t tmp;
-			std::cin >> index >> color >> tmp >> cellIndex; std::cin.ignore();
-			this->isMine = tmp == 1;
-		}
-		Chip(const Chip& other) :
-			connections(other.connections),
-			index(other.index),
-			isMine(other.isMine),
-			color(other.color),
-			cellIndex(other.cellIndex) {}
+		CubeCoord				coord;
+		Chip();
+		Chip(const Chip& other);
 	//public methods
 	public:
 		bool operator == (const Chip& other) const {
@@ -184,8 +177,8 @@ namespace std {
 class Game {
 	public:
 		Side											side;
-		std::array<std::unique_ptr<Cell>, CELL_COUNT>	board;
-		std::vector<std::unique_ptr<Chip>> 				chips;
+		std::array<CubeCoord, CELL_COUNT>				board;
+		std::unordered_map<CubeCoord, Chip>				chips;
 		std::vector<std::array<int32_t, 6>>				columns;
 		std::vector<bool>								validColumns;
 		std::array<std::vector<int32_t>, 2>				chipBag;
@@ -210,6 +203,7 @@ class Game {
 		void updateValidColumns();
 		void updateChips();
 		void updateChipConnections();
+		void clearChips();
 		void clearChipsFromCells();
 		void updateSelection();
 		void clearSelection();
@@ -219,38 +213,6 @@ class Game {
 	private:
 };
 std::unique_ptr<Game> game;
-
-class Cell {
-	public:
-		int32_t					index;
-		std::array<int32_t, 6>	neighbours;
-		int32_t					chip;
-		CubeCoord				coord;
-		Cell(CubeCoord& coord) : neighbours(), coord(coord) {
-			this->chip = NO_CHIP;
-			std::cin >> index >> neighbours[0] >> neighbours[1] >> neighbours[2] >> neighbours[3] >> neighbours[4] >> neighbours[5]; std::cin.ignore();
-		}
-	public:
-		bool containsChip() const {
-			return this->chip != NO_CHIP;
-		}
-		int32_t isReachable() {
-			Side direction = game->side.invert();
-			int32_t cellIndex = this->index;
-			int32_t last = cellIndex;
-			do {
-				if (cellIndex != this->index && game->board[cellIndex]->containsChip()) {
-					return NOT_REACHABLE;
-				}
-				last = cellIndex;
-				cellIndex = game->board[cellIndex]->neighbours[direction];
-			}
-			while (cellIndex != NO_NEIGHBOUR);
-			return last;
-		}
-	private:
-	private:
-};
 
 class GameState {
 	public:
@@ -324,12 +286,20 @@ void Game::initBoard() {
 	int32_t cellAmount; // amount of cells the board consists of
 	std::cin >> cellAmount; std::cin.ignore();
 	int32_t i = 0;
-	board[i++] = std::make_unique<Cell>(coord);
+	board[i++] = coord;
 	coord = coord.neighbour(0);
 	for (int32_t distance = 1; distance < MAP_RING_SIZE; distance++) {
 		for (int32_t orientation = 0; orientation < 6; orientation++) {
 			for (int32_t count = 0; count < distance; count++) {
-				board[i++] = std::make_unique<Cell>(coord);
+				int index; // unique indentifier between 0 and numberOfCells
+				int neigh_0; // the index of the neighbouring cell for each side
+				int neigh_1;
+				int neigh_2;
+				int neigh_3;
+				int neigh_4;
+				int neigh_5;
+				std::cin >> index >> neigh_0 >> neigh_1 >> neigh_2 >> neigh_3 >> neigh_4 >> neigh_5; std::cin.ignore();
+				board[i++] = coord;
 				coord = coord.neighbour((orientation + 2) % 6);
 			}
 		}
@@ -383,6 +353,10 @@ void Game::updateValidColumns() {
 	}
 }
 
+void Game::clearChips() {
+	game->chips.clear();
+}
+
 void Game::updateChips() {
 	clearChipsFromCells();
 	this->chips.clear();
@@ -394,9 +368,9 @@ void Game::updateChips() {
 	}
 
 	for (int i = 0; i < number_of_chips; i++) {
-		std::unique_ptr<Chip> chip = std::make_unique<Chip>(Chip());
-		this->board[chip->cellIndex]->chip = chip->index;
-		this->chips[chip->index].swap(chip);
+		Chip chip;
+		CubeCoord coord = this->board[chip.cellIndex];
+
 	}
 }
 
@@ -783,6 +757,21 @@ bool	Game::performDropAction() {
 	}
 	return false;
 }
+
+Chip::Chip() : connections(), coord(0,0,0) {
+	int32_t tmp;
+	std::cin >> index >> color >> tmp >> cellIndex; std::cin.ignore();
+	game->board[]
+	this->isMine = tmp == 1;
+}
+
+Chip::Chip(const Chip& other) :
+	connections(other.connections),
+	index(other.index),
+	isMine(other.isMine),
+	color(other.color),
+	cellIndex(other.cellIndex),
+	coord(other.coord) {}
 
 // int32_t	Game::calculateRotateValue(Side side) {
 // 	int32_t	value = 0;

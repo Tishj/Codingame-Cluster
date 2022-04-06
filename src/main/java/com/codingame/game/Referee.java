@@ -36,13 +36,13 @@ public class Referee extends AbstractReferee {
 		random = new Random(seed);
 
 		try {
-			Config.load(gameManager.getGameParameters());
+			Config.load(gameManager);
 			Config.export(gameManager.getGameParameters());
 			System.out.println(Config.MAX_ROUNDS);
 			gameManager.setFirstTurnMaxTime(1000);
 			gameManager.setTurnMaxTime(100);
 
-			gameManager.setFrameDuration(500);
+			gameManager.setFrameDuration(Constants.DEFAULT_FRAME_DURATION);
 			game.init(seed);
 
 			sendGlobalInfo();
@@ -77,7 +77,7 @@ public class Referee extends AbstractReferee {
 
 	public boolean handlePlayerCommand(Player player) {
 		try {
-			commandParser.parseCommands(player, player.getOutputs(), game);
+			return commandParser.parseCommands(player, player.getOutputs(), game);
 		}
 		catch (TimeoutException e) {
 			commandParser.deactivatePlayer(player, "Timeout!");
@@ -85,7 +85,6 @@ public class Referee extends AbstractReferee {
 			gameSummaryManager.addPlayerDisqualified(player);
 			return false;
 		}
-		return true;
 	}
 
 	@Override
